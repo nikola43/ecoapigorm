@@ -6,7 +6,7 @@ import (
 
 type Heartbeat struct {
 	gorm.Model
-	ClientId uint   `json:"client_id"`
-	Url      string `gorm:"type:varchar(128)" json:"url"`
-	Size     uint   `json:"size"`
+	ClientId uint   `gorm:"type:INTEGER not null" json:"client_id"`
+	Url      string `gorm:"type:varchar(128) not null" json:"url"`
+	Size     uint   `gorm:"type:INTEGER not null" json:"size"`
 }
