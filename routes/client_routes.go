@@ -2,12 +2,12 @@ package routes
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/nikola43/ecoapigormgorm/controllers"
+	"github.com/nikola43/ecoapigorm/controllers"
 )
 
 func ClientRoutes (router fiber.Router) {
 
 	// routes
-	router.Get("/", controllers.GetAllProducts)
+	router.Get("/", controllers.LoginClient)
 	//clientRouter.Get("/:id", controller.GetSingleProduct)
 }

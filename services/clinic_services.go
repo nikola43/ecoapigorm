@@ -1,15 +1,10 @@
-package controllers
+package services
 
 import (
-	"github.com/gofiber/fiber/v2"
+	Database "github.com/nikola43/ecoapigorm/database"
+	models "github.com/nikola43/ecoapigorm/models/responses"
 )
 
-func GetAllClinics (c *fiber.Ctx) error {
-	return c.SendString("Hello, World!")
-
-}
-
-/*
 func GetClinicas() ([]models.Clinic, error) {
 	var list []models.Clinic
 
@@ -31,4 +26,3 @@ func GetClinicaById(id uint) (*models.Clinic, error) {
 
 	return clinic, nil
 }
-*/

@@ -2,7 +2,7 @@ package routes
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/nikola43/ecoapigormgorm/controllers"
+	"github.com/nikola43/ecoapigorm/controllers"
 )
 
 func ClinicRoutes (router fiber.Router) {

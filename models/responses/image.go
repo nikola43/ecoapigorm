@@ -4,7 +4,7 @@ import (
 	"gorm.io/gorm"
 )
 
-type Streaming struct {
+type Image struct {
 	gorm.Model
 	ClientId uint   `json:"client_id"`
 	Url          string `gorm:"type:varchar(128)" json:"url"`

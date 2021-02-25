@@ -1,15 +1,34 @@
 package utils
 
 import (
+	"github.com/dgrijalva/jwt-go"
 	"os"
 	"time"
-	"github.com/dgrijalva/jwt-go"
 )
 
 type customToken struct {
 	Username string
 	jwt.StandardClaims
 }
+
+func GenerateClientToken(email string) (string, error) {
+	// Create token
+	token := jwt.New(jwt.SigningMethodHS256)
+
+	// Set claims
+	claims := token.Claims.(jwt.MapClaims)
+	claims["email"] = email
+	claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
+
+	// Generate encoded token and send it as response.
+	tokenString, err := token.SignedString([]byte("secret"))
+	if err != nil {
+		return "", err
+	}
+	return tokenString, err
+}
+
+
 
 func GenerateTokenUsername(userName string) string {
 	// Declare the expiration time of the token
