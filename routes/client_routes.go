@@ -16,5 +16,5 @@ func ClientRoutes (router fiber.Router) {
 	imagesRouter := clientRouter.Group("/images")
 
 	// /api/v1/client/images
-	imagesRouter.Get("/", controllers.GetAllImagesByClientID)
+	imagesRouter.Get("/:client_id", controllers.GetAllImagesByClientID)
 }
