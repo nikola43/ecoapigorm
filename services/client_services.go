@@ -1,7 +1,7 @@
 package services
 
 import (
-	models "github.com/nikola43/ecoapigorm/models/responses"
+	"github.com/nikola43/ecoapigorm/models"
 )
 
 func GetAllClientsByClinicId() ([]models.Client, error) {

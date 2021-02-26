@@ -2,19 +2,20 @@ package services
 
 import (
 	"database/sql"
-	Database "github.com/nikola43/ecoapigorm/database"
-	models "github.com/nikola43/ecoapigorm/models/responses"
+	database "github.com/nikola43/ecoapigorm/database"
+	"github.com/nikola43/ecoapigorm/models"
 	utils "github.com/nikola43/ecoapigorm/utils"
 )
 
 func LoginEmployer(email string, password string) (*models.Employee, error) {
 	employer := &models.Employee{}
-	dbResult := Database.DB.
+
+	GormDBResult := database.GormDB.
 		Where("email = ?", email).
 		Find(&employer)
 
-	if dbResult.Error != nil {
-		return nil, dbResult.Error
+	if GormDBResult.Error != nil {
+		return nil, GormDBResult.Error
 	}
 
 	match := utils.ComparePasswords(employer.Password, []byte(password))
@@ -32,7 +33,7 @@ func CreateNewEmployer(employer *models.Employee) (*models.Employee, error) {
 	//TODO validate
 
 	employer.Password = utils.HashAndSalt([]byte(employer.Password))
-	result := Database.DB.Create(employer)
+	result := database.GormDB.Create(employer)
 
 	if result.Error != nil {
 		return nil, result.Error

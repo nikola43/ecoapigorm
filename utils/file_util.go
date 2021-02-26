@@ -3,6 +3,8 @@ package utils
 import (
 	"bytes"
 	"fmt"
+	"github.com/joho/godotenv"
+	"log"
 	"os"
 	"os/exec"
 	"time"
@@ -238,4 +240,18 @@ func executeCommandVerbose(name string, arg ...string) error {
 	fmt.Println("Result: ")
 	fmt.Println(out.String())
 	return nil
+}
+
+// use godot package to load/read the .env file and
+// return the value of the key
+func GetEnvVariable(key string) string {
+
+	// load .env file
+	err := godotenv.Load(".env")
+
+	if err != nil {
+		log.Fatalf("Error loading .env file")
+	}
+
+	return os.Getenv(key)
 }

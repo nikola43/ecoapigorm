@@ -2,19 +2,19 @@ package services
 
 import (
 	"database/sql"
-	Database "github.com/nikola43/ecoapigorm/database"
-	models "github.com/nikola43/ecoapigorm/models/responses"
+	database "github.com/nikola43/ecoapigorm/database"
+	"github.com/nikola43/ecoapigorm/models"
 	"github.com/nikola43/ecoapigorm/utils"
 )
 
 func SignUpClient(name, email, password string) (string, error) {
 	client := &models.Client{}
-	dbResult := Database.DB.
+	GormDBResult := database.GormDB.
 		Where("email = ?", email).
 		Find(&client)
 
-	if dbResult.Error != nil {
-		return "", dbResult.Error
+	if GormDBResult.Error != nil {
+		return "", GormDBResult.Error
 	}
 
 	match := utils.ComparePasswords(client.Password, []byte(password))
@@ -34,12 +34,12 @@ func SignUpClient(name, email, password string) (string, error) {
 
 func SignUpEmployee(email, password string) (string, error) {
 	client := &models.Client{}
-	dbResult := Database.DB.
+	GormDBResult := database.GormDB.
 		Where("email = ?", email).
 		Find(&client)
 
-	if dbResult.Error != nil {
-		return "", dbResult.Error
+	if GormDBResult.Error != nil {
+		return "", GormDBResult.Error
 	}
 
 	match := utils.ComparePasswords(client.Password, []byte(password))

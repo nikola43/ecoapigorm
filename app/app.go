@@ -8,14 +8,14 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/gofiber/fiber/v2"
-	"github.com/joho/godotenv"
+	middlewares "github.com/nikola43/ecoapigorm/middleware"
 	database "github.com/nikola43/ecoapigorm/database"
-	models "github.com/nikola43/ecoapigorm/models/responses"
+	"github.com/nikola43/ecoapigorm/models"
 	"github.com/nikola43/ecoapigorm/routes"
+	"github.com/nikola43/ecoapigorm/utils"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"log"
-	"os"
 )
 
 var S3Session *s3.S3
@@ -29,20 +29,21 @@ func (a *App) Initialize(port string) {
 	httpServer := fiber.New()
 	api := httpServer.Group("/api") // /api
 	v1 := api.Group("/v1")          // /api/v1
+	api.Use(middlewares.ApiKeyMiddleware)
 
-	InitializeDbCorrection(
-		GetEnvVariable("MYSQL_USER"),
-		GetEnvVariable("MYSQL_PASSWORD"),
-		GetEnvVariable("MYSQL_DATABASE"))
+	Initializedatabase(
+		utils.GetEnvVariable("MYSQL_USER"),
+		utils.GetEnvVariable("MYSQL_PASSWORD"),
+		utils.GetEnvVariable("MYSQL_DATABASE"))
 
 	InitializeAWSConnection(
-		GetEnvVariable("AWS_ACCESS_KEY"),
-		GetEnvVariable("AWS_SECRET_KEY"),
-		GetEnvVariable("AWS_ENDPOINT"),
-		GetEnvVariable("AWS_BUCKET_NAME"),
-		GetEnvVariable("AWS_BUCKET_REGION"))
+		utils.GetEnvVariable("AWS_ACCESS_KEY"),
+		utils.GetEnvVariable("AWS_SECRET_KEY"),
+		utils.GetEnvVariable("AWS_ENDPOINT"),
+		utils.GetEnvVariable("AWS_BUCKET_NAME"),
+		utils.GetEnvVariable("AWS_BUCKET_REGION"))
 
-	MigrateDb()
+	MigrateDB()
 
 	HandleRoutes(v1)
 
@@ -60,7 +61,7 @@ func HandleRoutes(api fiber.Router) {
 	routes.SignUpRoutes(api)
 }
 
-func InitializeDbCorrection(user, password, database_name string) {
+func Initializedatabase(user, password, database_name string) {
 	connectionString := fmt.Sprintf(
 		"%s:%s@/%s?parseTime=true",
 		user,
@@ -73,43 +74,47 @@ func InitializeDbCorrection(user, password, database_name string) {
 		log.Fatal(err)
 	}
 
-	database.DB, err = gorm.Open(mysql.New(mysql.Config{Conn: DB}), &gorm.Config{})
+	database.GormDB, err = gorm.Open(mysql.New(mysql.Config{Conn: DB}), &gorm.Config{})
 	if err != nil {
 		log.Fatal(err)
 	}
 }
 
-func MigrateDb() {
-	database.DB.Migrator().DropTable(&models.Client{})
-	database.DB.Migrator().DropTable(&models.Employee{})
-	database.DB.Migrator().DropTable(&models.Clinic{})
-	database.DB.Migrator().DropTable(&models.Video{})
-	database.DB.Migrator().DropTable(&models.Image{})
-	database.DB.Migrator().DropTable(&models.Heartbeat{})
-	database.DB.Migrator().DropTable(&models.Streaming{})
-	database.DB.Migrator().DropTable(&models.Recovery{})
-	database.DB.Migrator().DropTable(&models.PushNotificationData{})
-	database.DB.Migrator().DropTable(&models.Promo{})
-	database.DB.Migrator().DropTable(&models.BankAccount{})
-	database.DB.Migrator().DropTable(&models.CreditCard{})
-	database.DB.Migrator().DropTable(&models.PaymentMethod{})
+func MigrateDB() {
+	// DROP
+	database.GormDB.Migrator().DropTable(&models.Client{})
+	database.GormDB.Migrator().DropTable(&models.Employee{})
+	database.GormDB.Migrator().DropTable(&models.Clinic{})
+	database.GormDB.Migrator().DropTable(&models.Video{})
+	database.GormDB.Migrator().DropTable(&models.Image{})
+	database.GormDB.Migrator().DropTable(&models.Heartbeat{})
+	database.GormDB.Migrator().DropTable(&models.Streaming{})
+	database.GormDB.Migrator().DropTable(&models.Recovery{})
+	database.GormDB.Migrator().DropTable(&models.PushNotificationData{})
+	database.GormDB.Migrator().DropTable(&models.Promo{})
+	database.GormDB.Migrator().DropTable(&models.BankAccount{})
+	database.GormDB.Migrator().DropTable(&models.CreditCard{})
+	database.GormDB.Migrator().DropTable(&models.PaymentMethod{})
 
-	database.DB.AutoMigrate(
-		&models.Client{},
-		&models.Employee{},
-		&models.Clinic{},
-		&models.Video{},
-		&models.Image{},
-		&models.Heartbeat{},
-		&models.Streaming{},
-		&models.Recovery{},
-		&models.PushNotificationData{},
-		&models.Promo{},
-		&models.BankAccount{},
-		&models.CreditCard{},
-		&models.PaymentMethod{})
+	// CREATE
+	database.GormDB.AutoMigrate(&models.Client{})
+	database.GormDB.AutoMigrate(&models.Employee{})
+	database.GormDB.AutoMigrate(&models.Clinic{})
+	database.GormDB.AutoMigrate(&models.Video{})
+	database.GormDB.AutoMigrate(&models.Image{})
+	database.GormDB.AutoMigrate(&models.Heartbeat{})
+	database.GormDB.AutoMigrate(&models.Streaming{})
+	database.GormDB.AutoMigrate(&models.Recovery{})
+	database.GormDB.AutoMigrate(&models.PushNotificationData{})
+	database.GormDB.AutoMigrate(&models.Promo{})
+	database.GormDB.AutoMigrate(&models.BankAccount{})
+	database.GormDB.AutoMigrate(&models.CreditCard{})
+	database.GormDB.AutoMigrate(&models.PaymentMethod{})
 }
 
+func CreateFakeData() {
+
+}
 func InitializeAWSConnection(access_key, secret_key, endpoint, bucket_name, bucket_region string) {
 	s3Config := &aws.Config{
 		Credentials:      credentials.NewStaticCredentials(access_key, secret_key, ""),
@@ -120,18 +125,4 @@ func InitializeAWSConnection(access_key, secret_key, endpoint, bucket_name, buck
 	newSession := session.New(s3Config)
 	S3Session = s3.New(newSession)
 	awsBucketName = bucket_name
-}
-
-// use godot package to load/read the .env file and
-// return the value of the key
-func GetEnvVariable(key string) string {
-
-	// load .env file
-	err := godotenv.Load(".env")
-
-	if err != nil {
-		log.Fatalf("Error loading .env file")
-	}
-
-	return os.Getenv(key)
 }

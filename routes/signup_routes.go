@@ -5,7 +5,7 @@ import (
 	"github.com/nikola43/ecoapigorm/controllers"
 )
 
-func SignUpRoutes (router fiber.Router) {
+func SignUpRoutes(router fiber.Router) {
 	authRouter := router.Group("/signup")
 	authRouter.Get("/client", controllers.SignUpClient)
 	authRouter.Get("/employee", controllers.SignUpEmployee)

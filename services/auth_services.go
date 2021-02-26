@@ -2,24 +2,25 @@ package services
 
 import (
 	"database/sql"
-	Database "github.com/nikola43/ecoapigorm/database"
-	models "github.com/nikola43/ecoapigorm/models/responses"
+	database "github.com/nikola43/ecoapigorm/database"
+	"github.com/nikola43/ecoapigorm/models"
 	"github.com/nikola43/ecoapigorm/utils"
 )
 
-func LoginClient(email, password string) (string, error) {
+func LoginClient(email, password string) (*models.ClientLoginResponse, error) {
 	client := &models.Client{}
-	dbResult := Database.DB.
+
+	GormDBResult := database.GormDB.
 		Where("email = ?", email).
 		Find(&client)
 
-	if dbResult.Error != nil {
-		return "", dbResult.Error
+	if GormDBResult.Error != nil {
+		return &models.ClientLoginResponse{}, GormDBResult.Error
 	}
 
 	match := utils.ComparePasswords(client.Password, []byte(password))
 	if match == false {
-		return "", sql.ErrNoRows
+		return &models.ClientLoginResponse{}, sql.ErrNoRows
 	}
 
 	// remove password
@@ -27,7 +28,9 @@ func LoginClient(email, password string) (string, error) {
 
 	token, err := utils.GenerateClientToken(client.Email)
 	if err != nil {
-		return "", err
+		return &models.ClientLoginResponse{}, err
 	}
-	return token, err
+	clientLoginResponse := models.ClientLoginResponse{client.ClinicID, client.Name, client.LastName, token}
+
+	return &clientLoginResponse, err
 }

@@ -1,16 +1,21 @@
 package middleware
 
-import "github.com/gofiber/fiber/v2"
+import (
+	"github.com/gofiber/fiber/v2"
+	"github.com/nikola43/ecoapigorm/utils"
+)
 
-var JwtMiddleware = func(context *fiber.Ctx) error {
-	// Set some security headers:
-	context.Set("X-XSS-Protection", "1; mode=block")
-	context.Set("X-Content-Type-Options", "nosniff")
-	context.Set("X-Download-Options", "noopen")
-	context.Set("Strict-Transport-Security", "max-age=5184000")
-	context.Set("X-Frame-Options", "SAMEORIGIN")
-	context.Set("X-DNS-Prefetch-Control", "off")
+func ApiKeyMiddleware(context *fiber.Ctx) error {
+	requestApiKey := context.Get("x-api-key")
+	serverApiKey := utils.GetEnvVariable("X_API_KEY")
 
-	// Go to next middleware:
+	if requestApiKey != serverApiKey {
+		return context.Status(fiber.StatusUnauthorized).JSON(&fiber.Map{
+			"error": "unauthorized",
+		})
+	}
+
 	return context.Next()
 }
+
+

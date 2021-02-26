@@ -131,3 +131,4 @@ func (i Info) SendPasswordRecoveryConfirmation(umail string) {
 		fmt.Println(err)
 	}
 }
+

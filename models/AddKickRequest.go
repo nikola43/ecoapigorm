@@ -1,4 +1,4 @@
-package requests
+package models
 
 import "time"
 

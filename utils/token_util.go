@@ -22,7 +22,7 @@ func GenerateClientToken(email string) (string, error) {
 	claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
 
 	// Generate encoded token and send it as response.
-	tokenString, err := token.SignedString([]byte("secret"))
+	tokenString, err := token.SignedString([]byte(GetEnvVariable("JWT_CLIENT_KEY")))
 	if err != nil {
 		return "", err
 	}
