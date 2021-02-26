@@ -25,20 +25,6 @@ var httpServer *fiber.App
 type App struct {
 }
 
-// use godot package to load/read the .env file and
-// return the value of the key
-func GetEnvVariable(key string) string {
-
-	// load .env file
-	err := godotenv.Load(".env")
-
-	if err != nil {
-		log.Fatalf("Error loading .env file")
-	}
-
-	return os.Getenv(key)
-}
-
 func (a *App) Initialize(port string) {
 	httpServer := fiber.New()
 	api := httpServer.Group("/api") // /api
@@ -49,14 +35,14 @@ func (a *App) Initialize(port string) {
 		GetEnvVariable("MYSQL_PASSWORD"),
 		GetEnvVariable("MYSQL_DATABASE"))
 
-	MigrateDb()
-
 	InitializeAWSConnection(
 		GetEnvVariable("AWS_ACCESS_KEY"),
 		GetEnvVariable("AWS_SECRET_KEY"),
 		GetEnvVariable("AWS_ENDPOINT"),
 		GetEnvVariable("AWS_BUCKET_NAME"),
 		GetEnvVariable("AWS_BUCKET_REGION"))
+
+	MigrateDb()
 
 	HandleRoutes(v1)
 
@@ -71,11 +57,12 @@ func HandleRoutes(api fiber.Router) {
 	routes.ClientRoutes(api)
 	routes.ClinicRoutes(api)
 	routes.AuthRoutes(api)
+	routes.SignUpRoutes(api)
 }
 
 func InitializeDbCorrection(user, password, database_name string) {
 	connectionString := fmt.Sprintf(
-		"%s:%s@/%s",
+		"%s:%s@/%s?parseTime=true",
 		user,
 		password,
 		database_name,
@@ -103,6 +90,9 @@ func MigrateDb() {
 	database.DB.Migrator().DropTable(&models.Recovery{})
 	database.DB.Migrator().DropTable(&models.PushNotificationData{})
 	database.DB.Migrator().DropTable(&models.Promo{})
+	database.DB.Migrator().DropTable(&models.BankAccount{})
+	database.DB.Migrator().DropTable(&models.CreditCard{})
+	database.DB.Migrator().DropTable(&models.PaymentMethod{})
 
 	database.DB.AutoMigrate(
 		&models.Client{},
@@ -114,7 +104,10 @@ func MigrateDb() {
 		&models.Streaming{},
 		&models.Recovery{},
 		&models.PushNotificationData{},
-		&models.Promo{})
+		&models.Promo{},
+		&models.BankAccount{},
+		&models.CreditCard{},
+		&models.PaymentMethod{})
 }
 
 func InitializeAWSConnection(access_key, secret_key, endpoint, bucket_name, bucket_region string) {
@@ -127,4 +120,18 @@ func InitializeAWSConnection(access_key, secret_key, endpoint, bucket_name, buck
 	newSession := session.New(s3Config)
 	S3Session = s3.New(newSession)
 	awsBucketName = bucket_name
+}
+
+// use godot package to load/read the .env file and
+// return the value of the key
+func GetEnvVariable(key string) string {
+
+	// load .env file
+	err := godotenv.Load(".env")
+
+	if err != nil {
+		log.Fatalf("Error loading .env file")
+	}
+
+	return os.Getenv(key)
 }

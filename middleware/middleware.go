@@ -2,15 +2,15 @@ package middleware
 
 import "github.com/gofiber/fiber/v2"
 
-var JwtMiddleware = func(c *fiber.Ctx) error {
+var JwtMiddleware = func(context *fiber.Ctx) error {
 	// Set some security headers:
-	c.Set("X-XSS-Protection", "1; mode=block")
-	c.Set("X-Content-Type-Options", "nosniff")
-	c.Set("X-Download-Options", "noopen")
-	c.Set("Strict-Transport-Security", "max-age=5184000")
-	c.Set("X-Frame-Options", "SAMEORIGIN")
-	c.Set("X-DNS-Prefetch-Control", "off")
+	context.Set("X-XSS-Protection", "1; mode=block")
+	context.Set("X-Content-Type-Options", "nosniff")
+	context.Set("X-Download-Options", "noopen")
+	context.Set("Strict-Transport-Security", "max-age=5184000")
+	context.Set("X-Frame-Options", "SAMEORIGIN")
+	context.Set("X-DNS-Prefetch-Control", "off")
 
 	// Go to next middleware:
-	return c.Next()
+	return context.Next()
 }

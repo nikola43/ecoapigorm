@@ -36,7 +36,7 @@ func AddAudioToVideo(inFile string, outFile string) error {
 
 	// extract audio from video using ffmpeg library
 	cmd := exec.Command(FFMPEG_PATH, "-y", "-i", inFile, "-i", "music_video.m4a", "-c", "copy", "-shortest", outFile)
-	//cmd := exec.Command("ffmpeg", "-i", inFile, "-i", "/home/ecodadys/go/src/github.com/nikola43/ecoapigorm/video_music.mp3", "-c", "copy", "-map", "0:v", "-map", "1:a", outFile)
+	//cmd := execontext.Command("ffmpeg", "-i", inFile, "-i", "/home/ecodadys/go/src/github.com/nikola43/ecoapigorm/video_musicontext.mp3", "-c", "copy", "-map", "0:v", "-map", "1:a", outFile)
 	err := cmd.Run()
 	if err != nil {
 		fmt.Println("Error injectando audio " + err.Error())

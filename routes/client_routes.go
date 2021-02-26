@@ -9,5 +9,10 @@ func ClientRoutes (router fiber.Router) {
 
 	// routes
 	router.Get("/", controllers.LoginClient)
+	router.Get("/", controllers.LoginClient)
+	router.Get("/", controllers.LoginClient)
+	router.Get("/", controllers.LoginClient)
+
+	router.Get("/", controllers.LoginClient)
 	//clientRouter.Get("/:id", controller.GetSingleProduct)
 }

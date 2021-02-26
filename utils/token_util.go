@@ -18,6 +18,7 @@ func GenerateClientToken(email string) (string, error) {
 	// Set claims
 	claims := token.Claims.(jwt.MapClaims)
 	claims["email"] = email
+	// todo añaair role e user id
 	claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
 
 	// Generate encoded token and send it as response.
