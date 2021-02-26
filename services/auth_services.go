@@ -1,7 +1,7 @@
 package services
 
 import (
-	"database/sql"
+	"errors"
 	database "github.com/nikola43/ecoapigorm/database"
 	"github.com/nikola43/ecoapigorm/models"
 	"github.com/nikola43/ecoapigorm/utils"
@@ -19,8 +19,8 @@ func LoginClient(email, password string) (*models.ClientLoginResponse, error) {
 	}
 
 	match := utils.ComparePasswords(client.Password, []byte(password))
-	if match == false {
-		return &models.ClientLoginResponse{}, sql.ErrNoRows
+	if !match {
+		return &models.ClientLoginResponse{}, errors.New("not found")
 	}
 
 	// remove password
@@ -30,7 +30,7 @@ func LoginClient(email, password string) (*models.ClientLoginResponse, error) {
 	if err != nil {
 		return &models.ClientLoginResponse{}, err
 	}
-	clientLoginResponse := models.ClientLoginResponse{client.ClinicID, client.Name, client.LastName, token}
+	clientLoginResponse := models.ClientLoginResponse{client.Name, client.LastName, token}
 
 	return &clientLoginResponse, err
 }

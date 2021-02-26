@@ -8,8 +8,8 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/gofiber/fiber/v2"
-	middlewares "github.com/nikola43/ecoapigorm/middleware"
 	database "github.com/nikola43/ecoapigorm/database"
+	middlewares "github.com/nikola43/ecoapigorm/middleware"
 	"github.com/nikola43/ecoapigorm/models"
 	"github.com/nikola43/ecoapigorm/routes"
 	"github.com/nikola43/ecoapigorm/utils"
@@ -44,6 +44,8 @@ func (a *App) Initialize(port string) {
 		utils.GetEnvVariable("AWS_BUCKET_REGION"))
 
 	MigrateDB()
+
+	CreateFakeData()
 
 	HandleRoutes(v1)
 
@@ -113,7 +115,8 @@ func MigrateDB() {
 }
 
 func CreateFakeData() {
-
+	user := models.Client{Name: "Paulo", Email: "pauloxti@gmail.com", Password: utils.HashAndSalt([]byte("1111111111"))}
+	database.GormDB.Create(&user)
 }
 func InitializeAWSConnection(access_key, secret_key, endpoint, bucket_name, bucket_region string) {
 	s3Config := &aws.Config{
