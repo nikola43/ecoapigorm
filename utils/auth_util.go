@@ -5,7 +5,7 @@ import (
 	"log"
 )
 
-func HashAndSalt(pwd []byte) string {
+func HashPassword(pwd []byte) string {
 
 	// Use GenerateFromPassword to hash & salt pwd.
 	// MinCost is just an integer constant provided by the bcrypt

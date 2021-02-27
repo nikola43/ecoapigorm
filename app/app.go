@@ -10,7 +10,6 @@ import (
 	"github.com/gofiber/fiber/v2"
 	database "github.com/nikola43/ecoapigorm/database"
 	middlewares "github.com/nikola43/ecoapigorm/middleware"
-	"github.com/nikola43/ecoapigorm/models"
 	"github.com/nikola43/ecoapigorm/routes"
 	"github.com/nikola43/ecoapigorm/utils"
 	"gorm.io/driver/mysql"
@@ -43,9 +42,9 @@ func (a *App) Initialize(port string) {
 		utils.GetEnvVariable("AWS_BUCKET_NAME"),
 		utils.GetEnvVariable("AWS_BUCKET_REGION"))
 
-	MigrateDB()
+	database.Migrate()
 
-	CreateFakeData()
+	database.CreateFakeData()
 
 	HandleRoutes(v1)
 
@@ -82,42 +81,6 @@ func Initializedatabase(user, password, database_name string) {
 	}
 }
 
-func MigrateDB() {
-	// DROP
-	database.GormDB.Migrator().DropTable(&models.Client{})
-	database.GormDB.Migrator().DropTable(&models.Employee{})
-	database.GormDB.Migrator().DropTable(&models.Clinic{})
-	database.GormDB.Migrator().DropTable(&models.Video{})
-	database.GormDB.Migrator().DropTable(&models.Image{})
-	database.GormDB.Migrator().DropTable(&models.Heartbeat{})
-	database.GormDB.Migrator().DropTable(&models.Streaming{})
-	database.GormDB.Migrator().DropTable(&models.Recovery{})
-	database.GormDB.Migrator().DropTable(&models.PushNotificationData{})
-	database.GormDB.Migrator().DropTable(&models.Promo{})
-	database.GormDB.Migrator().DropTable(&models.BankAccount{})
-	database.GormDB.Migrator().DropTable(&models.CreditCard{})
-	database.GormDB.Migrator().DropTable(&models.PaymentMethod{})
-
-	// CREATE
-	database.GormDB.AutoMigrate(&models.Client{})
-	database.GormDB.AutoMigrate(&models.Employee{})
-	database.GormDB.AutoMigrate(&models.Clinic{})
-	database.GormDB.AutoMigrate(&models.Video{})
-	database.GormDB.AutoMigrate(&models.Image{})
-	database.GormDB.AutoMigrate(&models.Heartbeat{})
-	database.GormDB.AutoMigrate(&models.Streaming{})
-	database.GormDB.AutoMigrate(&models.Recovery{})
-	database.GormDB.AutoMigrate(&models.PushNotificationData{})
-	database.GormDB.AutoMigrate(&models.Promo{})
-	database.GormDB.AutoMigrate(&models.BankAccount{})
-	database.GormDB.AutoMigrate(&models.CreditCard{})
-	database.GormDB.AutoMigrate(&models.PaymentMethod{})
-}
-
-func CreateFakeData() {
-	user := models.Client{Name: "Paulo", Email: "pauloxti@gmail.com", Password: utils.HashAndSalt([]byte("1111111111"))}
-	database.GormDB.Create(&user)
-}
 func InitializeAWSConnection(access_key, secret_key, endpoint, bucket_name, bucket_region string) {
 	s3Config := &aws.Config{
 		Credentials:      credentials.NewStaticCredentials(access_key, secret_key, ""),

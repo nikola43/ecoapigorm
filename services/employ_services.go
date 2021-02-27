@@ -32,7 +32,7 @@ func LoginEmployer(email string, password string) (*models.Employee, error) {
 func CreateNewEmployer(employer *models.Employee) (*models.Employee, error) {
 	//TODO validate
 
-	employer.Password = utils.HashAndSalt([]byte(employer.Password))
+	employer.Password = utils.HashPassword([]byte(employer.Password))
 	result := database.GormDB.Create(employer)
 
 	if result.Error != nil {
