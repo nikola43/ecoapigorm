@@ -12,6 +12,9 @@ func ClientRoutes (router fiber.Router) {
 	clientRouter := router.Group("/client")
 	clientRouter.Use(jwtware.New(jwtware.Config{SigningKey: []byte(utils.GetEnvVariable("JWT_CLIENT_KEY"))}))
 
+	// /api/v1/client/create
+	clientRouter.Post("/create", controllers.CreateClient)
+
 	// /api/v1/client/images
 	imagesRouter := clientRouter.Group("/images")
 
