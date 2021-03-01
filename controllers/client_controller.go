@@ -20,6 +20,18 @@ func GetAllImagesByClientID(context *fiber.Ctx) error {
 	return context.Status(fiber.StatusOK).JSON(images)
 }
 
+func GetAllVideosByClientID(context *fiber.Ctx) error {
+	clientID := context.Params("client_id")
+	videos := make([]models.Video, 0)
+	var err error
+
+	if videos, err = services.GetAllVideosByClientID(clientID); err != nil {
+		return context.SendStatus(fiber.StatusInternalServerError)
+	}
+
+	return context.Status(fiber.StatusOK).JSON(videos)
+}
+
 func CreateClient(context *fiber.Ctx) error {
 	createClientRequest := new(modelsClient.CreateClientRequest)
 	createClientResponse := new(modelsClient.CreateClientResponse)

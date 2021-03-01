@@ -23,4 +23,10 @@ func ClientRoutes (router fiber.Router) {
 
 	// /api/v1/client/images/:client_id
 	imagesRouter.Get("/:client_id", controllers.GetAllImagesByClientID)
+
+	// /api/v1/client/videos
+	videosRouter := clientRouter.Group("/videos")
+
+	// /api/v1/client/videos/:client_id
+	videosRouter.Get("/:client_id", controllers.GetAllVideosByClientID)
 }

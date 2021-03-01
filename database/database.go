@@ -46,4 +46,36 @@ func CreateFakeData() {
 
 	userMigue := models.Client{Name: "Migue", Email: "migue@gmail.com", Password: utils.HashPassword([]byte("migue"))}
 	GormDB.Create(&userMigue)
+
+	images := make([]models.Image, 0)
+	images = append(images, models.Image{
+		ClientID: 2,
+		Url:      "https://www.miecografia4d.com/wp-content/uploads/Ecografia-4-d-oferta-44.jpg",
+		Size:     0,
+	})
+
+	images = append(images, models.Image{
+		ClientID: 2,
+		Url:      "https://www.miecografia4d.com/wp-content/uploads/Ecografia-4-d-oferta-44.jpg",
+		Size:     0,
+	})
+
+	GormDB.Create(&images)
+
+	videos := make([]models.Video, 0)
+	videos = append(videos, models.Video{
+		ClientID:     2,
+		Url:          "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+		ThumbnailUrl: "https://www.miecografia4d.com/wp-content/uploads/Ecografia-4-d-oferta-44.jpg",
+		Size:         0,
+	})
+
+	videos = append(videos, models.Video{
+		ClientID:     2,
+		Url:          "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+		ThumbnailUrl: "https://www.miecografia4d.com/wp-content/uploads/Ecografia-4-d-oferta-44.jpg",
+		Size:         0,
+	})
+
+	GormDB.Create(&videos)
 }

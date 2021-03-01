@@ -64,3 +64,13 @@ func GetAllImagesByClientID(clientID string) ([]models.Image, error) {
 
 	return list , nil
 }
+
+func GetAllVideosByClientID(clientID string) ([]models.Video, error) {
+	var list = make([]models.Video, 0)
+
+	if err := database.GormDB.Find(&list).Where("id = ?", clientID).Error; err != nil {
+		return nil, err
+	}
+
+	return list , nil
+}
