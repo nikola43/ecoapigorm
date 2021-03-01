@@ -15,6 +15,9 @@ func ClientRoutes (router fiber.Router) {
 	// /api/v1/client/create
 	clientRouter.Post("/create", controllers.CreateClient)
 
+	// /api/v1/client/changepass
+	clientRouter.Post("/changepass", controllers.ChangePassClient)
+
 	// /api/v1/client/images
 	imagesRouter := clientRouter.Group("/images")
 

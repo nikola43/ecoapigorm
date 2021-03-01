@@ -31,6 +31,23 @@ func CreateClient(newClient *modelsClients.CreateClientRequest) (*modelsClients.
 	return &createClientResponse, result.Error
 }
 
+func ChangePassClientService(request *modelsClients.ChangePassClientRequest) error {
+	client := &models.Client{}
+
+	GormDBResult := database.GormDB.
+		Find(&client, request.ClientId)
+
+	if GormDBResult.Error != nil {
+		return GormDBResult.Error
+	}
+
+	newPassHashed := utils.HashPassword([]byte(request.NewPass))
+
+	database.GormDB.Model(&client).Update("password", newPassHashed)
+
+	return  nil
+}
+
 func GetAllImagesByClientID(clientID string) ([]models.Image, error) {
 	var list = make([]models.Image, 0)
 

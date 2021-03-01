@@ -23,14 +23,18 @@ func LoginClient(email, password string) (*models.ClientLoginResponse, error) {
 		return &models.ClientLoginResponse{}, errors.New("not found")
 	}
 
-	// remove password
-	//client.Password = ""
-
 	token, err := utils.GenerateClientToken(client.Email)
 	if err != nil {
 		return &models.ClientLoginResponse{}, err
 	}
-	clientLoginResponse := models.ClientLoginResponse{client.Name, client.LastName, token}
+
+	clientLoginResponse := models.ClientLoginResponse{
+		Id:       client.ID,
+		Email: client.Email,
+		Name:     client.Name,
+		LastName: client.LastName,
+		Token: token,
+	}
 
 	return &clientLoginResponse, err
 }

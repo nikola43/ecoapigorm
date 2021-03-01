@@ -39,3 +39,22 @@ func CreateClient(context *fiber.Ctx) error {
 		return context.JSON(createClientResponse)
 	}
 }
+
+func ChangePassClient(context *fiber.Ctx) error {
+	changePassClientRequest := new(modelsClient.ChangePassClientRequest)
+	var err error
+
+	if err = context.BodyParser(changePassClientRequest);
+	err != nil {
+		return context.SendStatus(fiber.StatusBadRequest)
+	}
+
+	err = services.ChangePassClientService(changePassClientRequest)
+
+	if err != nil {
+		return context.SendStatus(fiber.StatusNotFound)
+	}
+
+	return context.SendStatus(fiber.StatusOK)
+}
+
