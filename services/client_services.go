@@ -10,8 +10,13 @@ import (
 func CreateClient(newClient *modelsClients.CreateClientRequest) (*modelsClients.CreateClientResponse, error) {
 	//TODO validate
 
-	newClient.Password = utils.HashPassword([]byte(newClient.Password))
-	result := database.GormDB.Create(newClient)
+	client := models.Client{
+		Email:                 newClient.Email,
+		Password:              utils.HashPassword([]byte(newClient.Password)),
+		Name:                  newClient.Name,
+		LastName:              newClient.LastName,
+	}
+	result := database.GormDB.Create(&client)
 
 	if result.Error != nil {
 		return nil, result.Error
@@ -23,8 +28,10 @@ func CreateClient(newClient *modelsClients.CreateClientRequest) (*modelsClients.
 	}
 
 	createClientResponse := modelsClients.CreateClientResponse{
-		Name:     newClient.Name,
-		LastName: newClient.LastName,
+		Id:       client.ID,
+		Email:    client.Email,
+		Name:     client.Name,
+		LastName: client.LastName,
 		Token:    token,
 	}
 
