@@ -50,13 +50,13 @@ func CreateFakeData() {
 	images := make([]models.Image, 0)
 	images = append(images, models.Image{
 		ClientID: 2,
-		Url:      "https://www.miecografia4d.com/wp-content/uploads/Ecografia-4-d-oferta-44.jpg",
+		Url:      "https://s3.eu-central-1.wasabisys.com/babyandme/4/image/MARIANA VICENTE (10).png",
 		Size:     0,
 	})
 
 	images = append(images, models.Image{
 		ClientID: 2,
-		Url:      "https://www.miecografia4d.com/wp-content/uploads/Ecografia-4-d-oferta-44.jpg",
+		Url:      "https://s3.eu-central-1.wasabisys.com/babyandme/4/image/MARIANA VICENTE (13).png",
 		Size:     0,
 	})
 
@@ -65,15 +65,15 @@ func CreateFakeData() {
 	videos := make([]models.Video, 0)
 	videos = append(videos, models.Video{
 		ClientID:     2,
-		Url:          "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-		ThumbnailUrl: "https://www.miecografia4d.com/wp-content/uploads/Ecografia-4-d-oferta-44.jpg",
+		Url:          "https://s3.eu-central-1.wasabisys.com/babyandme/4/video/MARIANA VICENTE (2) (online-video-cutter.com) copy.mp4-audio.mp4",
+		ThumbnailUrl: "https://s3.eu-central-1.wasabisys.com/babyandme/4/video/MARIANA VICENTE (2) (online-video-cutter.com) copy.mp4-audio.mp4-thumbnail.jpg",
 		Size:         0,
 	})
 
 	videos = append(videos, models.Video{
 		ClientID:     2,
-		Url:          "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-		ThumbnailUrl: "https://www.miecografia4d.com/wp-content/uploads/Ecografia-4-d-oferta-44.jpg",
+		Url:          "https://s3.eu-central-1.wasabisys.com/babyandme/4/video/MARIANA VICENTE (2).mp4-audio copy.mp4-audio.mp4",
+		ThumbnailUrl: "https://s3.eu-central-1.wasabisys.com/babyandme/4/video/MARIANA VICENTE (2).mp4-audio copy.mp4-audio.mp4-thumbnail.jpg",
 		Size:         0,
 	})
 

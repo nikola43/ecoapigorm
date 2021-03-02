@@ -20,7 +20,7 @@ func ClientRoutes (router fiber.Router) {
 	clientRouter.Use(jwtware.New(jwtware.Config{SigningKey: []byte(utils.GetEnvVariable("JWT_CLIENT_KEY"))}))
 
 	// /api/v1/client/changepass
-	clientRouter.Post("/changepass", controllers.ChangePassClient)
+	clientRouter.Post("/change_password", controllers.ChangePassClient)
 
 	// /api/v1/client/images
 	imagesRouter := clientRouter.Group("/images")
@@ -33,4 +33,10 @@ func ClientRoutes (router fiber.Router) {
 
 	// /api/v1/client/videos/:client_id
 	videosRouter.Get("/:client_id", controllers.GetAllVideosByClientID)
+
+	// /api/v1/client/streaming
+	streamingsRouter := clientRouter.Group("/streaming")
+
+	// /api/v1/client/streaming/:client_id
+	streamingsRouter.Get("/:client_id", controllers.GetAllVideosByClientID)
 }

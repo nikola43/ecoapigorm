@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"errors"
 	"fmt"
+	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	"github.com/nikola43/ecoapigorm/models"
 	modelsClient "github.com/nikola43/ecoapigorm/models/clients"
@@ -27,6 +27,18 @@ func GetAllImagesByClientID(context *fiber.Ctx) error {
 	return context.Status(fiber.StatusOK).JSON(images)
 }
 
+func GetAllStreamingByClientID(context *fiber.Ctx) error {
+	clientID := context.Params("client_id")
+	videos := make([]models.Streaming, 0)
+	var err error
+
+	if videos, err = services.GetAllStreamingByClientID(clientID); err != nil {
+		return context.SendStatus(fiber.StatusInternalServerError)
+	}
+
+	return context.Status(fiber.StatusOK).JSON(videos)
+}
+
 func GetAllVideosByClientID(context *fiber.Ctx) error {
 	clientID := context.Params("client_id")
 	videos := make([]models.Video, 0)
@@ -45,16 +57,27 @@ func CreateClient(context *fiber.Ctx) error {
 	var err error
 
 	if err = context.BodyParser(createClientRequest);
-	err != nil {
-		return context.SendStatus(fiber.StatusBadRequest)
+		err != nil {
+		return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+			"error": "bad request",
+		})
+	}
+
+	// validation
+	v := validator.New()
+	_ = v.Struct(createClientRequest)
+	for _, e := range err.(validator.ValidationErrors) {
+		return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+			"error": "validation_error: " + e.Field(),
+		})
 	}
 
 	if createClientResponse, err = services.CreateClient(createClientRequest);
-	err != nil {
-	return context.Status(fiber.StatusNotFound).JSON(&fiber.Map{
-		"error": errors.New("not found"),
-	})
-	}else {
+		err != nil {
+		return context.Status(fiber.StatusNotFound).JSON(&fiber.Map{
+			"error": "not found",
+		})
+	} else {
 		return context.JSON(createClientResponse)
 	}
 }
@@ -64,7 +87,7 @@ func ChangePassClient(context *fiber.Ctx) error {
 	var err error
 
 	if err = context.BodyParser(changePassClientRequest);
-	err != nil {
+		err != nil {
 		return context.SendStatus(fiber.StatusBadRequest)
 	}
 
