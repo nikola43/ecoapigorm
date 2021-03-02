@@ -8,7 +8,7 @@ import (
 
 var GormDB *gorm.DB
 
-func Migrate()  {
+func Migrate() {
 	// DROP
 	GormDB.Migrator().DropTable(&models.Client{})
 	GormDB.Migrator().DropTable(&models.Employee{})
@@ -43,12 +43,21 @@ func Migrate()  {
 }
 
 func CreateFakeData() {
-	user := models.Client{Name: "Paulo", Email: "pauloxti@gmail.com", Password: utils.HashPassword([]byte("paulo"))}
-	GormDB.Create(&user)
+	// CLIENTS ------------------------------------------------------------------------------------------------------------------------------------------------------------------
+	client1 := models.Client{Name: "Paulo", Email: "pauloxti@gmail.com", Password: utils.HashPassword([]byte("paulo"))}
+	GormDB.Create(&client1)
 
-	userMigue := models.Client{Name: "Migue", Email: "migue@gmail.com", Password: utils.HashPassword([]byte("migue"))}
-	GormDB.Create(&userMigue)
+	client2 := models.Client{Name: "Migue", Email: "migue@gmail.com", Password: utils.HashPassword([]byte("migue"))}
+	GormDB.Create(&client2)
 
+	// EMPLOYEES ------------------------------------------------------------------------------------------------------------------------------------------------------------------
+	user1 := models.Employee{Name: "Paulo", Email: "pauloxti@gmail.com", Password: utils.HashPassword([]byte("paulo")), Role: "admin"}
+	GormDB.Create(&user1)
+
+	user2 := models.Employee{Name: "Migue", Email: "migue@gmail.com", Password: utils.HashPassword([]byte("migue")), Role: "employeee"}
+	GormDB.Create(&user2)
+
+	// IMAGES ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	images := make([]models.Image, 0)
 	images = append(images, models.Image{
 		ClientID: 2,
@@ -81,8 +90,9 @@ func CreateFakeData() {
 
 	GormDB.Create(&videos)
 
+	// CALCULATOR ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	for i := 1; i < 41; i++ {
-		calculatorDetail :=  models.CalculatorDetail{
+		calculatorDetail := models.CalculatorDetail{
 			Week:  uint(i),
 			Image: "https://s3.eu-central-1.wasabisys.com/stela/weeks/21SM.jpg",
 			Text:  "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book",

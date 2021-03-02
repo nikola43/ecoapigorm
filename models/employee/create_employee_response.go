@@ -1,9 +1,10 @@
-package employee
+package clients
 
 type CreateEmployeeResponse struct {
-	Id       uint   `json:"id"`
-	Email    string `json:"email"`
+	Id     uint `json:"id"`
+	Email     string `json:"email"`
 	Name     string `json:"name"`
 	LastName string `json:"lastname"`
 	Token    string `json:"token"`
 }
+

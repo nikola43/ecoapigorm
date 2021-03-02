@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
+	database "github.com/nikola43/ecoapigorm/database"
 	"github.com/nikola43/ecoapigorm/models"
 	modelsClient "github.com/nikola43/ecoapigorm/models/clients"
 	"github.com/nikola43/ecoapigorm/services"
@@ -57,6 +58,7 @@ func CreateClient(context *fiber.Ctx) error {
 	createClientResponse := new(modelsClient.CreateClientResponse)
 	var err error
 
+	// parse request
 	if err = context.BodyParser(createClientRequest);
 		err != nil {
 		return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
@@ -76,8 +78,20 @@ func CreateClient(context *fiber.Ctx) error {
 			}
 		}
 	}
-	// ---------------------------------------------------------------------------------
 
+	// check if client already exist
+	client := models.Client{}
+	GormDBResult := database.GormDB.
+		Where("email = ?", createClientRequest.Email).
+		Find(&client)
+
+	if GormDBResult.Error != nil {
+		return context.Status(fiber.StatusInternalServerError).JSON(&fiber.Map{
+			"error": "internal server",
+		})
+	}
+
+	// create and response
 	if createClientResponse, err = services.CreateClient(createClientRequest);
 		err != nil {
 		return context.Status(fiber.StatusNotFound).JSON(&fiber.Map{
