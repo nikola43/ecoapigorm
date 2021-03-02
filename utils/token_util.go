@@ -18,7 +18,6 @@ func GenerateClientToken(email string, client_id uint, clinic_id uint) (string, 
 	claims["client_id"] = client_id
 	claims["clinic_id"] = clinic_id
 	claims["email"] = email
-	// todo añaair role e user id
 	claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
 
 	// Generate encoded token and send it as response.
@@ -42,7 +41,6 @@ func GetClientTokenClaims(context *fiber.Ctx) (models.ClientTokenClaims, error) 
 			}
 			return clientTokenClaims, nil
 		}
-
 	} else {
 		return models.ClientTokenClaims{}, errors.New("invalid claims")
 	}
@@ -61,12 +59,10 @@ func GetEmployeeTokenClaims(context *fiber.Ctx) (models.EmployeeTokenClaims, err
 			}
 			return employeeTokenClaims, nil
 		}
-
 	} else {
 		return models.EmployeeTokenClaims{}, errors.New("invalid claims")
 	}
 	return models.EmployeeTokenClaims{}, errors.New("invalid claims")
-
 }
 
 func GenerateEmployeeToken(email string, employee_id uint, clinic_id uint, role string) (string, error) {
@@ -79,7 +75,6 @@ func GenerateEmployeeToken(email string, employee_id uint, clinic_id uint, role 
 	claims["clinic_id"] = clinic_id
 	claims["email"] = email
 	claims["role"] = role
-	// todo añaair role e user id
 	claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
 
 	// Generate encoded token and send it as response.
