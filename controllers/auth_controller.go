@@ -9,8 +9,8 @@ import (
 )
 
 func LoginClient(context *fiber.Ctx) error {
-	clientLoginRequest := new(models.ClientLoginRequest)
-	clientLoginResponse := new(models.ClientLoginResponse)
+	clientLoginRequest := new(models.LoginClientRequest)
+	clientLoginResponse := new(models.LoginClientResponse)
 	var err error
 
 	if err = context.BodyParser(clientLoginRequest); err != nil {
