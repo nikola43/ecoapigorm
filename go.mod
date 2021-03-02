@@ -4,6 +4,8 @@ go 1.14
 
 require (
 	github.com/aws/aws-sdk-go v1.37.21
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
+	github.com/dgrijalva/jwt-go/v4 v4.0.0-preview1
 	github.com/form3tech-oss/jwt-go v3.2.2+incompatible
 	github.com/go-playground/validator/v10 v10.4.1
 	github.com/gofiber/fiber/v2 v2.5.0

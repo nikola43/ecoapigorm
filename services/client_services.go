@@ -15,7 +15,7 @@ func CreateClient(createClientRequest *modelsClients.CreateClientRequest) (*mode
 		Password: utils.HashPassword([]byte(createClientRequest.Password)),
 		Name:     createClientRequest.Name,
 		LastName: createClientRequest.LastName,
-		Phone: createClientRequest.Phone,
+		Phone:    createClientRequest.Phone,
 	}
 	result := database.GormDB.Create(&client)
 
