@@ -8,7 +8,7 @@ echo "KILL API"
 sudo pkill ecoapi
 echo "BUILD API..."
 
-go build
+/usr/local/go/bin/go build
 echo "KILL API"
 
 sudo pkill ecoapi
