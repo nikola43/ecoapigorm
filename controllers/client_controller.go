@@ -70,3 +70,21 @@ func ChangePassClient(context *fiber.Ctx) error {
 	return context.SendStatus(fiber.StatusOK)
 }
 
+func PassRecoveryClient(context *fiber.Ctx) error {
+	passRecoveryClientRequest := new(modelsClient.PassRecoveryRequest)
+	var err error
+
+	if err = context.BodyParser(passRecoveryClientRequest);
+	err != nil {
+		return context.SendStatus(fiber.StatusBadRequest)
+	}
+
+	err = services.PassRecoveryClientService(passRecoveryClientRequest)
+
+	if err != nil {
+		return context.SendStatus(fiber.StatusNotFound)
+	}
+
+	return context.SendStatus(fiber.StatusOK)
+}
+

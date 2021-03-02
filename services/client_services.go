@@ -55,6 +55,32 @@ func ChangePassClientService(request *modelsClients.ChangePassClientRequest) err
 	return  nil
 }
 
+func PassRecoveryClientService(request *modelsClients.PassRecoveryRequest) error {
+	client := &models.Client{}
+
+	GormDBResult := database.GormDB.
+		Where("email = ?", request.Email).
+		Find(&client)
+
+	if GormDBResult.Error != nil {
+		return GormDBResult.Error
+	}
+
+	apiTokenString := utils.GenerateTokenUsername(client.Email)
+
+	recovery := models.Recovery{
+		ClientID:                 client.ID,
+		Token:              apiTokenString,
+	}
+	result := database.GormDB.Create(&recovery)
+	if result.Error != nil {
+		return result.Error
+	}
+	SendMailRecovery(client.Email, recovery.Token)
+
+	return  nil
+}
+
 func GetAllImagesByClientID(clientID string) ([]models.Image, error) {
 	var list = make([]models.Image, 0)
 
