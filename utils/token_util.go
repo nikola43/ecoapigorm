@@ -21,6 +21,27 @@ func GetTokenClaims(context *fiber.Ctx) (models.ClientTokenClaims, error) {
 	return clientTokenClaim, nil
 }
 
+func GenerateEmployeeToken(email string, employee_id uint, clinic_id uint, role string) (string, error) {
+	// Create token
+	token := jwt.New(jwt.SigningMethodHS256)
+
+	// Set claims
+	claims := token.Claims.(jwt.MapClaims)
+	claims["employee_id"] = employee_id
+	claims["clinic_id"] = clinic_id
+	claims["email"] = email
+	claims["role"] = role
+	// todo añaair role e user id
+	claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
+
+	// Generate encoded token and send it as response.
+	tokenString, err := token.SignedString([]byte(GetEnvVariable("JWT_CLIENT_KEY")))
+	if err != nil {
+		return "", err
+	}
+	return tokenString, err
+}
+
 func GenerateClientToken(email string, client_id uint, clinic_id uint) (string, error) {
 	// Create token
 	token := jwt.New(jwt.SigningMethodHS256)

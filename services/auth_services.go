@@ -7,7 +7,7 @@ import (
 	"github.com/nikola43/ecoapigorm/utils"
 )
 
-func LoginClient(email, password string) (*models.ClientLoginResponse, error) {
+func LoginClient(email, password string) (*models.LoginClientResponse, error) {
 	client := &models.Client{}
 
 	GormDBResult := database.GormDB.
@@ -15,20 +15,20 @@ func LoginClient(email, password string) (*models.ClientLoginResponse, error) {
 		Find(&client)
 
 	if GormDBResult.Error != nil {
-		return &models.ClientLoginResponse{}, GormDBResult.Error
+		return &models.LoginClientResponse{}, GormDBResult.Error
 	}
 
 	match := utils.ComparePasswords(client.Password, []byte(password))
 	if !match {
-		return &models.ClientLoginResponse{}, errors.New("not found")
+		return &models.LoginClientResponse{}, errors.New("not found")
 	}
 
 	token, err := utils.GenerateClientToken(client.Email, client.ID, client.ClinicID)
 	if err != nil {
-		return &models.ClientLoginResponse{}, err
+		return &models.LoginClientResponse{}, err
 	}
 
-	clientLoginResponse := models.ClientLoginResponse{
+	clientLoginResponse := models.LoginClientResponse{
 		Id:       client.ID,
 		Email:    client.Email,
 		Name:     client.Name,

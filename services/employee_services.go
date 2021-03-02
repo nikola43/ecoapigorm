@@ -1,45 +1,38 @@
 package services
 
 import (
-	"database/sql"
 	database "github.com/nikola43/ecoapigorm/database"
 	"github.com/nikola43/ecoapigorm/models"
+	modelsEmployees "github.com/nikola43/ecoapigorm/models/employee"
 	utils "github.com/nikola43/ecoapigorm/utils"
 )
 
-func LoginEmployer(email string, password string) (*models.Employee, error) {
-	employer := &models.Employee{}
-
-	GormDBResult := database.GormDB.
-		Where("email = ?", email).
-		Find(&employer)
-
-	if GormDBResult.Error != nil {
-		return nil, GormDBResult.Error
+func CreateEmployee(createEmployeeRequest *modelsEmployees.CreateEmployeeRequest) (*modelsEmployees.CreateEmployeeResponse, error) {
+	employee := models.Employee{
+		Email:    createEmployeeRequest.Email,
+		Password: utils.HashPassword([]byte(createEmployeeRequest.Password)),
+		Name:     createEmployeeRequest.Name,
+		LastName: createEmployeeRequest.LastName,
+		Phone:    createEmployeeRequest.Phone,
 	}
-
-	match := utils.ComparePasswords(employer.Password, []byte(password))
-	if match == false {
-		return nil, sql.ErrNoRows
-	}
-
-	// remove password
-	employer.Password = ""
-
-	return employer, nil
-}
-
-func CreateNewEmployer(employer *models.Employee) (*models.Employee, error) {
-	//TODO validate
-
-	employer.Password = utils.HashPassword([]byte(employer.Password))
-	result := database.GormDB.Create(employer)
+	result := database.GormDB.Create(&employee)
 
 	if result.Error != nil {
 		return nil, result.Error
 	}
 
-	employer.Password = ""
+	token, err := utils.GenerateEmployeeToken(employee.Email, employee.ID, 0, "admin")
+	if err != nil {
+		return nil, err
+	}
 
-	return employer, result.Error
+	createEmployeeResponse := modelsEmployees.CreateEmployeeResponse{
+		Id:       employee.ID,
+		Email:    employee.Email,
+		Name:     employee.Name,
+		LastName: employee.LastName,
+		Token:    token,
+	}
+
+	return &createEmployeeResponse, result.Error
 }
