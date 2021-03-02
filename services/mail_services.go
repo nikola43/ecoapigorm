@@ -31,7 +31,7 @@ func SendMailRecovery(umail string, token string){
 	m.SetBody("text/html", result)
 	//m.Attach("template.html")// attach whatever you want
 
-	d := gomail.NewDialer("smtp.gmail.com", 587, "mimatrona.soporte@gmail.com", "#ecodadys1")
+	d := gomail.NewDialer("smtp.gmail.com", 587, "mimatrona.soporte@gmail.com", "@4Hs|d~}%w+N4.,!")
 
 	// Send the email to Bob, Cora and Dan.
 	if err := d.DialAndSend(m); err != nil {
