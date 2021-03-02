@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"errors"
 	"github.com/form3tech-oss/jwt-go"
 	"github.com/gofiber/fiber/v2"
 	"github.com/nikola43/ecoapigorm/models"
@@ -28,31 +29,44 @@ func GenerateClientToken(email string, client_id uint, clinic_id uint) (string, 
 	return tokenString, err
 }
 
+// todo validar claims por separado
 func GetClientTokenClaims(context *fiber.Ctx) (models.ClientTokenClaims, error) {
-	// todo handle error
 	user := context.Locals("user").(*jwt.Token)
-	claims := user.Claims.(jwt.MapClaims)
-	clientTokenClaim := models.ClientTokenClaims{
-		Email:    claims["email"].(string),
-		ClientID: uint(math.Round(claims["client_id"].(float64))),
-		ClinicID: uint(math.Round(claims["clinic_id"].(float64))),
-		Exp:      uint(math.Round(claims["exp"].(float64))),
+	if claims, ok := user.Claims.(jwt.MapClaims); ok && user.Valid {
+		if claims["email"] != nil && claims["client_id"] != nil && claims["clinic_id"] != nil && claims["exp"] != nil {
+			clientTokenClaims := models.ClientTokenClaims{
+				Email:    claims["email"].(string),
+				ClientID: uint(math.Round(claims["client_id"].(float64))),
+				ClinicID: uint(math.Round(claims["clinic_id"].(float64))),
+				Exp:      uint(math.Round(claims["exp"].(float64))),
+			}
+			return clientTokenClaims, nil
+		}
+
+	} else {
+		return models.ClientTokenClaims{}, errors.New("invalid claims")
 	}
-	return clientTokenClaim, nil
+	return models.ClientTokenClaims{}, errors.New("invalid claims")
 }
 
 func GetEmployeeTokenClaims(context *fiber.Ctx) (models.EmployeeTokenClaims, error) {
-	// todo handle error
 	user := context.Locals("user").(*jwt.Token)
-	claims := user.Claims.(jwt.MapClaims)
-	employeeTokenClaims := models.EmployeeTokenClaims{
-		Email:      claims["email"].(string),
-		EmployeeID: uint(math.Round(claims["employee_id"].(float64))),
-		ClinicID:   uint(math.Round(claims["clinic_id"].(float64))),
-		Role:       claims["role"].(string),
-		Exp:        uint(math.Round(claims["exp"].(float64))),
+	if claims, ok := user.Claims.(jwt.MapClaims); ok && user.Valid {
+		if claims["email"] != nil && claims["role"] != nil && claims["clinic_id"] != nil && claims["exp"] != nil {
+			employeeTokenClaims := models.EmployeeTokenClaims{
+				Email:    claims["email"].(string),
+				Role:     claims["role"].(string),
+				ClinicID: uint(math.Round(claims["clinic_id"].(float64))),
+				Exp:      uint(math.Round(claims["exp"].(float64))),
+			}
+			return employeeTokenClaims, nil
+		}
+
+	} else {
+		return models.EmployeeTokenClaims{}, errors.New("invalid claims")
 	}
-	return employeeTokenClaims, nil
+	return models.EmployeeTokenClaims{}, errors.New("invalid claims")
+
 }
 
 func GenerateEmployeeToken(email string, employee_id uint, clinic_id uint, role string) (string, error) {

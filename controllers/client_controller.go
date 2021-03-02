@@ -14,13 +14,18 @@ import (
 
 func GetAllImagesByClientID(context *fiber.Ctx) error {
 	var err error
+	var claimsErr error
 	var tokenClaims = models.ClientTokenClaims{}
 	images := make([]models.Image, 0)
 	clientID, _ := strconv.ParseUint(context.Params("client_id"), 10, 64)
 
 	// todo example get token claims
-	tokenClaims, err = utils.GetClientTokenClaims(context)
-	fmt.Println(tokenClaims)
+	tokenClaims, claimsErr = utils.GetClientTokenClaims(context)
+
+	tokenClaims, claimsErr = utils.GetClientTokenClaims(context)
+	if claimsErr != nil {
+		fmt.Println(tokenClaims)
+	}
 
 	if images, err = services.GetAllImagesByClientID(uint(clientID)); err != nil {
 		return context.SendStatus(fiber.StatusInternalServerError)
