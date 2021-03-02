@@ -1,8 +1,8 @@
 package clients
 
 type CreateClientRequest struct {
-	Name     string `json:"name"`
-	LastName string `json:"lastname"`
-	Email    string `json:"email" xml:"email" form:"email"`
-	Password string `json:"password" xml:"password" form:"password"`
+	Name     string `json:"name" validate:"required"`
+	LastName string `json:"lastname" validate:"required"`
+	Email    string `json:"email" xml:"email" form:"email" validate:"required,email"`
+	Password string `json:"password" xml:"password" form:"password" validate:"required"`
 }

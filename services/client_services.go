@@ -11,10 +11,10 @@ func CreateClient(newClient *modelsClients.CreateClientRequest) (*modelsClients.
 	//TODO validate
 
 	client := models.Client{
-		Email:                 newClient.Email,
-		Password:              utils.HashPassword([]byte(newClient.Password)),
-		Name:                  newClient.Name,
-		LastName:              newClient.LastName,
+		Email:    newClient.Email,
+		Password: utils.HashPassword([]byte(newClient.Password)),
+		Name:     newClient.Name,
+		LastName: newClient.LastName,
 	}
 	result := database.GormDB.Create(&client)
 
@@ -23,10 +23,10 @@ func CreateClient(newClient *modelsClients.CreateClientRequest) (*modelsClients.
 	}
 
 	/*
-	token, err := utils.GenerateClientToken(newClient.Email)
-	if err != nil {
-		return nil, err
-	}
+		token, err := utils.GenerateClientToken(newClient.Email)
+		if err != nil {
+			return nil, err
+		}
 	*/
 
 	createClientResponse := modelsClients.CreateClientResponse{
@@ -54,25 +54,35 @@ func ChangePassClientService(request *modelsClients.ChangePassClientRequest) err
 
 	database.GormDB.Model(&client).Update("password", newPassHashed)
 
-	return  nil
+	return nil
 }
 
 func GetAllImagesByClientID(clientID string) ([]models.Image, error) {
 	var list = make([]models.Image, 0)
 
-	if err := database.GormDB.Find(&list).Where("id = ?", clientID).Error; err != nil {
+	if err := database.GormDB.Find(&list).Where("client_id = ?", clientID).Error; err != nil {
 		return nil, err
 	}
 
-	return list , nil
+	return list, nil
 }
 
 func GetAllVideosByClientID(clientID string) ([]models.Video, error) {
 	var list = make([]models.Video, 0)
 
-	if err := database.GormDB.Find(&list).Where("id = ?", clientID).Error; err != nil {
+	if err := database.GormDB.Find(&list).Where("client_id = ?", clientID).Error; err != nil {
 		return nil, err
 	}
 
-	return list , nil
+	return list, nil
+}
+
+func GetAllStreamingByClientID(clientID string) ([]models.Streaming, error) {
+	var list = make([]models.Streaming, 0)
+
+	if err := database.GormDB.Find(&list).Where("client_id = ?", clientID).Error; err != nil {
+		return nil, err
+	}
+
+	return list, nil
 }
