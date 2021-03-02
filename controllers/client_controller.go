@@ -64,14 +64,19 @@ func CreateClient(context *fiber.Ctx) error {
 		})
 	}
 
-	// validation
+	// validation ---------------------------------------------------------------------
 	v := validator.New()
-	_ = v.Struct(createClientRequest)
-	for _, e := range err.(validator.ValidationErrors) {
-		return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-			"error": "validation_error: " + e.Field(),
-		})
+	err = v.Struct(createClientRequest)
+	if err != nil {
+		for _, e := range err.(validator.ValidationErrors) {
+			if e != nil {
+				return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+					"error": "validation_error: " + e.Field(),
+				})
+			}
+		}
 	}
+	// ---------------------------------------------------------------------------------
 
 	if createClientResponse, err = services.CreateClient(createClientRequest);
 		err != nil {
@@ -106,7 +111,7 @@ func PassRecoveryClient(context *fiber.Ctx) error {
 	var err error
 
 	if err = context.BodyParser(passRecoveryClientRequest);
-	err != nil {
+		err != nil {
 		return context.SendStatus(fiber.StatusBadRequest)
 	}
 
@@ -118,4 +123,3 @@ func PassRecoveryClient(context *fiber.Ctx) error {
 
 	return context.SendStatus(fiber.StatusOK)
 }
-

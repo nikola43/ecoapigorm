@@ -10,6 +10,7 @@ type Client struct {
 	Email                 string                 `gorm:"type:varchar(64) not null" json:"email" xml:"email" form:"email"`
 	Password              string                 `gorm:"type:varchar(256) not null; size:256" json:"password" xml:"password" form:"password"`
 	Name                  string                 `gorm:"type:varchar(32) not null" json:"name" xml:"name" form:"name"`
+	Phone                 string                 `gorm:"type:varchar(32) not null" json:"phone" xml:"phone" form:"phone"`
 	LastName              string                 `gorm:"type:varchar(32)" json:"lastname" xml:"lastname" form:"lastname"`
 	Videos                []Video                `json:"videos" xml:"videos" form:"videos"`
 	Images                []Image                `json:"images" xml:"images" form:"images"`
