@@ -1,11 +1,7 @@
 package models
 
-import (
-	"gorm.io/gorm"
-)
-
 type Client struct {
-	gorm.Model
+	CustomGormModel
 	ClinicID              uint                   `gorm:"type:INTEGER null; DEFAULT:NULL" json:"clinic_id" xml:"clinic_id" form:"clinic_id"`
 	Email                 string                 `gorm:"index; unique; type:varchar(64) not null" json:"email"`
 	Password              string                 `gorm:"type:varchar(256) not null; size:256" json:"password" xml:"password" form:"password"`

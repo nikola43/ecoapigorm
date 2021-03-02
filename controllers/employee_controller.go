@@ -7,6 +7,7 @@ import (
 	"github.com/nikola43/ecoapigorm/models"
 	modelsEmployees "github.com/nikola43/ecoapigorm/models/employee"
 	"github.com/nikola43/ecoapigorm/services"
+	"strconv"
 )
 
 func CreateEmployee(context *fiber.Ctx) error {
@@ -61,4 +62,17 @@ func CreateEmployee(context *fiber.Ctx) error {
 		})
 	}
 	return context.JSON(createEmployeeResponse)
+}
+
+func GetEmployeesByParentEmployeeID(context *fiber.Ctx) error {
+	parentEmployeeID, _ := strconv.ParseUint(context.Params("parent_employee_id"), 10, 64)
+
+	employees := make([]models.Employee, 0)
+	var err error
+
+	if employees, err = services.GetEmployeesByParentEmployeeID(uint(parentEmployeeID)); err != nil {
+		return context.SendStatus(fiber.StatusInternalServerError)
+	}
+
+	return context.Status(fiber.StatusOK).JSON(employees)
 }

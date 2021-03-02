@@ -38,3 +38,13 @@ func CreateEmployee(createEmployeeRequest *modelsEmployees.CreateEmployeeRequest
 
 	return &createEmployeeResponse, result.Error
 }
+
+func GetEmployeesByParentEmployeeID(parentEmployeeID uint) ([]models.Employee, error) {
+	var list = make([]models.Employee, 0)
+
+	if err := database.GormDB.Where("parent_employee_id = ?", parentEmployeeID).Find(&list).Error; err != nil {
+		return nil, err
+	}
+
+	return list, nil
+}

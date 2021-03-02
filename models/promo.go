@@ -1,11 +1,7 @@
 package models
 
-import (
-	"gorm.io/gorm"
-)
-
 type Promo struct {
-	gorm.Model
+	CustomGormModel
 	ClinicID uint   `gorm:"type:INTEGER not null" json:"clinic_id"`
 	Title    string `gorm:"type:varchar(128) not null" json:"title"`
 	Text     string `gorm:"type:varchar(128) not null" json:"text"`

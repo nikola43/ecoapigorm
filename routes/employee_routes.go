@@ -21,4 +21,7 @@ func EmployeeRoutes (router fiber.Router) {
 	// /api/v1/employee/create
 	employeeRouter.Post("/create", controllers.CreateEmployee)
 
+	// /api/v1/employee/:parent_employee_id/employees
+	employeeRouter.Get("/:parent_employee_id/employees", controllers.GetEmployeesByParentEmployeeID)
+
 }

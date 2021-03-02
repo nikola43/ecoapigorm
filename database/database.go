@@ -54,7 +54,7 @@ func CreateFakeData() {
 	user1 := models.Employee{Name: "Paulo", Email: "pauloxti@gmail.com", Password: utils.HashPassword([]byte("paulo")), Role: "admin"}
 	GormDB.Create(&user1)
 
-	user2 := models.Employee{Name: "Migue", Email: "migue@gmail.com", Password: utils.HashPassword([]byte("migue")), Role: "employeee"}
+	user2 := models.Employee{Name: "Migue", Email: "migue@gmail.com", Password: utils.HashPassword([]byte("migue")), Role: "employeee", ParentEmployeeID: 1}
 	GormDB.Create(&user2)
 
 	// IMAGES ------------------------------------------------------------------------------------------------------------------------------------------------------------------
