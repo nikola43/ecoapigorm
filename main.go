@@ -4,5 +4,5 @@ import "github.com/nikola43/ecoapigorm/app"
 
 func main() {
 	a := app.App{}
-	a.Initialize(":3000")
+	a.Initialize(":8081")
 }
