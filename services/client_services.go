@@ -7,14 +7,14 @@ import (
 	"github.com/nikola43/ecoapigorm/utils"
 )
 
-func CreateClient(newClient *modelsClients.CreateClientRequest) (*modelsClients.CreateClientResponse, error) {
+func CreateClient(createClientRequest *modelsClients.CreateClientRequest) (*modelsClients.CreateClientResponse, error) {
 	//TODO validate
 
 	client := models.Client{
-		Email:    newClient.Email,
-		Password: utils.HashPassword([]byte(newClient.Password)),
-		Name:     newClient.Name,
-		LastName: newClient.LastName,
+		Email:    createClientRequest.Email,
+		Password: utils.HashPassword([]byte(createClientRequest.Password)),
+		Name:     createClientRequest.Name,
+		LastName: createClientRequest.LastName,
 	}
 	result := database.GormDB.Create(&client)
 
@@ -22,19 +22,17 @@ func CreateClient(newClient *modelsClients.CreateClientRequest) (*modelsClients.
 		return nil, result.Error
 	}
 
-	/*
-		token, err := utils.GenerateClientToken(newClient.Email)
-		if err != nil {
-			return nil, err
-		}
-	*/
+	token, err := utils.GenerateClientToken(client.Email, client.ID, client.ClinicID)
+	if err != nil {
+		return nil, err
+	}
 
 	createClientResponse := modelsClients.CreateClientResponse{
 		Id:       client.ID,
 		Email:    client.Email,
 		Name:     client.Name,
 		LastName: client.LastName,
-		Token:    "",
+		Token:    token,
 	}
 
 	return &createClientResponse, result.Error
@@ -68,14 +66,14 @@ func PassRecoveryClientService(request *modelsClients.PassRecoveryRequest) error
 		return GormDBResult.Error
 	}
 
-	apiTokenString , err := utils.GenerateClientToken(client.Email, client.ClinicID, client.ID)
+	apiTokenString, err := utils.GenerateClientToken(client.Email, client.ClinicID, client.ID)
 	if err != nil {
 		return err
 	}
 
 	recovery := models.Recovery{
-		ClientID:                 client.ID,
-		Token:              apiTokenString,
+		ClientID: client.ID,
+		Token:    apiTokenString,
 	}
 	result := database.GormDB.Create(&recovery)
 	if result.Error != nil {
@@ -83,7 +81,7 @@ func PassRecoveryClientService(request *modelsClients.PassRecoveryRequest) error
 	}
 	SendMailRecovery(client.Email, recovery.Token)
 
-	return  nil
+	return nil
 }
 
 func GetAllImagesByClientID(clientID string) ([]models.Image, error) {
