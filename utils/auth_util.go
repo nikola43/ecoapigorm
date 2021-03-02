@@ -6,7 +6,6 @@ import (
 )
 
 func HashPassword(pwd []byte) string {
-
 	// Use GenerateFromPassword to hash & salt pwd.
 	// MinCost is just an integer constant provided by the bcrypt
 	// package along with DefaultCost & MaxCost.
@@ -30,6 +29,5 @@ func ComparePasswords(hashedPwd string, plainPwd []byte) bool {
 		log.Println(err)
 		return false
 	}
-
 	return true
 }

@@ -12,8 +12,7 @@ func EmployeeRoutes (router fiber.Router) {
 	// /api/v1/employee
 	employeeRouter := router.Group("/employee")
 
-
-
+	// use jwt
 	employeeRouter.Use(jwtware.New(jwtware.Config{SigningKey: []byte(utils.GetEnvVariable("JWT_CLIENT_KEY"))}))
 
 	// check Employee.Role == 'admin'
