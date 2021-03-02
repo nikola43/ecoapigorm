@@ -1,4 +1,4 @@
-package employee
+package clients
 
 type CreateEmployeeRequest struct {
 	Name     string `json:"name" validate:"required"`

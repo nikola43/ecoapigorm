@@ -4,10 +4,12 @@ import (
 	database "github.com/nikola43/ecoapigorm/database"
 	"github.com/nikola43/ecoapigorm/models"
 	modelsEmployees "github.com/nikola43/ecoapigorm/models/employee"
-	utils "github.com/nikola43/ecoapigorm/utils"
+	"github.com/nikola43/ecoapigorm/utils"
 )
 
 func CreateEmployee(createEmployeeRequest *modelsEmployees.CreateEmployeeRequest) (*modelsEmployees.CreateEmployeeResponse, error) {
+	//TODO validate
+
 	employee := models.Employee{
 		Email:    createEmployeeRequest.Email,
 		Password: utils.HashPassword([]byte(createEmployeeRequest.Password)),

@@ -38,3 +38,38 @@ func LoginClient(email, password string) (*models.LoginClientResponse, error) {
 
 	return &clientLoginResponse, err
 }
+
+func LoginEmployee(email, password string) (*models.LoginEmployeeResponse, error) {
+	employee := &models.Employee{}
+
+	GormDBResult := database.GormDB.
+		Where("email = ?", email).
+		Find(&employee)
+
+	if GormDBResult.Error != nil {
+		return &models.LoginEmployeeResponse{}, GormDBResult.Error
+	}
+
+	match := utils.ComparePasswords(employee.Password, []byte(password))
+	if !match {
+		return &models.LoginEmployeeResponse{}, errors.New("not found")
+	}
+
+	// todo coger clinic id de la relacion
+	token, err := utils.GenerateEmployeeToken(employee.Email, employee.ID, 0, employee.Role)
+	if err != nil {
+		return &models.LoginEmployeeResponse{}, err
+	}
+
+	clientEmployeeResponse := models.LoginEmployeeResponse{
+		Id:       employee.ID,
+		ClinicID: 0,
+		Email:    employee.Email,
+		Name:     employee.Name,
+		Role:     employee.Role,
+		LastName: employee.LastName,
+		Token:    token,
+	}
+
+	return &clientEmployeeResponse, err
+}
