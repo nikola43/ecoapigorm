@@ -1,22 +1,34 @@
 package utils
 
 import (
-	"github.com/dgrijalva/jwt-go"
-	"os"
+	"github.com/form3tech-oss/jwt-go"
+	"github.com/gofiber/fiber/v2"
+	"github.com/nikola43/ecoapigorm/models"
+	"math"
 	"time"
 )
 
-type customToken struct {
-	Username string
-	jwt.StandardClaims
+func GetTokenClaims(context *fiber.Ctx) (models.ClientTokenClaims, error) {
+	// todo handle error
+	user := context.Locals("user").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
+	clientTokenClaim := models.ClientTokenClaims{
+		Email: claims["email"].(string),
+		ClientID: uint(math.Round(claims["client_id"].(float64))),
+		ClinicID: uint(math.Round(claims["clinic_id"].(float64))),
+		Exp: uint(math.Round(claims["exp"].(float64))),
+	}
+	return clientTokenClaim, nil
 }
 
-func GenerateClientToken(email string) (string, error) {
+func GenerateClientToken(email string, client_id uint, clinic_id uint) (string, error) {
 	// Create token
 	token := jwt.New(jwt.SigningMethodHS256)
 
 	// Set claims
 	claims := token.Claims.(jwt.MapClaims)
+	claims["client_id"] = client_id
+	claims["clinic_id"] = clinic_id
 	claims["email"] = email
 	// todo añaair role e user id
 	claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
@@ -27,25 +39,4 @@ func GenerateClientToken(email string) (string, error) {
 		return "", err
 	}
 	return tokenString, err
-}
-
-
-
-func GenerateTokenUsername(userName string) string {
-	// Declare the expiration time of the token
-	// here, we have kept it as 1 day
-	expirationTime := time.Now().Add(1440 * time.Minute)
-
-	// Create the JWT claims, which includes the username and expiry time
-	claims := &customToken{
-		Username: userName,
-		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: expirationTime.Unix(),
-		},
-	}
-
-	// generate api token
-	apiToken := jwt.NewWithClaims(jwt.GetSigningMethod("HS256"), claims)
-	apiTokenString, _ := apiToken.SignedString([]byte(os.Getenv("token_password")))
-	return apiTokenString
 }

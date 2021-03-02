@@ -25,11 +25,13 @@ func SignUpClient(name, email, password string) (string, error) {
 	// remove password
 	//client.Password = ""
 
-	token, err := utils.GenerateClientToken(client.Email)
-	if err != nil {
-		return "", err
-	}
-	return token, err
+	/*
+		token, err := utils.GenerateClientToken(client.Email)
+		if err != nil {
+			return "", err
+		}
+	*/
+	return "token", nil
 }
 
 func SignUpEmployee(email, password string) (string, error) {
@@ -49,10 +51,11 @@ func SignUpEmployee(email, password string) (string, error) {
 
 	// remove password
 	//client.Password = ""
-
-	token, err := utils.GenerateClientToken(client.Email)
-	if err != nil {
-		return "", err
-	}
-	return token, err
+	/*
+		token, err := utils.GenerateClientToken(client.Email)
+		if err != nil {
+			return "", err
+		}
+	*/
+	return "token", nil
 }

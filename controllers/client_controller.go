@@ -2,16 +2,23 @@ package controllers
 
 import (
 	"errors"
+	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/nikola43/ecoapigorm/models"
 	modelsClient "github.com/nikola43/ecoapigorm/models/clients"
 	"github.com/nikola43/ecoapigorm/services"
+	"github.com/nikola43/ecoapigorm/utils"
 )
 
 func GetAllImagesByClientID(context *fiber.Ctx) error {
-	clientID := context.Params("client_id")
-	images := make([]models.Image, 0)
 	var err error
+	var tokenClaims = models.ClientTokenClaims{}
+	images := make([]models.Image, 0)
+	clientID := context.Params("client_id")
+
+	// todo example get token claims
+	tokenClaims, err = utils.GetTokenClaims(context)
+	fmt.Println(tokenClaims)
 
 	if images, err = services.GetAllImagesByClientID(clientID); err != nil {
 		return context.SendStatus(fiber.StatusInternalServerError)
