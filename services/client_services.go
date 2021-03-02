@@ -22,17 +22,19 @@ func CreateClient(newClient *modelsClients.CreateClientRequest) (*modelsClients.
 		return nil, result.Error
 	}
 
+	/*
 	token, err := utils.GenerateClientToken(newClient.Email)
 	if err != nil {
 		return nil, err
 	}
+	*/
 
 	createClientResponse := modelsClients.CreateClientResponse{
 		Id:       client.ID,
 		Email:    client.Email,
 		Name:     client.Name,
 		LastName: client.LastName,
-		Token:    token,
+		Token:    "",
 	}
 
 	return &createClientResponse, result.Error
