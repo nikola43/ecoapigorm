@@ -81,8 +81,9 @@ func CreateFakeData() {
 
 	GormDB.Create(&videos)
 
-	for i := 0; i < 40; i++ {
+	for i := 1; i < 41; i++ {
 		calculatorDetail :=  models.CalculatorDetail{
+			Week:  uint(i),
 			Image: "https://s3.eu-central-1.wasabisys.com/stela/weeks/21SM.jpg",
 			Text:  "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book",
 		}
