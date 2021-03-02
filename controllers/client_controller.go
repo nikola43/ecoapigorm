@@ -19,7 +19,7 @@ func GetAllImagesByClientID(context *fiber.Ctx) error {
 	clientID, _ := strconv.ParseUint(context.Params("client_id"), 10, 64)
 
 	// todo example get token claims
-	tokenClaims, err = utils.GetTokenClaims(context)
+	tokenClaims, err = utils.GetClientTokenClaims(context)
 	fmt.Println(tokenClaims)
 
 	if images, err = services.GetAllImagesByClientID(uint(clientID)); err != nil {

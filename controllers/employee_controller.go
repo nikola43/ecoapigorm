@@ -10,9 +10,10 @@ import (
 )
 
 func CreateEmployee(context *fiber.Ctx) error {
+	var err error
+
 	createEmployeeRequest := new(modelsEmployees.CreateEmployeeRequest)
 	createEmployeeResponse := new(modelsEmployees.CreateEmployeeResponse)
-	var err error
 
 	// parse request
 	if err = context.BodyParser(createEmployeeRequest);
