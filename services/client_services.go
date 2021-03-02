@@ -68,7 +68,10 @@ func PassRecoveryClientService(request *modelsClients.PassRecoveryRequest) error
 		return GormDBResult.Error
 	}
 
-	apiTokenString := utils.GenerateTokenUsername(client.Email)
+	apiTokenString , err := utils.GenerateClientToken(client.Email, client.ClinicID, client.ID)
+	if err != nil {
+		return err
+	}
 
 	recovery := models.Recovery{
 		ClientID:                 client.ID,
