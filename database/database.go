@@ -23,6 +23,7 @@ func Migrate()  {
 	GormDB.Migrator().DropTable(&models.BankAccount{})
 	GormDB.Migrator().DropTable(&models.CreditCard{})
 	GormDB.Migrator().DropTable(&models.PaymentMethod{})
+	GormDB.Migrator().DropTable(&models.CalculatorDetail{})
 
 	// CREATE
 	GormDB.AutoMigrate(&models.Client{})
@@ -38,6 +39,7 @@ func Migrate()  {
 	GormDB.AutoMigrate(&models.BankAccount{})
 	GormDB.AutoMigrate(&models.CreditCard{})
 	GormDB.AutoMigrate(&models.PaymentMethod{})
+	GormDB.AutoMigrate(&models.CalculatorDetail{})
 }
 
 func CreateFakeData() {
@@ -78,4 +80,13 @@ func CreateFakeData() {
 	})
 
 	GormDB.Create(&videos)
+
+	for i := 0; i < 40; i++ {
+		calculatorDetail :=  models.CalculatorDetail{
+			Image: "https://s3.eu-central-1.wasabisys.com/stela/weeks/21SM.jpg",
+			Text:  "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book",
+		}
+
+		GormDB.Create(&calculatorDetail)
+	}
 }

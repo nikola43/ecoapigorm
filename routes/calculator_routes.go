@@ -10,5 +10,5 @@ func CalculatorRoutes (router fiber.Router) {
 	calculatorRouter := router.Group("/calculator")
 
 	// /api/v1/calculator/:week
-	calculatorRouter.Post("/:week", controllers.LoginClient)
+	calculatorRouter.Get("/:week", controllers.GetCalculatorByWeek)
 }

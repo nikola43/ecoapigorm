@@ -1,11 +1,15 @@
 package services
 
-/*
+import (
+	database "github.com/nikola43/ecoapigorm/database"
+	"github.com/nikola43/ecoapigorm/models"
+)
+
 func GetCalculator(week uint) (*models.CalculatorDetail, error) {
 	calculator := &models.CalculatorDetail{}
-	database.GormDBResult := database.GormDB.
+	res := database.GormDB.
 		Find(&calculator,week)
 
-	return calculator, database.GormDBResult.Error
+	return calculator, res.Error
 }
-*/
+

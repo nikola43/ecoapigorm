@@ -61,6 +61,7 @@ func HandleRoutes(api fiber.Router) {
 	routes.ClinicRoutes(api)
 	routes.AuthRoutes(api)
 	routes.SignUpRoutes(api)
+	routes.CalculatorRoutes(api)
 }
 
 func InitializeDatabase(user, password, database_name string) {
