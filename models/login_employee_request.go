@@ -1,4 +1,4 @@
-package employee
+package models
 
 type LoginEmployeeRequest struct {
 	Email    string `json:"email" xml:"email" form:"email"`
