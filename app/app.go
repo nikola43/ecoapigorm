@@ -14,6 +14,7 @@ import (
 	"github.com/nikola43/ecoapigorm/utils"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 	"log"
 )
 
@@ -75,7 +76,7 @@ func InitializeDatabase(user, password, database_name string) {
 		log.Fatal(err)
 	}
 
-	database.GormDB, err = gorm.Open(mysql.New(mysql.Config{Conn: DB}), &gorm.Config{})
+	database.GormDB, err = gorm.Open(mysql.New(mysql.Config{Conn: DB}), &gorm.Config{Logger: logger.Default.LogMode(logger.Info)})
 	if err != nil {
 		log.Fatal(err)
 	}

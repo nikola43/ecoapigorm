@@ -8,19 +8,20 @@ import (
 	modelsClient "github.com/nikola43/ecoapigorm/models/clients"
 	"github.com/nikola43/ecoapigorm/services"
 	"github.com/nikola43/ecoapigorm/utils"
+	"strconv"
 )
 
 func GetAllImagesByClientID(context *fiber.Ctx) error {
 	var err error
 	var tokenClaims = models.ClientTokenClaims{}
 	images := make([]models.Image, 0)
-	clientID := context.Params("client_id")
+	clientID, _ := strconv.ParseUint(context.Params("client_id"), 10, 64)
 
 	// todo example get token claims
 	tokenClaims, err = utils.GetTokenClaims(context)
 	fmt.Println(tokenClaims)
 
-	if images, err = services.GetAllImagesByClientID(clientID); err != nil {
+	if images, err = services.GetAllImagesByClientID(uint(clientID)); err != nil {
 		return context.SendStatus(fiber.StatusInternalServerError)
 	}
 

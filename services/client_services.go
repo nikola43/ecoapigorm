@@ -84,10 +84,9 @@ func PassRecoveryClientService(request *modelsClients.PassRecoveryRequest) error
 	return nil
 }
 
-func GetAllImagesByClientID(clientID string) ([]models.Image, error) {
+func GetAllImagesByClientID(clientID uint) ([]models.Image, error) {
 	var list = make([]models.Image, 0)
-
-	if err := database.GormDB.Find(&list).Where("client_id = ?", clientID).Error; err != nil {
+	if err := database.GormDB.Where("client_id = ?", clientID).Find(&list).Error; err != nil {
 		return nil, err
 	}
 
@@ -97,7 +96,7 @@ func GetAllImagesByClientID(clientID string) ([]models.Image, error) {
 func GetAllVideosByClientID(clientID string) ([]models.Video, error) {
 	var list = make([]models.Video, 0)
 
-	if err := database.GormDB.Find(&list).Where("client_id = ?", clientID).Error; err != nil {
+	if err := database.GormDB.Where("client_id = ?", clientID).Find(&list).Error; err != nil {
 		return nil, err
 	}
 
@@ -107,7 +106,7 @@ func GetAllVideosByClientID(clientID string) ([]models.Video, error) {
 func GetAllStreamingByClientID(clientID string) ([]models.Streaming, error) {
 	var list = make([]models.Streaming, 0)
 
-	if err := database.GormDB.Find(&list).Where("client_id = ?", clientID).Error; err != nil {
+	if err := database.GormDB.Where("client_id = ?", clientID).Find(&list).Error; err != nil {
 		return nil, err
 	}
 
