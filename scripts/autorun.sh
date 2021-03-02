@@ -1,12 +1,10 @@
 #!/bin/bash
-cd /home/ubuntu/go/src/github.com/nikola43/ecoapi
+cd /home/ubuntu/go/src/github.com/nikola43/ecoapigorm
 
 echo "KILL API"
-sudo pkill ecoapi
-sudo systemctl stop ecoapi
+sudo pkill ecoapigorm
+sudo systemctl stop ecoapigorm
 
-sudo pkill ecoapi
 echo "RUN API"
-#./ecoapi &
-sudo systemctl start ecoapi
+sudo systemctl start ecoapigorm
 exit

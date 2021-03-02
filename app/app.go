@@ -30,7 +30,7 @@ func (a *App) Initialize(port string) {
 	v1 := api.Group("/v1")          // /api/v1
 	api.Use(middlewares.ApiKeyMiddleware)
 
-	Initializedatabase(
+	InitializeDatabase(
 		utils.GetEnvVariable("MYSQL_USER"),
 		utils.GetEnvVariable("MYSQL_PASSWORD"),
 		utils.GetEnvVariable("MYSQL_DATABASE"))
@@ -62,7 +62,7 @@ func HandleRoutes(api fiber.Router) {
 	routes.SignUpRoutes(api)
 }
 
-func Initializedatabase(user, password, database_name string) {
+func InitializeDatabase(user, password, database_name string) {
 	connectionString := fmt.Sprintf(
 		"%s:%s@/%s?parseTime=true",
 		user,
