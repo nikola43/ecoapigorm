@@ -5,6 +5,8 @@ import (
 	"github.com/nikola43/ecoapigorm/models/kicks"
 	"github.com/nikola43/ecoapigorm/utils"
 	"gorm.io/gorm"
+	"math/rand"
+	"time"
 )
 
 var GormDB *gorm.DB
@@ -102,6 +104,22 @@ func CreateFakeData() {
 		}
 
 		GormDB.Create(&calculatorDetail)
+	}
+
+	// KICKS
+	Time := time.Date(2020, 1, 4, 0, 0, 0, 0, time.UTC)
+	for i := 1; i < 8; i++ {
+		Time = Time.AddDate(0,1,0)
+		randomKicksCounter := rand.Intn(100)
+		for i := 1; i < randomKicksCounter; i++ {
+
+			kick := kicks.Kick{
+				Date:     Time.AddDate(0,0,0),
+				ClientId: 2,
+			}
+
+			GormDB.Create(&kick)
+		}
 	}
 
 	// CLINIC ------------------------------------------------------------------------------------------------------------------------------------------------------------------
