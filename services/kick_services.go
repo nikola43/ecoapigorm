@@ -20,13 +20,16 @@ func CreateNewKickService(kickRequest kicks.AddKickRequest) (kicks.Kick, error) 
 }
 
 func DeleteKickByIdService(ClientId uint, kickId uint) error {
+	kick := kicks.Kick{}
 	result := database.GormDB.
 		Where("client_id = ?", ClientId).
-		Delete(kicks.Kick{}, kickId)
+		Find(&kick, kickId)
 
 	if result.Error != nil {
 		return result.Error
 	}
+
+	database.GormDB.Delete(&kick)
 
 	return nil
 }
@@ -47,7 +50,7 @@ func GetAllKicksByClientService(clientID uint) ([]kicks.Kick, error) {
 func ResetAllKicksByClientService(clientID uint) error {
 	result := database.GormDB.
 		Where("client_id = ?", clientID).
-		Delete(kicks.Kick{})
+		Delete(&kicks.Kick{})
 
 	if result.Error != nil {
 		return result.Error
