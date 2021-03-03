@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"github.com/nikola43/ecoapigorm/models"
+	"github.com/nikola43/ecoapigorm/models/kicks"
 	"github.com/nikola43/ecoapigorm/utils"
 	"gorm.io/gorm"
 )
@@ -24,6 +25,7 @@ func Migrate() {
 	GormDB.Migrator().DropTable(&models.CreditCard{})
 	GormDB.Migrator().DropTable(&models.PaymentMethod{})
 	GormDB.Migrator().DropTable(&models.CalculatorDetail{})
+	GormDB.Migrator().DropTable(&kicks.Kick{})
 
 	// CREATE
 	GormDB.AutoMigrate(&models.Client{})
@@ -40,6 +42,7 @@ func Migrate() {
 	GormDB.AutoMigrate(&models.CreditCard{})
 	GormDB.AutoMigrate(&models.PaymentMethod{})
 	GormDB.AutoMigrate(&models.CalculatorDetail{})
+	GormDB.AutoMigrate(&kicks.Kick{})
 }
 
 func CreateFakeData() {

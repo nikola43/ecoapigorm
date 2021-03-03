@@ -62,6 +62,7 @@ func HandleRoutes(api fiber.Router) {
 	routes.AuthRoutes(api)
 	routes.SignUpRoutes(api)
 	routes.CalculatorRoutes(api)
+	routes.KickRoutes(api)
 	routes.EmployeeRoutes(api)
 }
 
