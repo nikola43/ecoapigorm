@@ -99,8 +99,8 @@ func CreateClient(context *fiber.Ctx) error {
 	// create and response
 	if createClientResponse, err = services.CreateClient(createClientRequest);
 		err != nil {
-		return context.Status(fiber.StatusNotFound).JSON(&fiber.Map{
-			"error": "not found",
+		return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+			"error": err.Error(),
 		})
 	} else {
 		return context.JSON(createClientResponse)

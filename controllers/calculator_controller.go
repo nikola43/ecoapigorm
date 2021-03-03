@@ -9,7 +9,7 @@ import (
 
 func GetCalculatorByWeek(context *fiber.Ctx) error {
 	week, _ := strconv.ParseUint(context.Params("week"), 10, 64)
-	if calculatorDetail, err := services.GetCalculator(uint(week))
+	if calculatorDetail, err := services.GetCalculatorByWeekNumber(uint(week))
 		err != nil {
 		return context.Status(fiber.StatusNotFound).JSON(&fiber.Map{
 			"error": errors.New("not found"),

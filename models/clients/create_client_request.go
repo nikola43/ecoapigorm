@@ -1,6 +1,7 @@
 package clients
 
 type CreateClientRequest struct {
+	ClinicID uint   `json:"clinic_id"`
 	Name     string `json:"name" validate:"required"`
 	LastName string `json:"lastname" validate:"required"`
 	Email    string `json:"email" xml:"email" form:"email" validate:"required,email"`

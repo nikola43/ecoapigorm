@@ -2,6 +2,7 @@ package services
 
 import (
 	"errors"
+	"fmt"
 	database "github.com/nikola43/ecoapigorm/database"
 	"github.com/nikola43/ecoapigorm/models"
 	"github.com/nikola43/ecoapigorm/utils"
@@ -55,15 +56,20 @@ func LoginEmployee(email, password string) (*models.LoginEmployeeResponse, error
 		return &models.LoginEmployeeResponse{}, errors.New("not found")
 	}
 
+	clinic:= models.Clinic{}
+	database.GormDB.Model(&clinic).Select("clinics.id").Joins("inner join employees on clinics.employee_id = employees.id").Where("employees.id = ?", employee.ID).Scan(&clinic)
+	fmt.Println("clinic")
+	fmt.Println(clinic.ID)
+
 	// todo coger clinic id de la relacion
-	token, err := utils.GenerateEmployeeToken(employee.Email, employee.ID, 0, employee.Role)
+	token, err := utils.GenerateEmployeeToken(employee.Email, employee.ID, clinic.ID, employee.Role)
 	if err != nil {
 		return &models.LoginEmployeeResponse{}, err
 	}
 
 	clientEmployeeResponse := models.LoginEmployeeResponse{
 		Id:       employee.ID,
-		ClinicID: 0,
+		ClinicID: clinic.ID,
 		Email:    employee.Email,
 		Name:     employee.Name,
 		Role:     employee.Role,

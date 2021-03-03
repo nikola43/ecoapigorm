@@ -103,4 +103,11 @@ func CreateFakeData() {
 
 		GormDB.Create(&calculatorDetail)
 	}
+
+	// CLINIC ------------------------------------------------------------------------------------------------------------------------------------------------------------------
+	clinic1 := models.Clinic{Name: "M Clinic", EmployeeID: 2}
+	GormDB.Create(&clinic1)
+
+	clinic2 := models.Clinic{Name: "P Clinic", EmployeeID: 1}
+	GormDB.Create(&clinic2)
 }
