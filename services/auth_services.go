@@ -48,12 +48,14 @@ func LoginEmployee(email, password string) (*models.LoginEmployeeResponse, error
 		Find(&employee)
 
 	if GormDBResult.Error != nil {
-		return &models.LoginEmployeeResponse{}, GormDBResult.Error
+		return nil, GormDBResult.Error
 	}
+
+	fmt.Println(employee)
 
 	match := utils.ComparePasswords(employee.Password, []byte(password))
 	if !match {
-		return &models.LoginEmployeeResponse{}, errors.New("not found")
+		return nil, errors.New("not found")
 	}
 
 	clinic:= models.Clinic{}

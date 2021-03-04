@@ -12,6 +12,7 @@ require (
 	github.com/gofiber/jwt/v2 v2.1.0
 	github.com/gorilla/mux v1.8.0
 	github.com/joho/godotenv v1.3.0
+	github.com/stripe/stripe-go/v72 v72.37.0 // indirect
 	golang.org/x/crypto v0.0.0-20210220033148-5ea612d1eb83
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
