@@ -21,8 +21,6 @@ func GetAllImagesByClientID(context *fiber.Ctx) error {
 
 	// todo example get token claims
 	tokenClaims, claimsErr = utils.GetClientTokenClaims(context)
-
-	tokenClaims, claimsErr = utils.GetClientTokenClaims(context)
 	if claimsErr != nil {
 		fmt.Println(tokenClaims)
 	}
@@ -139,6 +137,25 @@ func PassRecoveryClient(context *fiber.Ctx) error {
 	if err != nil {
 		return context.SendStatus(fiber.StatusNotFound)
 	}
+
+	return context.SendStatus(fiber.StatusOK)
+}
+
+func UploadMultimedia(context *fiber.Ctx) error {
+	clientID, _ := strconv.ParseUint(context.Params("client_id"), 10, 64)
+	fmt.Println(clientID)
+
+	// Get first file from form field "document":
+	uploadedFile, err := context.FormFile("file")
+	//uploadedFileMode, err := context.FormFile("mode")
+	if err != nil {
+		return err
+	}
+
+
+	services.UploadMultimedia(context,uint(clientID), uploadedFile)
+
+
 
 	return context.SendStatus(fiber.StatusOK)
 }

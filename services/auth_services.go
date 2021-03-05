@@ -59,7 +59,7 @@ func LoginEmployee(email, password string) (*models.LoginEmployeeResponse, error
 	}
 
 	clinic:= models.Clinic{}
-	database.GormDB.Model(&clinic).Select("clinics.id").Joins("inner join employees on clinics.employee_id = employees.id").Where("employees.id = ?", employee.ID).Scan(&clinic)
+	database.GormDB.Model(&clinic).Select("clinics.id").Joins("left join employees on clinics.employee_id = employees.id").Where("employees.id = ?", employee.ID).Scan(&clinic)
 	fmt.Println("clinic")
 	fmt.Println(clinic.ID)
 

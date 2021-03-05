@@ -16,15 +16,13 @@ func LoginClient(context *fiber.Ctx) error {
 		return context.SendStatus(fiber.StatusBadRequest)
 	}
 
-	if clientLoginResponse, err = services.LoginClient(clientLoginRequest.Email, clientLoginRequest.Password);
-
-	err != nil {
+	if clientLoginResponse, err = services.LoginClient(clientLoginRequest.Email, clientLoginRequest.Password); err != nil {
 		return context.Status(fiber.StatusNotFound).JSON(&fiber.Map{
 			"error": errors.New("not found"),
 		})
-	}else {
-		return context.JSON(clientLoginResponse)
 	}
+
+	return context.JSON(clientLoginResponse)
 }
 
 func LoginEmployee(context *fiber.Ctx) error {
@@ -36,13 +34,11 @@ func LoginEmployee(context *fiber.Ctx) error {
 		return context.SendStatus(fiber.StatusBadRequest)
 	}
 
-	if clientEmployeeResponse, err = services.LoginEmployee(clientEmployeeRequest.Email, clientEmployeeRequest.Password);
-
-		err != nil {
+	if services.LoginEmployee(clientEmployeeRequest.Email, clientEmployeeRequest.Password); err != nil {
 		return context.Status(fiber.StatusNotFound).JSON(&fiber.Map{
 			"error": errors.New("not found"),
 		})
-	}else {
-		return context.JSON(clientEmployeeResponse)
 	}
+
+	return context.JSON(clientEmployeeResponse)
 }

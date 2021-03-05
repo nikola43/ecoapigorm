@@ -29,6 +29,7 @@ func Migrate() {
 	GormDB.Migrator().DropTable(&models.CalculatorDetail{})
 	GormDB.Migrator().DropTable(&models.Calculator{})
 	GormDB.Migrator().DropTable(&kicks.Kick{})
+	GormDB.Migrator().DropTable(&models.Company{})
 
 	// CREATE
 	GormDB.AutoMigrate(&models.Client{})
@@ -47,25 +48,40 @@ func Migrate() {
 	GormDB.AutoMigrate(&models.Calculator{})
 	GormDB.AutoMigrate(&models.CalculatorDetail{})
 	GormDB.AutoMigrate(&kicks.Kick{})
+	GormDB.AutoMigrate(&models.Company{})
 }
 
 func CreateFakeData() {
+
+
 	// EMPLOYEES ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	employee1 := models.Employee{Name: "Paulo", LastName: "Soares", Phone: "666666666", Email: "pauloxti@gmail.com", Password: utils.HashPassword([]byte("paulo")), Role: "admin"}
 	GormDB.Create(&employee1)
 
-	employee2 := models.Employee{Name: "Migue", LastName: "Barrera", Phone: "999999999", Email: "migue@gmail.com", Password: utils.HashPassword([]byte("migue")), Role: "employeee", ParentEmployeeID: 1}
+	employee2 := models.Employee{Name: "Migue", LastName: "Barrera", Phone: "999999999", Email: "migue@gmail.com", Password: utils.HashPassword([]byte("migue")), Role: "employeee", ParentEmployeeID: employee1.ID}
 	GormDB.Create(&employee2)
 
+	employee3 := models.Employee{Name: "Pablo", LastName: "Gutierrez", Phone: "777777777", Email: "pablojoseguit@gmail.com", Password: utils.HashPassword([]byte("pablo")), Role: "employee", ParentEmployeeID: employee1.ID}
+	GormDB.Create(&employee3)
+
+	// COMPANIES ------------------------------------------------------------------------------------------------------------------------------------------------------------------
+	company1 := models.Company{Name: "Paulo Company", EmployeeID: employee1.ID}
+	GormDB.Create(&company1)
+	GormDB.Model(&employee1).Update("company_id", company1.ID)
+	GormDB.Model(&employee2).Update("company_id", company1.ID)
+	GormDB.Model(&employee3).Update("company_id", company1.ID)
+
+
+
 	// CLINIC ------------------------------------------------------------------------------------------------------------------------------------------------------------------
-	clinic1 := models.Clinic{Name: "P Clinic", EmployeeID: employee1.ID}
+	clinic1 := models.Clinic{Name: "Paulo Clinic", EmployeeID: employee1.ID}
 	GormDB.Create(&clinic1)
 
-	clinic2 := models.Clinic{Name: "M Clinic", EmployeeID: employee2.ID}
+	clinic2 := models.Clinic{Name: "Migue Clinic", EmployeeID: employee2.ID}
 	GormDB.Create(&clinic2)
 
-	// database.GormDB.Model(&client).Update("password", newPassHashed)
-
+	clinic3 := models.Clinic{Name: "Pablo Clinic", EmployeeID: employee3.ID}
+	GormDB.Create(&clinic3)
 
 	// CLIENTS ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	client1 := models.Client{ClinicID: clinic1.ID, Name: "Paulo", LastName: "Soares", Phone: "666666666", Email: "pauloxti@gmail.com", Password: utils.HashPassword([]byte("paulo"))}

@@ -2,10 +2,13 @@ package services
 
 import (
 	"errors"
+	"fmt"
+	"github.com/gofiber/fiber/v2"
 	database "github.com/nikola43/ecoapigorm/database"
 	"github.com/nikola43/ecoapigorm/models"
 	modelsClients "github.com/nikola43/ecoapigorm/models/clients"
 	"github.com/nikola43/ecoapigorm/utils"
+	"mime/multipart"
 )
 
 func CreateClient(createClientRequest *modelsClients.CreateClientRequest) (*modelsClients.CreateClientResponse, error) {
@@ -32,7 +35,7 @@ func CreateClient(createClientRequest *modelsClients.CreateClientRequest) (*mode
 		}
 
 		// check if clinic has sufficient credits
-		if clinic.AvailableClients > 0 {
+		if clinic.AvailableCredits > 0 {
 			useClinicAvailableUsers = true
 		} else {
 			// get clinic owner
@@ -57,8 +60,8 @@ func CreateClient(createClientRequest *modelsClients.CreateClientRequest) (*mode
 							"inner join employees on clinics.employee_id = employees.id").Where(
 								"employees.id = ?", clinicOwnerParentEmployee.ID).Scan(&clinicOwnerParentEmployeeClinic)
 
-					if clinicOwnerParentEmployeeClinic.ExtendClients {
-						if clinicOwnerParentEmployeeClinic.AvailableClients > 0 {
+					if clinicOwnerParentEmployeeClinic.ExtendCredits {
+						if clinicOwnerParentEmployeeClinic.AvailableCredits > 0 {
 							useParentEmployeeClinicAvailableUsers = true
 						} else {
 							return nil, errors.New("insufficient parent employee credits")
@@ -105,13 +108,13 @@ func CreateClient(createClientRequest *modelsClients.CreateClientRequest) (*mode
 
 	// check if client has been created by clinic
 	if useClinicAvailableUsers {
-		database.GormDB.Model(&clinic).Update("available_clients", clinic.AvailableClients-1)
+		database.GormDB.Model(&clinic).Update("available_clients", clinic.AvailableCredits-1)
 	}
 
 	// check if client has been created by clinic
 	if useParentEmployeeClinicAvailableUsers {
 		database.GormDB.Model(&clinicOwnerParentEmployeeClinic).Update(
-			"available_clients", clinicOwnerParentEmployeeClinic.AvailableClients-1)
+			"available_clients", clinicOwnerParentEmployeeClinic.AvailableCredits-1)
 	}
 
 	return &createClientResponse, result.Error
@@ -190,4 +193,15 @@ func GetAllStreamingByClientID(clientID string) ([]models.Streaming, error) {
 	}
 
 	return list, nil
+}
+
+func UploadMultimedia(context *fiber.Ctx,clientID uint, uploadedFile *multipart.FileHeader) error {
+	fmt.Println(context)
+	fmt.Println(clientID)
+	fmt.Println(uploadedFile)
+
+	// Save file to root directory:
+	context.SaveFile(uploadedFile, fmt.Sprintf("./%s", uploadedFile.Filename))
+
+	return nil
 }

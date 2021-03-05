@@ -27,14 +27,12 @@ type App struct {
 }
 
 func (a *App) Initialize(port string) {
-	httpServer := fiber.New()
+	httpServer = fiber.New()
 	httpServer.Use(cors.New())
 
 	api := httpServer.Group("/api") // /api
 	v1 := api.Group("/v1")          // /api/v1
 	api.Use(middlewares.ApiKeyMiddleware)
-
-
 
 	InitializeDatabase(
 		utils.GetEnvVariable("MYSQL_USER"),
@@ -69,6 +67,7 @@ func HandleRoutes(api fiber.Router) {
 	routes.CalculatorRoutes(api)
 	routes.KickRoutes(api)
 	routes.EmployeeRoutes(api)
+	routes.CompanyRoutes(api)
 }
 
 func InitializeDatabase(user, password, database_name string) {
