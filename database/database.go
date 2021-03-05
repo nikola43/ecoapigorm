@@ -47,7 +47,6 @@ func Migrate() {
 	GormDB.AutoMigrate(&models.Calculator{})
 	GormDB.AutoMigrate(&models.CalculatorDetail{})
 	GormDB.AutoMigrate(&kicks.Kick{})
-	GormDB.AutoMigrate(&kicks.Kick{})
 }
 
 func CreateFakeData() {
@@ -64,6 +63,9 @@ func CreateFakeData() {
 
 	clinic2 := models.Clinic{Name: "M Clinic", EmployeeID: employee2.ID}
 	GormDB.Create(&clinic2)
+
+	// database.GormDB.Model(&client).Update("password", newPassHashed)
+
 
 	// CLIENTS ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	client1 := models.Client{ClinicID: clinic1.ID, Name: "Paulo", LastName: "Soares", Phone: "666666666", Email: "pauloxti@gmail.com", Password: utils.HashPassword([]byte("paulo"))}

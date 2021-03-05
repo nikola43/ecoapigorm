@@ -8,8 +8,11 @@ import (
 )
 
 func ApiKeyMiddleware(context *fiber.Ctx) error {
-	requestApiKey := context.Get("x-api-key")
+	requestApiKey := context.Get("X_API_KEY")
 	serverApiKey := utils.GetEnvVariable("X_API_KEY")
+
+	fmt.Println("requestApiKey")
+	fmt.Println(requestApiKey)
 
 	if requestApiKey != serverApiKey {
 		return context.Status(fiber.StatusUnauthorized).JSON(&fiber.Map{
