@@ -27,6 +27,7 @@ func Migrate() {
 	GormDB.Migrator().DropTable(&models.CreditCard{})
 	GormDB.Migrator().DropTable(&models.PaymentMethod{})
 	GormDB.Migrator().DropTable(&models.CalculatorDetail{})
+	GormDB.Migrator().DropTable(&models.Calculator{})
 	GormDB.Migrator().DropTable(&kicks.Kick{})
 
 	// CREATE
@@ -43,24 +44,39 @@ func Migrate() {
 	GormDB.AutoMigrate(&models.BankAccount{})
 	GormDB.AutoMigrate(&models.CreditCard{})
 	GormDB.AutoMigrate(&models.PaymentMethod{})
+	GormDB.AutoMigrate(&models.Calculator{})
 	GormDB.AutoMigrate(&models.CalculatorDetail{})
+	GormDB.AutoMigrate(&kicks.Kick{})
 	GormDB.AutoMigrate(&kicks.Kick{})
 }
 
 func CreateFakeData() {
+	// EMPLOYEES ------------------------------------------------------------------------------------------------------------------------------------------------------------------
+	employee1 := models.Employee{Name: "Paulo", LastName: "Soares", Phone: "666666666", Email: "pauloxti@gmail.com", Password: utils.HashPassword([]byte("paulo")), Role: "admin"}
+	GormDB.Create(&employee1)
+
+	employee2 := models.Employee{Name: "Migue", LastName: "Barrera", Phone: "999999999", Email: "migue@gmail.com", Password: utils.HashPassword([]byte("migue")), Role: "employeee", ParentEmployeeID: 1}
+	GormDB.Create(&employee2)
+
+	// CLINIC ------------------------------------------------------------------------------------------------------------------------------------------------------------------
+	clinic1 := models.Clinic{Name: "P Clinic", EmployeeID: employee1.ID}
+	GormDB.Create(&clinic1)
+
+	clinic2 := models.Clinic{Name: "M Clinic", EmployeeID: employee2.ID}
+	GormDB.Create(&clinic2)
+
 	// CLIENTS ------------------------------------------------------------------------------------------------------------------------------------------------------------------
-	client1 := models.Client{Name: "Paulo", Email: "pauloxti@gmail.com", Password: utils.HashPassword([]byte("paulo"))}
+	client1 := models.Client{ClinicID: clinic1.ID, Name: "Paulo", LastName: "Soares", Phone: "666666666", Email: "pauloxti@gmail.com", Password: utils.HashPassword([]byte("paulo"))}
 	GormDB.Create(&client1)
 
-	client2 := models.Client{Name: "Migue", Email: "migue@gmail.com", Password: utils.HashPassword([]byte("migue"))}
+	client2 := models.Client{ClinicID: clinic2.ID, Name: "Migue", LastName: "Barrera", Phone: "999999999", Email: "migue@gmail.com", Password: utils.HashPassword([]byte("migue"))}
 	GormDB.Create(&client2)
 
-	// EMPLOYEES ------------------------------------------------------------------------------------------------------------------------------------------------------------------
-	user1 := models.Employee{Name: "Paulo", Email: "pauloxti@gmail.com", Password: utils.HashPassword([]byte("paulo")), Role: "admin"}
-	GormDB.Create(&user1)
+	calculator1 := models.Calculator{ClientID: client1.ID, Week: 4}
+	GormDB.Create(&calculator1)
 
-	user2 := models.Employee{Name: "Migue", Email: "migue@gmail.com", Password: utils.HashPassword([]byte("migue")), Role: "employeee", ParentEmployeeID: 1}
-	GormDB.Create(&user2)
+	calculator2 := models.Calculator{ClientID: client2.ID, Week: 8}
+	GormDB.Create(&calculator2)
 
 	// IMAGES ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	images := make([]models.Image, 0)
@@ -109,23 +125,16 @@ func CreateFakeData() {
 	// KICKS
 	Time := time.Date(2020, 1, 4, 0, 0, 0, 0, time.UTC)
 	for i := 1; i < 8; i++ {
-		Time = Time.AddDate(0,1,0)
+		Time = Time.AddDate(0, 1, 0)
 		randomKicksCounter := rand.Intn(100)
 		for i := 1; i < randomKicksCounter; i++ {
 
 			kick := kicks.Kick{
-				Date:     Time.AddDate(0,0,0),
+				Date:     Time.AddDate(0, 0, 0),
 				ClientId: 2,
 			}
 
 			GormDB.Create(&kick)
 		}
 	}
-
-	// CLINIC ------------------------------------------------------------------------------------------------------------------------------------------------------------------
-	clinic1 := models.Clinic{Name: "M Clinic", EmployeeID: 2}
-	GormDB.Create(&clinic1)
-
-	clinic2 := models.Clinic{Name: "P Clinic", EmployeeID: 1}
-	GormDB.Create(&clinic2)
 }

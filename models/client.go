@@ -7,7 +7,8 @@ type Client struct {
 	Password              string                 `gorm:"type:varchar(256) not null; size:256" json:"password" xml:"password" form:"password"`
 	Name                  string                 `gorm:"type:varchar(32) not null" json:"name" xml:"name" form:"name"`
 	Phone                 string                 `gorm:"type:varchar(32) not null" json:"phone" xml:"phone" form:"phone"`
-	LastName              string                 `gorm:"type:varchar(32)" json:"lastname" xml:"lastname" form:"lastname"`
+	LastName              string                 `gorm:"type:varchar(32)" json:"last_name" xml:"last_name" form:"last_name"`
+	Calculator            Calculator             `json:"calculator" xml:"calculator" form:"calculator"`
 	Videos                []Video                `json:"videos" xml:"videos" form:"videos"`
 	Images                []Image                `json:"images" xml:"images" form:"images"`
 	Heartbeat             []Heartbeat            `json:"heartbeat" xml:"heartbeat" form:"heartbeat"`

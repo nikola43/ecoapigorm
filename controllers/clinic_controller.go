@@ -6,6 +6,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	database "github.com/nikola43/ecoapigorm/database"
 	"github.com/nikola43/ecoapigorm/models"
+	"github.com/nikola43/ecoapigorm/models/clients"
 	clinicModels "github.com/nikola43/ecoapigorm/models/clinic"
 	"github.com/nikola43/ecoapigorm/services"
 	"strconv"
@@ -94,5 +95,21 @@ func CreateClinic(context *fiber.Ctx) error {
 		})
 	} else {
 		return context.JSON(createClinicResponse)
+	}
+}
+
+func GetClientsByClinicID(context *fiber.Ctx) error {
+	clientsList := make([]clients.ListClientRequest, 0)
+	var err error
+
+	clinicID, _ := strconv.ParseUint(context.Params("clinic_id"), 10, 64)
+	fmt.Println(clinicID)
+	if clientsList, err = services.GetClientsByClinicID(uint(clinicID))
+		err != nil {
+		return context.Status(fiber.StatusNotFound).JSON(&fiber.Map{
+			"error": "clinic not found",
+		})
+	} else {
+		return context.JSON(clientsList)
 	}
 }

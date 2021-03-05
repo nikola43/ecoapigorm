@@ -5,7 +5,7 @@ type CreateClientResponse struct {
 	ClinicId     uint `json:"clinic_id"`
 	Email     string `json:"email"`
 	Name     string `json:"name"`
-	LastName string `json:"lastname"`
+	LastName string `json:"last_name"`
 	Token    string `json:"token"`
 }
 
