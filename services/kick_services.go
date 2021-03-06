@@ -34,7 +34,7 @@ func DeleteKickByIdService(ClientId uint, kickId uint) error {
 	return nil
 }
 
-func GetAllKicksByClientService(clientID uint) ([]kicks.Kick, error) {
+func GetAllKicksByClientIDService(clientID uint) ([]kicks.Kick, error) {
 	var list = make([]kicks.Kick, 0)
 	result := database.GormDB.
 		Where("client_id = ?", clientID).

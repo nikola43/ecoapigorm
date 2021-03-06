@@ -30,10 +30,10 @@ func AddKickToClient(context *fiber.Ctx) error {
 	return context.Status(fiber.StatusCreated).JSON(kick)
 }
 
-func GetKicksByClient(context *fiber.Ctx) error {
+func GetKicksByClientID(context *fiber.Ctx) error {
 	clientID, _ := strconv.ParseUint(context.Params("client_id"), 10, 64)
 
-	kicks,err := services.GetAllKicksByClientService(uint(clientID))
+	kicks,err := services.GetAllKicksByClientIDService(uint(clientID))
 	if err != nil {
 		return context.SendStatus(fiber.StatusInternalServerError)
 	}
@@ -53,7 +53,7 @@ func DeleteKick(context *fiber.Ctx) error {
 	return context.SendStatus(fiber.StatusOK)
 }
 
-func ResetAllByClientKicks(context *fiber.Ctx) error {
+func ResetAllKicksByClientID(context *fiber.Ctx) error {
 	clientID, _ := strconv.ParseUint(context.Params("client_id"), 10, 64)
 
 	err := services.ResetAllKicksByClientService(uint(clientID))

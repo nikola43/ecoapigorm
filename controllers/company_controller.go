@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	database "github.com/nikola43/ecoapigorm/database"
@@ -99,18 +98,13 @@ func CreateCompany(context *fiber.Ctx) error {
 }
 
 func GetEmployeesByCompanyID(context *fiber.Ctx) error {
-
-	list := make([]models.Employee, 0)
-	var err error
-
 	companyID, _ := strconv.ParseUint(context.Params("company_id"), 10, 64)
-	fmt.Println(companyID)
-	if list, err = services.GetEmployeesByCompanyID(uint(companyID))
-		err != nil {
+
+	if list, err := services.GetEmployeesByCompanyID(uint(companyID)); err != nil {
 		return context.Status(fiber.StatusNotFound).JSON(&fiber.Map{
 			"error": "Company not found",
 		})
+	} else {
+		return context.JSON(list)
 	}
-
-	return context.JSON(list)
 }

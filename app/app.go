@@ -27,18 +27,6 @@ type App struct {
 }
 
 func (a *App) Initialize(port string) {
-	httpServer = fiber.New()
-	httpServer.Use(cors.New())
-
-	api := httpServer.Group("/api") // /api
-	v1 := api.Group("/v1")          // /api/v1
-	api.Use(middlewares.ApiKeyMiddleware)
-
-	InitializeDatabase(
-		utils.GetEnvVariable("MYSQL_USER"),
-		utils.GetEnvVariable("MYSQL_PASSWORD"),
-		utils.GetEnvVariable("MYSQL_DATABASE"))
-
 	InitializeAWSConnection(
 		utils.GetEnvVariable("AWS_ACCESS_KEY"),
 		utils.GetEnvVariable("AWS_SECRET_KEY"),
@@ -46,20 +34,20 @@ func (a *App) Initialize(port string) {
 		utils.GetEnvVariable("AWS_BUCKET_NAME"),
 		utils.GetEnvVariable("AWS_BUCKET_REGION"))
 
-	database.Migrate()
+	InitializeDatabase(
+		utils.GetEnvVariable("MYSQL_USER"),
+		utils.GetEnvVariable("MYSQL_PASSWORD"),
+		utils.GetEnvVariable("MYSQL_DATABASE"))
 
+	database.Migrate()
 	database.CreateFakeData()
 
-	HandleRoutes(v1)
-
-	httpServer.Listen(port)
+	InitializeHttpServer(port)
 }
 
 func HandleRoutes(api fiber.Router) {
-
 	//app.Use(middleware.Logger())
 
-	// use routes
 	routes.ClientRoutes(api)
 	routes.ClinicRoutes(api)
 	routes.AuthRoutes(api)
@@ -68,6 +56,18 @@ func HandleRoutes(api fiber.Router) {
 	routes.KickRoutes(api)
 	routes.EmployeeRoutes(api)
 	routes.CompanyRoutes(api)
+}
+
+func InitializeHttpServer(port string) {
+	httpServer = fiber.New()
+	httpServer.Use(cors.New())
+	httpServer.Use(middlewares.XApiKeyMiddleware)
+
+	api := httpServer.Group("/api") // /api
+	v1 := api.Group("/v1")          // /api/v1
+	HandleRoutes(v1)
+
+	httpServer.Listen(port)
 }
 
 func InitializeDatabase(user, password, database_name string) {
@@ -89,14 +89,14 @@ func InitializeDatabase(user, password, database_name string) {
 	}
 }
 
-func InitializeAWSConnection(access_key, secret_key, endpoint, bucket_name, bucket_region string) {
+func InitializeAWSConnection(accessKey, secretKey, endpoint, bucketName, bucketRegion string) {
 	s3Config := &aws.Config{
-		Credentials:      credentials.NewStaticCredentials(access_key, secret_key, ""),
+		Credentials:      credentials.NewStaticCredentials(accessKey, secretKey, ""),
 		Endpoint:         aws.String(endpoint),
-		Region:           aws.String(bucket_region),
+		Region:           aws.String(bucketRegion),
 		S3ForcePathStyle: aws.Bool(true),
 	}
 	newSession := session.New(s3Config)
 	S3Session = s3.New(newSession)
-	awsBucketName = bucket_name
+	awsBucketName = bucketName
 }

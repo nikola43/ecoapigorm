@@ -20,7 +20,9 @@ func CreateClient(createClientRequest *modelsClients.CreateClientRequest) (*mode
 	useClinicAvailableUsers := false
 
 	// check if client already exist
-	if err := database.GormDB.Where("email = ?", createClientRequest.Email).Find(&client).Error; err != nil {
+	if err := database.GormDB.
+		Where("email = ?", createClientRequest.Email).
+		Find(&client).Error; err != nil {
 		return nil, err
 	}
 
@@ -98,8 +100,8 @@ func CreateClient(createClientRequest *modelsClients.CreateClientRequest) (*mode
 	}
 
 	createClientResponse := modelsClients.CreateClientResponse{
-		Id:       client.ID,
-		ClinicId: client.ClinicID,
+		ID:       client.ID,
+		ClinicID: client.ClinicID,
 		Email:    client.Email,
 		Name:     client.Name,
 		LastName: client.LastName,
@@ -196,12 +198,12 @@ func GetAllStreamingByClientID(clientID string) ([]models.Streaming, error) {
 }
 
 func UploadMultimedia(context *fiber.Ctx,clientID uint, uploadedFile *multipart.FileHeader) error {
-	fmt.Println(context)
-	fmt.Println(clientID)
-	fmt.Println(uploadedFile)
+	//fmt.Println(context)
+	//fmt.Println(clientID)
+	//fmt.Println(uploadedFile)
 
 	// Save file to root directory:
-	context.SaveFile(uploadedFile, fmt.Sprintf("./%s", uploadedFile.Filename))
+	context.SaveFile(uploadedFile, fmt.Sprintf("./tempFiles/%s", uploadedFile.Filename))
 
 	return nil
 }

@@ -11,7 +11,7 @@ func ClientRoutes (router fiber.Router) {
 
 
 	// /api/v1/client/:client_id/upload
-	clientRouter.Post("/:client_id/upload", controllers.UploadMultimedia)
+	clientRouter.Post("/:client_id/upload/:upload_mode", controllers.UploadMultimedia)
 
 	// /api/v1/client/recovery
 	clientRouter.Post("/recovery", controllers.PassRecoveryClient)

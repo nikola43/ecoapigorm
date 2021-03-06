@@ -2,7 +2,6 @@ package services
 
 import (
 	"errors"
-	"fmt"
 	database "github.com/nikola43/ecoapigorm/database"
 	"github.com/nikola43/ecoapigorm/models"
 	"github.com/nikola43/ecoapigorm/utils"
@@ -10,23 +9,19 @@ import (
 
 func LoginClient(email, password string) (*models.LoginClientResponse, error) {
 	client := &models.Client{}
+	var err error
+	token := ""
 
-	GormDBResult := database.GormDB.
-		Where("email = ?", email).
-		Find(&client)
-
-	if GormDBResult.Error != nil {
-		return &models.LoginClientResponse{}, GormDBResult.Error
+	if err = database.GormDB.Where("email = ?", email).Find(&client).Error; err != nil {
+		return nil, err
 	}
 
-	match := utils.ComparePasswords(client.Password, []byte(password))
-	if !match {
-		return &models.LoginClientResponse{}, errors.New("not found")
+	if !utils.ComparePasswords(client.Password, []byte(password)) {
+		return nil, errors.New("not found")
 	}
 
-	token, err := utils.GenerateClientToken(client.Email, client.ID, client.ClinicID)
-	if err != nil {
-		return &models.LoginClientResponse{}, err
+	if token, err = utils.GenerateClientToken(client.Email, client.ID, client.ClinicID); err != nil {
+		return nil, err
 	}
 
 	clientLoginResponse := models.LoginClientResponse{
@@ -42,31 +37,29 @@ func LoginClient(email, password string) (*models.LoginClientResponse, error) {
 
 func LoginEmployee(email, password string) (*models.LoginEmployeeResponse, error) {
 	employee := &models.Employee{}
+	clinic:= models.Clinic{}
+	token := ""
+	var err error
 
-	GormDBResult := database.GormDB.
-		Where("email = ?", email).
-		Find(&employee)
-
-	if GormDBResult.Error != nil {
-		return nil, GormDBResult.Error
+	if err := database.GormDB.Where("email = ?", email).Find(&employee).Error; err != nil {
+		return nil, err
 	}
-
-	fmt.Println(employee)
 
 	match := utils.ComparePasswords(employee.Password, []byte(password))
 	if !match {
 		return nil, errors.New("not found")
 	}
 
-	clinic:= models.Clinic{}
-	database.GormDB.Model(&clinic).Select("clinics.id").Joins("left join employees on clinics.employee_id = employees.id").Where("employees.id = ?", employee.ID).Scan(&clinic)
-	fmt.Println("clinic")
-	fmt.Println(clinic.ID)
+
+	database.GormDB.Model(&clinic).
+		Select("clinics.id").
+		Joins("left join employees on clinics.employee_id = employees.id").
+		Where("employees.id = ?", employee.ID).
+		Scan(&clinic)
 
 	// todo coger clinic id de la relacion
-	token, err := utils.GenerateEmployeeToken(employee.Email, employee.ID, clinic.ID, employee.Role)
-	if err != nil {
-		return &models.LoginEmployeeResponse{}, err
+	if token, err = utils.GenerateEmployeeToken(employee.Email, employee.ID, clinic.ID, employee.Role); err != nil {
+		return nil, err
 	}
 
 	clientEmployeeResponse := models.LoginEmployeeResponse{

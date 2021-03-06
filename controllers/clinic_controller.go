@@ -14,15 +14,16 @@ import (
 
 func GetClinicById(context *fiber.Ctx) error {
 	clinicID, _ := strconv.ParseUint(context.Params("clinic_id"), 10, 64)
-	fmt.Println(clinicID)
-	if clinic, err := services.GetClinicByID(uint(clinicID))
-		err != nil {
+	clinic := &models.Clinic{}
+	var err error
+
+	if clinic, err = services.GetClinicByID(uint(clinicID)); err != nil {
 		return context.Status(fiber.StatusNotFound).JSON(&fiber.Map{
 			"error": "clinic not found",
 		})
-	} else {
-		return context.JSON(clinic)
 	}
+
+	return context.JSON(clinic)
 }
 
 func CreateClinic(context *fiber.Ctx) error {

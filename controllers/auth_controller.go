@@ -34,7 +34,7 @@ func LoginEmployee(context *fiber.Ctx) error {
 		return context.SendStatus(fiber.StatusBadRequest)
 	}
 
-	if services.LoginEmployee(clientEmployeeRequest.Email, clientEmployeeRequest.Password); err != nil {
+	if clientEmployeeResponse, err = services.LoginEmployee(clientEmployeeRequest.Email, clientEmployeeRequest.Password); err != nil {
 		return context.Status(fiber.StatusNotFound).JSON(&fiber.Map{
 			"error": errors.New("not found"),
 		})

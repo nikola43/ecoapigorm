@@ -8,22 +8,13 @@ import (
 	"github.com/nikola43/ecoapigorm/models"
 	modelsClient "github.com/nikola43/ecoapigorm/models/clients"
 	"github.com/nikola43/ecoapigorm/services"
-	"github.com/nikola43/ecoapigorm/utils"
 	"strconv"
 )
 
 func GetAllImagesByClientID(context *fiber.Ctx) error {
 	var err error
-	var claimsErr error
-	var tokenClaims = models.ClientTokenClaims{}
 	images := make([]models.Image, 0)
 	clientID, _ := strconv.ParseUint(context.Params("client_id"), 10, 64)
-
-	// todo example get token claims
-	tokenClaims, claimsErr = utils.GetClientTokenClaims(context)
-	if claimsErr != nil {
-		fmt.Println(tokenClaims)
-	}
 
 	if images, err = services.GetAllImagesByClientID(uint(clientID)); err != nil {
 		return context.SendStatus(fiber.StatusInternalServerError)
@@ -143,7 +134,9 @@ func PassRecoveryClient(context *fiber.Ctx) error {
 
 func UploadMultimedia(context *fiber.Ctx) error {
 	clientID, _ := strconv.ParseUint(context.Params("client_id"), 10, 64)
-	fmt.Println(clientID)
+	uploadMode, _ := strconv.ParseUint(context.Params("upload_mode"), 10, 64)
+	//uploadMode, _ := strconv.ParseUint(context.FormValue("upload_mode"), 10, 64)
+	fmt.Println(uploadMode)
 
 	// Get first file from form field "document":
 	uploadedFile, err := context.FormFile("file")
