@@ -146,8 +146,10 @@ func UploadMultimedia(context *fiber.Ctx) error {
 	}
 
 
-	services.UploadMultimedia(context,uint(clientID), uploadedFile)
-
+	err = services.UploadMultimedia(context,uint(clientID), uploadedFile)
+	if err != nil {
+		return err
+	}
 
 
 	return context.SendStatus(fiber.StatusOK)

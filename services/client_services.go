@@ -203,7 +203,9 @@ func UploadMultimedia(context *fiber.Ctx,clientID uint, uploadedFile *multipart.
 	//fmt.Println(uploadedFile)
 
 	// Save file to root directory:
-	context.SaveFile(uploadedFile, fmt.Sprintf("./tempFiles/%s", uploadedFile.Filename))
-
+	err := context.SaveFile(uploadedFile, fmt.Sprintf("./tempFiles/%s", uploadedFile.Filename))
+	if err != nil {
+		return err
+	}
 	return nil
 }

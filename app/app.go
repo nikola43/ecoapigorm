@@ -42,6 +42,16 @@ func (a *App) Initialize(port string) {
 	database.Migrate()
 	database.CreateFakeData()
 
+	fmt.Println(utils.GetEnvVariable("AWS_ACCESS_KEY"))
+	fmt.Println(utils.GetEnvVariable("AWS_SECRET_KEY"))
+	fmt.Println(utils.GetEnvVariable("AWS_ENDPOINT"))
+	fmt.Println(utils.GetEnvVariable("AWS_BUCKET_NAME"))
+	fmt.Println(utils.GetEnvVariable("AWS_BUCKET_REGION"))
+	fmt.Println(utils.GetEnvVariable("MYSQL_USER"))
+	fmt.Println(utils.GetEnvVariable("MYSQL_PASSWORD"))
+	fmt.Println(utils.GetEnvVariable("MYSQL_DATABASE"))
+	fmt.Println(utils.GetEnvVariable("X_API_KEY"))
+
 	InitializeHttpServer(port)
 }
 
@@ -66,7 +76,6 @@ func InitializeHttpServer(port string) {
 	v1 := api.Group("/v1")          // /api/v1
 
 	api.Use(middlewares.XApiKeyMiddleware)
-
 
 	HandleRoutes(v1)
 
