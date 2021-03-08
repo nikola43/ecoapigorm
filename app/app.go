@@ -27,13 +27,6 @@ type App struct {
 }
 
 func (a *App) Initialize(port string) {
-	httpServer = fiber.New()
-	httpServer.Use(cors.New())
-
-	api := httpServer.Group("/api") // /api
-	v1 := api.Group("/v1")          // /api/v1
-	api.Use(middlewares.XApiKeyMiddleware)
-
 	InitializeAWSConnection(
 		utils.GetEnvVariable("AWS_ACCESS_KEY"),
 		utils.GetEnvVariable("AWS_SECRET_KEY"),
@@ -59,10 +52,7 @@ func (a *App) Initialize(port string) {
 	fmt.Println(utils.GetEnvVariable("MYSQL_DATABASE"))
 	fmt.Println(utils.GetEnvVariable("X_API_KEY"))
 
-
-	HandleRoutes(v1)
-
-	httpServer.Listen(port)
+	InitializeHttpServer(port)
 }
 
 func HandleRoutes(api fiber.Router) {
@@ -76,6 +66,23 @@ func HandleRoutes(api fiber.Router) {
 	routes.KickRoutes(api)
 	routes.EmployeeRoutes(api)
 	routes.CompanyRoutes(api)
+}
+
+func InitializeHttpServer(port string) {
+	httpServer = fiber.New()
+	httpServer.Use(cors.New())
+
+	api := httpServer.Group("/api") // /api
+	v1 := api.Group("/v1")          // /api/v1
+
+	api.Use(middlewares.XApiKeyMiddleware)
+
+	HandleRoutes(v1)
+
+	err := httpServer.Listen(port)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func InitializeDatabase(user, password, database_name string) {
