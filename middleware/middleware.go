@@ -12,8 +12,11 @@ func XApiKeyMiddleware(context *fiber.Ctx) error {
 	// serverApiKey := utils.GetEnvVariable("X_API_KEY")
 	// todo investigar por que no coge .env
 	serverApiKey := "ef2ff59e253e5c36f7f11a387c2c4a1c33ed0c3166a4c32a5bca6d3a64bff6e0"
+	fmt.Println("requestApiKey")
 	fmt.Println(requestApiKey)
+	fmt.Println("serverApiKey")
 	fmt.Println(serverApiKey)
+
 
 	if requestApiKey != serverApiKey {
 		return context.Status(fiber.StatusUnauthorized).JSON(&fiber.Map{
