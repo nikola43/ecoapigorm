@@ -8,7 +8,6 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/cors"
 	database "github.com/nikola43/ecoapigorm/database"
 	middlewares "github.com/nikola43/ecoapigorm/middleware"
 	"github.com/nikola43/ecoapigorm/routes"
@@ -71,9 +70,11 @@ func HandleRoutes(api fiber.Router) {
 func InitializeHttpServer(port string) {
 
 	httpServer = fiber.New()
+	/*
 	httpServer.Use(cors.New(cors.Config{
 		AllowHeaders: "Origin, Content-Type, Accept, X_API_KEY",
 	}))
+	*/
 
 	api := httpServer.Group("/api") // /api
 	v1 := api.Group("/v1")          // /api/v1
