@@ -61,10 +61,13 @@ func HandleRoutes(api fiber.Router) {
 func InitializeHttpServer(port string) {
 	httpServer = fiber.New()
 	httpServer.Use(cors.New())
-	httpServer.Use(middlewares.XApiKeyMiddleware)
 
 	api := httpServer.Group("/api") // /api
 	v1 := api.Group("/v1")          // /api/v1
+
+	api.Use(middlewares.XApiKeyMiddleware)
+
+
 	HandleRoutes(v1)
 
 	httpServer.Listen(port)
