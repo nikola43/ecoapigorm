@@ -9,9 +9,7 @@ import (
 
 func XApiKeyMiddleware(context *fiber.Ctx) error {
 	requestApiKey := context.Get("X_API_KEY")
-	// serverApiKey := utils.GetEnvVariable("X_API_KEY")
-	// todo investigar por que no coge .env
-	serverApiKey := "ef2ff59e253e5c36f7f11a387c2c4a1c33ed0c3166a4c32a5bca6d3a64bff6e0"
+	serverApiKey := utils.GetEnvVariable("X_API_KEY")
 	fmt.Println("requestApiKey")
 	fmt.Println(requestApiKey)
 	fmt.Println("serverApiKey")
