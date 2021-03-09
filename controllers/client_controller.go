@@ -132,6 +132,7 @@ func PassRecoveryClient(context *fiber.Ctx) error {
 	return context.SendStatus(fiber.StatusOK)
 }
 
+
 func UploadMultimedia(context *fiber.Ctx) error {
 	clientID, _ := strconv.ParseUint(context.Params("client_id"), 10, 64)
 	uploadMode, _ := strconv.ParseUint(context.Params("upload_mode"), 10, 64)
@@ -150,6 +151,12 @@ func UploadMultimedia(context *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
+
+
+	return context.SendStatus(fiber.StatusOK)
+}
+
+func PasswordRecovery(context *fiber.Ctx) error {
 
 
 	return context.SendStatus(fiber.StatusOK)

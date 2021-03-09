@@ -157,4 +157,10 @@ func CreateFakeData() {
 
 		GormDB.Create(&promo)
 	}
+
+	streaming1 := models.Streaming{Code: "AAAAA", ClientID: client1.ID, Url: "https://www.youtube.com/watch?v=5qap5aO4i9A"}
+	GormDB.Create(&streaming1)
+
+	streaming2 := models.Streaming{Code: "AAAAB", ClientID: client1.ID, Url: "https://www.youtube.com/watch?v=5qap5aO4i9A"}
+	GormDB.Create(&streaming2)
 }

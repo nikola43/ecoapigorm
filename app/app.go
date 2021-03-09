@@ -66,11 +66,15 @@ func HandleRoutes(api fiber.Router) {
 	routes.EmployeeRoutes(api)
 	routes.CompanyRoutes(api)
 	routes.PromoRoutes(api)
+	routes.StreamingRoutes(api)
 }
 
 func InitializeHttpServer(port string) {
 
-	httpServer = fiber.New()
+	// todo calcular 5GB
+	httpServer = fiber.New(fiber.Config{
+		BodyLimit: 50000 * 1024 * 1024, // this is the default limit of 4MB
+	})
 	httpServer.Use(middlewares.XApiKeyMiddleware)
 	/*
 	httpServer.Use(cors.New(cors.Config{
