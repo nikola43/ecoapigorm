@@ -1,7 +1,9 @@
 package models
 
+import "github.com/nikola43/ecoapigorm/models/base"
+
 type Employee struct {
-	CustomGormModel
+	base.CustomGormModel
 	ParentEmployeeID uint          `json:"parent_employee_id"`
 	Company          Company       `json:"company"`
 	CompanyID        uint          `gorm:"type:INTEGER NULL; DEFAULT:NULL" json:"company_id" xml:"company_id" form:"company_id"`

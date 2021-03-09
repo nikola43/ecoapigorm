@@ -3,6 +3,7 @@ package controllers
 import (
 	"github.com/nikola43/ecoapigorm/models"
 	"github.com/nikola43/ecoapigorm/models/kicks"
+	"github.com/nikola43/ecoapigorm/models/promos"
 	"github.com/nikola43/ecoapigorm/utils"
 	"gorm.io/gorm"
 	"math/rand"
@@ -22,7 +23,7 @@ func Migrate() {
 	GormDB.Migrator().DropTable(&models.Streaming{})
 	GormDB.Migrator().DropTable(&models.Recovery{})
 	GormDB.Migrator().DropTable(&models.PushNotificationData{})
-	GormDB.Migrator().DropTable(&models.Promo{})
+	GormDB.Migrator().DropTable(&promos.Promo{})
 	GormDB.Migrator().DropTable(&models.BankAccount{})
 	GormDB.Migrator().DropTable(&models.CreditCard{})
 	GormDB.Migrator().DropTable(&models.PaymentMethod{})
@@ -41,7 +42,7 @@ func Migrate() {
 	GormDB.AutoMigrate(&models.Streaming{})
 	GormDB.AutoMigrate(&models.Recovery{})
 	GormDB.AutoMigrate(&models.PushNotificationData{})
-	GormDB.AutoMigrate(&models.Promo{})
+	GormDB.AutoMigrate(&promos.Promo{})
 	GormDB.AutoMigrate(&models.BankAccount{})
 	GormDB.AutoMigrate(&models.CreditCard{})
 	GormDB.AutoMigrate(&models.PaymentMethod{})
@@ -97,37 +98,26 @@ func CreateFakeData() {
 	GormDB.Create(&calculator2)
 
 	// IMAGES ------------------------------------------------------------------------------------------------------------------------------------------------------------------
-	images := make([]models.Image, 0)
-	images = append(images, models.Image{
-		ClientID: 2,
-		Url:      "https://s3.eu-central-1.wasabisys.com/babyandme/4/image/MARIANA VICENTE (10).png",
-		Size:     0,
-	})
+	for i := 1; i < 20; i++ {
+		images := models.Image{
+			ClientID: 2,
+			Url:      "https://s3.eu-central-1.wasabisys.com/babyandme/4/image/MARIANA VICENTE (10).png",
+			Size:     0,
+		}
 
-	images = append(images, models.Image{
-		ClientID: 2,
-		Url:      "https://s3.eu-central-1.wasabisys.com/babyandme/4/image/MARIANA VICENTE (13).png",
-		Size:     0,
-	})
+		GormDB.Create(&images)
+	}
 
-	GormDB.Create(&images)
+	for i := 1; i < 20; i++ {
+		videos := models.Video{
+			ClientID:     client2.ID,
+			Url:          "https://s3.eu-central-1.wasabisys.com/babyandme/4/video/MARIANA VICENTE (2) (online-video-cutter.com) copy.mp4-audio.mp4",
+			ThumbnailUrl: "https://s3.eu-central-1.wasabisys.com/babyandme/4/video/MARIANA VICENTE (2) (online-video-cutter.com) copy.mp4-audio.mp4-thumbnail.jpg",
+			Size:         0,
+		}
 
-	videos := make([]models.Video, 0)
-	videos = append(videos, models.Video{
-		ClientID:     2,
-		Url:          "https://s3.eu-central-1.wasabisys.com/babyandme/4/video/MARIANA VICENTE (2) (online-video-cutter.com) copy.mp4-audio.mp4",
-		ThumbnailUrl: "https://s3.eu-central-1.wasabisys.com/babyandme/4/video/MARIANA VICENTE (2) (online-video-cutter.com) copy.mp4-audio.mp4-thumbnail.jpg",
-		Size:         0,
-	})
-
-	videos = append(videos, models.Video{
-		ClientID:     2,
-		Url:          "https://s3.eu-central-1.wasabisys.com/babyandme/4/video/MARIANA VICENTE (2).mp4-audio copy.mp4-audio.mp4",
-		ThumbnailUrl: "https://s3.eu-central-1.wasabisys.com/babyandme/4/video/MARIANA VICENTE (2).mp4-audio copy.mp4-audio.mp4-thumbnail.jpg",
-		Size:         0,
-	})
-
-	GormDB.Create(&videos)
+		GormDB.Create(&videos)
+	}
 
 	// CALCULATOR ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	for i := 1; i < 41; i++ {
@@ -154,5 +144,17 @@ func CreateFakeData() {
 
 			GormDB.Create(&kick)
 		}
+	}
+	
+	//PROMOS
+	for i := 1; i < 100; i++ {
+		promo := promos.Promo{
+			ClinicID: clinic2.ID,
+			Title:    "Tu primera eco gratis",
+			Text:     "Ven a vernos y consigue que te hagamos la primera eco gratis.",
+			ImageUrl: "https://s3.eu-central-1.wasabisys.com/stela/weeks/21SM.jpg",
+		}
+
+		GormDB.Create(&promo)
 	}
 }

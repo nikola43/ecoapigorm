@@ -65,6 +65,7 @@ func HandleRoutes(api fiber.Router) {
 	routes.KickRoutes(api)
 	routes.EmployeeRoutes(api)
 	routes.CompanyRoutes(api)
+	routes.PromoRoutes(api)
 }
 
 func InitializeHttpServer(port string) {

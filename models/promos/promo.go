@@ -1,7 +1,11 @@
-package models
+package promos
+
+import (
+	"github.com/nikola43/ecoapigorm/models/base"
+)
 
 type Promo struct {
-	CustomGormModel
+	base.CustomGormModel
 	ClinicID uint   `gorm:"type:INTEGER not null" json:"clinic_id"`
 	Title    string `gorm:"type:varchar(128) not null" json:"title"`
 	Text     string `gorm:"type:varchar(128) not null" json:"text"`
