@@ -1,6 +1,9 @@
 package models
 
-import "github.com/nikola43/ecoapigorm/models/base"
+import (
+	"github.com/nikola43/ecoapigorm/models/base"
+	"github.com/nikola43/ecoapigorm/models/streaming"
+)
 
 type Client struct {
 	base.CustomGormModel
@@ -14,7 +17,7 @@ type Client struct {
 	Videos                []Video                `json:"videos" xml:"videos" form:"videos"`
 	Images                []Image                `json:"images" xml:"images" form:"images"`
 	Heartbeat             []Heartbeat            `json:"heartbeat" xml:"heartbeat" form:"heartbeat"`
-	Streaming             Streaming              `json:"streaming" xml:"streaming" form:"streaming"`
+	Streaming             streaming.Streaming    `json:"streaming" xml:"streaming" form:"streaming"`
 	Recovery              Recovery               `json:"recovery" xml:"recovery" form:"recovery"`
 	PushNotificationDatas []PushNotificationData `json:"push_notification_datas" xml:"push_notification_datas" form:"push_notification_datas"`
 }
