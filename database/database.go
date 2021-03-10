@@ -5,7 +5,10 @@ import (
 	"github.com/nikola43/ecoapigorm/models/kicks"
 	"github.com/nikola43/ecoapigorm/models/promos"
 	"github.com/nikola43/ecoapigorm/models/streaming"
+	"github.com/nikola43/ecoapigorm/utils"
 	"gorm.io/gorm"
+	"math/rand"
+	"time"
 )
 
 var GormDB *gorm.DB
@@ -156,9 +159,9 @@ func CreateFakeData() {
 		GormDB.Create(&promo)
 	}
 
-	streaming1 := models.Streaming{Code: "AAAAA", ClientID: client1.ID, Url: "https://www.youtube.com/watch?v=5qap5aO4i9A"}
+	streaming1 := streaming.Streaming{Code: "AAAAA", ClientID: client1.ID, Url: "https://www.youtube.com/watch?v=5qap5aO4i9A"}
 	GormDB.Create(&streaming1)
 
-	streaming2 := models.Streaming{Code: "AAAAB", ClientID: client1.ID, Url: "https://www.youtube.com/watch?v=5qap5aO4i9A"}
+	streaming2 := streaming.Streaming{Code: "AAAAB", ClientID: client1.ID, Url: "https://www.youtube.com/watch?v=5qap5aO4i9A"}
 	GormDB.Create(&streaming2)
 }
