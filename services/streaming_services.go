@@ -1,23 +1,18 @@
 package services
 
 import (
-	"errors"
 	database "github.com/nikola43/ecoapigorm/database"
-	"github.com/nikola43/ecoapigorm/models"
+	"github.com/nikola43/ecoapigorm/models/streaming"
 )
 
-func GetStreamingByCode(code string) (*models.Streaming, error) {
-	streaming := &models.Streaming{}
-	result := database.GormDB.
-		Where("code = ?", code).
-		Find(&streaming)
+func GetStreamingByCodeService(code string) (streaming.Streaming, error) {
+	var streaming = streaming.Streaming{}
 
-	if result.Error != nil {
-		return nil, result.Error
-	}
+	if err := database.GormDB.Where("code = ?", code).
+		First(&streaming).Error;
 
-	if streaming.ID < 1 {
-		return nil, errors.New("not found")
+	err != nil {
+		return streaming, err
 	}
 
 	return streaming, nil

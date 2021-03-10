@@ -43,5 +43,5 @@ func ClientRoutes (router fiber.Router) {
 	streamingsRouter := clientRouter.Group("/streaming")
 
 	// /api/v1/client/streaming/:client_id
-	streamingsRouter.Get("/:client_id", controllers.GetAllVideosByClientID)
+	streamingsRouter.Get("/:client_id", controllers.GetAllStreamingByClientID)
 }

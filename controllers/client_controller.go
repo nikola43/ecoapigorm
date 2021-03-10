@@ -7,6 +7,7 @@ import (
 	database "github.com/nikola43/ecoapigorm/database"
 	"github.com/nikola43/ecoapigorm/models"
 	modelsClient "github.com/nikola43/ecoapigorm/models/clients"
+	"github.com/nikola43/ecoapigorm/models/streaming"
 	"github.com/nikola43/ecoapigorm/services"
 	"strconv"
 )
@@ -25,7 +26,7 @@ func GetAllImagesByClientID(context *fiber.Ctx) error {
 
 func GetAllStreamingByClientID(context *fiber.Ctx) error {
 	clientID := context.Params("client_id")
-	videos := make([]models.Streaming, 0)
+	videos := make([]streaming.Streaming, 0)
 	var err error
 
 	if videos, err = services.GetAllStreamingByClientID(clientID); err != nil {

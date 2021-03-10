@@ -7,6 +7,7 @@ import (
 	database "github.com/nikola43/ecoapigorm/database"
 	"github.com/nikola43/ecoapigorm/models"
 	modelsClients "github.com/nikola43/ecoapigorm/models/clients"
+	"github.com/nikola43/ecoapigorm/models/streaming"
 	"github.com/nikola43/ecoapigorm/utils"
 	"mime/multipart"
 )
@@ -187,10 +188,11 @@ func GetAllVideosByClientID(clientID string) ([]models.Video, error) {
 	return list, nil
 }
 
-func GetAllStreamingByClientID(clientID string) ([]models.Streaming, error) {
-	var list = make([]models.Streaming, 0)
+func GetAllStreamingByClientID(clientID string) ([]streaming.Streaming, error) {
+	var list = make([]streaming.Streaming, 0)
 
-	if err := database.GormDB.Where("client_id = ?", clientID).Find(&list).Error; err != nil {
+	if err := database.GormDB.Where("client_id = ?", clientID).Find(&list).Error;
+	err != nil {
 		return nil, err
 	}
 

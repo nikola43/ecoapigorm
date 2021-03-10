@@ -9,6 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/gofiber/fiber/v2"
 	database "github.com/nikola43/ecoapigorm/database"
+	"github.com/nikola43/ecoapigorm/database/fakedatabase"
 	middlewares "github.com/nikola43/ecoapigorm/middleware"
 	"github.com/nikola43/ecoapigorm/routes"
 	"github.com/nikola43/ecoapigorm/utils"
@@ -39,7 +40,7 @@ func (a *App) Initialize(port string) {
 		utils.GetEnvVariable("MYSQL_DATABASE"))
 
 	database.Migrate()
-	database.CreateFakeData()
+	fakedatabase.CreateFakeData()
 
 	fmt.Println(utils.GetEnvVariable("AWS_ACCESS_KEY"))
 	fmt.Println(utils.GetEnvVariable("AWS_SECRET_KEY"))
