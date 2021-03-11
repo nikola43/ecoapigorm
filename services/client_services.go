@@ -60,8 +60,8 @@ func CreateClient(createClientRequest *modelsClients.CreateClientRequest) (*mode
 					// get clinic owner employee clinic
 					database.GormDB.Model(models.Clinic{}).Select(
 						"clinics.id, clinics.extend_clients, clinics.available_clients").Joins(
-							"inner join employees on clinics.employee_id = employees.id").Where(
-								"employees.id = ?", clinicOwnerParentEmployee.ID).Scan(&clinicOwnerParentEmployeeClinic)
+						"inner join employees on clinics.employee_id = employees.id").Where(
+						"employees.id = ?", clinicOwnerParentEmployee.ID).Scan(&clinicOwnerParentEmployeeClinic)
 
 					if clinicOwnerParentEmployeeClinic.ExtendCredits {
 						if clinicOwnerParentEmployeeClinic.AvailableCredits > 0 {
@@ -169,6 +169,19 @@ func PassRecoveryClientService(request *modelsClients.PassRecoveryRequest) error
 	return nil
 }
 
+func GetClientById(clientID uint) (*models.Client, error) {
+	client := &models.Client{}
+
+	GormDBResult := database.GormDB.
+		Where("id = ?", clientID).
+		Find(&client)
+
+	if GormDBResult.Error != nil {
+		return nil, GormDBResult.Error
+	}
+	return client, nil
+}
+
 func GetAllImagesByClientID(clientID uint) ([]models.Image, error) {
 	var list = make([]models.Image, 0)
 	if err := database.GormDB.Where("client_id = ?", clientID).Find(&list).Error; err != nil {
@@ -192,14 +205,14 @@ func GetAllStreamingByClientID(clientID string) ([]streaming.Streaming, error) {
 	var list = make([]streaming.Streaming, 0)
 
 	if err := database.GormDB.Where("client_id = ?", clientID).Find(&list).Error;
-	err != nil {
+		err != nil {
 		return nil, err
 	}
 
 	return list, nil
 }
 
-func UploadMultimedia(context *fiber.Ctx,clientID uint, uploadedFile *multipart.FileHeader) error {
+func UploadMultimedia(context *fiber.Ctx, clientID uint, uploadedFile *multipart.FileHeader, uploadMode uint) error {
 	//fmt.Println(context)
 	//fmt.Println(clientID)
 	//fmt.Println(uploadedFile)
@@ -209,5 +222,51 @@ func UploadMultimedia(context *fiber.Ctx,clientID uint, uploadedFile *multipart.
 	if err != nil {
 		return err
 	}
-	return nil
+
+	fileType := utils.GetFileType(uploadedFile.Filename, uploadMode)
+	fmt.Println("fileType")
+	fmt.Println(fileType)
+
+	if fileType == "image" {
+		// image
+		url, size, storeInAmazonError := utils.UploadObject("tempFiles/"+uploadedFile.Filename, clientID, fileType)
+		if storeInAmazonError != nil {
+			fmt.Println(storeInAmazonError.Error())
+		}
+		image := models.Image{ClientID: clientID, Url: url, Size: uint(size)}
+		database.GormDB.Create(&image)
+
+		return err
+	} else if fileType == "video" {
+		// video
+		url, size, storeInAmazonError := utils.UploadObject("tempFiles/"+uploadedFile.Filename, clientID, fileType)
+		if storeInAmazonError != nil {
+			fmt.Println(storeInAmazonError.Error())
+		}
+		video := models.Video{ClientID: clientID, Url: url, Size: uint(size)}
+		database.GormDB.Create(&video)
+		return err
+	} else if fileType == "holo" {
+		// holo
+		/*
+			url, size, storeInAmazonError := utils.UploadObject("tempFiles/"+uploadedFile.Filename, clientID, fileType)
+			if storeInAmazonError != nil {
+				fmt.Println(storeInAmazonError.Error())
+			}
+			image := models.Video{ClientID: clientID, Url: url, Size: uint(size)}
+			database.GormDB.Create(&image)
+		*/
+		return err
+	} else if fileType == "heartbeat" {
+		// holo
+		url, size, storeInAmazonError := utils.UploadObject("tempFiles/"+uploadedFile.Filename, clientID, fileType)
+		if storeInAmazonError != nil {
+			fmt.Println(storeInAmazonError.Error())
+		}
+		video := models.Heartbeat{ClientID: clientID, Url: url, Size: uint(size)}
+		database.GormDB.Create(&video)
+		return err
+	} else {
+		return errors.New("invalid file")
+	}
 }

@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"time"
 )
 
@@ -158,7 +159,7 @@ func WriteLog(message string) {
 	}
 }
 
-func GenerateHologramVideo(inFile string, outFile string) error  {
+func GenerateHologramVideo(inFile string, outFile string) error {
 
 	command := "/Library/Frameworks/Python.framework/Versions/3.8/bin/python3"
 
@@ -167,7 +168,6 @@ func GenerateHologramVideo(inFile string, outFile string) error  {
 	if err != nil {
 		return err
 	}
-
 
 	err = executeCommandVerbose(command, inFile)
 
@@ -254,4 +254,34 @@ func GetEnvVariable(key string) string {
 	}
 
 	return os.Getenv(key)
+}
+
+func GetFileType(file string, uploadMode uint) string {
+	// fileType image -> 1
+	// fileType video -> 2
+	// fileType holo -> 3
+	// fileType heartbeat -> 4
+
+	fileType := ""
+	extension := filepath.Ext(file)
+
+	if extension == ".jpg" ||
+		extension == ".png" {
+		fileType = "image"
+	} else if extension == ".mp4" ||
+		extension == ".avi" ||
+		extension == ".mpg" {
+		fileType = "video"
+
+		if uploadMode == 2 {
+			fileType = "holo"
+		}
+	} else if extension == ".mp3" ||
+		extension == ".wav" {
+		fileType = "heartbeat"
+	} else {
+		fileType = ""
+	}
+
+	return fileType
 }

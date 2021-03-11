@@ -19,6 +19,9 @@ func ClientRoutes (router fiber.Router) {
 	// /api/v1/client/create
 	clientRouter.Post("/create", controllers.CreateClient)
 
+	// /api/v1/client/:client_id
+	clientRouter.Get("/:client_id", controllers.GetClientById)
+
 	// use jwt
 	//clientRouter.Use(jwtware.New(jwtware.Config{SigningKey: []byte(utils.GetEnvVariable("JWT_CLIENT_KEY"))}))
 

@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	database "github.com/nikola43/ecoapigorm/database"
@@ -9,8 +8,20 @@ import (
 	modelsClient "github.com/nikola43/ecoapigorm/models/clients"
 	"github.com/nikola43/ecoapigorm/models/streaming"
 	"github.com/nikola43/ecoapigorm/services"
+	"log"
+	"os"
 	"strconv"
 )
+
+func GetClientById(context *fiber.Ctx) error {
+	clientID, _ := strconv.ParseUint(context.Params("client_id"), 10, 64)
+
+	if client, err := services.GetClientById(uint(clientID)); err != nil {
+		return context.SendStatus(fiber.StatusNotFound)
+	} else {
+		return context.Status(fiber.StatusOK).JSON(client)
+	}
+}
 
 func GetAllImagesByClientID(context *fiber.Ctx) error {
 	var err error
@@ -133,32 +144,30 @@ func PassRecoveryClient(context *fiber.Ctx) error {
 	return context.SendStatus(fiber.StatusOK)
 }
 
-
 func UploadMultimedia(context *fiber.Ctx) error {
 	clientID, _ := strconv.ParseUint(context.Params("client_id"), 10, 64)
 	uploadMode, _ := strconv.ParseUint(context.Params("upload_mode"), 10, 64)
-	//uploadMode, _ := strconv.ParseUint(context.FormValue("upload_mode"), 10, 64)
-	fmt.Println(uploadMode)
 
-	// Get first file from form field "document":
 	uploadedFile, err := context.FormFile("file")
-	//uploadedFileMode, err := context.FormFile("mode")
 	if err != nil {
 		return err
 	}
 
-
-	err = services.UploadMultimedia(context,uint(clientID), uploadedFile)
+	err = services.UploadMultimedia(context, uint(clientID), uploadedFile, uint(uploadMode))
 	if err != nil {
 		return err
 	}
 
+	e := os.Remove("./tempFiles/" + uploadedFile.Filename)
+	if e != nil {
+		log.Fatal(e)
+	}
 
-	return context.SendStatus(fiber.StatusOK)
+	return context.Status(fiber.StatusOK).JSON(&fiber.Map{
+		"file": uploadedFile.Filename,
+	})
 }
 
 func PasswordRecovery(context *fiber.Ctx) error {
-
-
 	return context.SendStatus(fiber.StatusOK)
 }

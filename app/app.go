@@ -3,11 +3,8 @@ package app
 import (
 	"database/sql"
 	"fmt"
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/credentials"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	database "github.com/nikola43/ecoapigorm/database"
 	"github.com/nikola43/ecoapigorm/database/fakedatabase"
 	middlewares "github.com/nikola43/ecoapigorm/middleware"
@@ -19,20 +16,13 @@ import (
 	"log"
 )
 
-var S3Session *s3.S3
-var awsBucketName string
 var httpServer *fiber.App
 
 type App struct {
 }
 
 func (a *App) Initialize(port string) {
-	InitializeAWSConnection(
-		utils.GetEnvVariable("AWS_ACCESS_KEY"),
-		utils.GetEnvVariable("AWS_SECRET_KEY"),
-		utils.GetEnvVariable("AWS_ENDPOINT"),
-		utils.GetEnvVariable("AWS_BUCKET_NAME"),
-		utils.GetEnvVariable("AWS_BUCKET_REGION"))
+
 
 	InitializeDatabase(
 		utils.GetEnvVariable("MYSQL_USER"),
@@ -77,11 +67,9 @@ func InitializeHttpServer(port string) {
 		BodyLimit: 50000 * 1024 * 1024, // this is the default limit of 4MB
 	})
 	httpServer.Use(middlewares.XApiKeyMiddleware)
-	/*
-	httpServer.Use(cors.New(cors.Config{
-		AllowHeaders: "Origin, Content-Type, Accept, X_API_KEY",
-	}))
-	*/
+
+	httpServer.Use(cors.New(cors.Config{}))
+
 	// httpServer.Use(middleware.)
 
 	api := httpServer.Group("/api") // /api
@@ -116,14 +104,4 @@ func InitializeDatabase(user, password, database_name string) {
 	}
 }
 
-func InitializeAWSConnection(accessKey, secretKey, endpoint, bucketName, bucketRegion string) {
-	s3Config := &aws.Config{
-		Credentials:      credentials.NewStaticCredentials(accessKey, secretKey, ""),
-		Endpoint:         aws.String(endpoint),
-		Region:           aws.String(bucketRegion),
-		S3ForcePathStyle: aws.Bool(true),
-	}
-	newSession := session.New(s3Config)
-	S3Session = s3.New(newSession)
-	awsBucketName = bucketName
-}
+
