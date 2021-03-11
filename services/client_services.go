@@ -9,7 +9,9 @@ import (
 	modelsClients "github.com/nikola43/ecoapigorm/models/clients"
 	"github.com/nikola43/ecoapigorm/models/streaming"
 	"github.com/nikola43/ecoapigorm/utils"
+	"log"
 	"mime/multipart"
+	"os"
 )
 
 func CreateClient(createClientRequest *modelsClients.CreateClientRequest) (*modelsClients.CreateClientResponse, error) {
@@ -238,13 +240,34 @@ func UploadMultimedia(context *fiber.Ctx, clientID uint, uploadedFile *multipart
 
 		return err
 	} else if fileType == "video" {
-		// video
-		url, size, storeInAmazonError := utils.UploadObject("tempFiles/"+uploadedFile.Filename, clientID, fileType)
+		// upload video
+		videoUrl, videoSize, storeInAmazonError := utils.UploadObject("tempFiles/"+uploadedFile.Filename, clientID, fileType)
 		if storeInAmazonError != nil {
-			fmt.Println(storeInAmazonError.Error())
+			return err
 		}
-		video := models.Video{ClientID: clientID, Url: url, Size: uint(size)}
+
+		// create thumb
+		videoThumbnailFileName := "tempFiles/" + uploadedFile.Filename + "-thumb.jpg"
+		extractThumbnailFromVideoError := utils.ExtractThumbnailFromVideo("tempFiles/"+uploadedFile.Filename, videoThumbnailFileName)
+		if extractThumbnailFromVideoError != nil {
+			return extractThumbnailFromVideoError
+		}
+
+		// thumb video
+		thumbUrl, thumbSize, storeThumbInAmazonError := utils.UploadObject(videoThumbnailFileName, clientID, fileType)
+		if storeThumbInAmazonError != nil {
+			return storeThumbInAmazonError
+		}
+
+		video := models.Video{ClientID: clientID, Url: videoUrl, ThumbnailUrl: thumbUrl, Size: uint(videoSize + thumbSize)}
 		database.GormDB.Create(&video)
+
+
+		e := os.Remove(videoThumbnailFileName)
+		if e != nil {
+			log.Fatal(e)
+		}
+
 		return err
 	} else if fileType == "holo" {
 		// holo

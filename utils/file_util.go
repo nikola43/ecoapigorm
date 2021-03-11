@@ -83,40 +83,6 @@ func ExtractAudioFromVideo(inFile string, outFile string) error {
 	return nil
 }
 
-/**
-Extract audio from video and generate audio file
-*/
-func ExtractThumbnailFromVideo(inFile string, outFile string) error {
-	// check if input file exists
-	inFileError := CheckIfFileExists(inFile)
-	if inFileError != nil {
-		fmt.Printf("Error: %s", inFileError.Error())
-		return inFileError
-	}
-
-	// check if output file exists
-	outFileError := CheckIfFileExists(outFile)
-	if outFileError != nil {
-		fmt.Printf("Error: %s", outFileError.Error())
-		return outFileError
-	} else {
-		// // if exists then remove
-		// removeFileError := os.Remove(outFile)
-		// if removeFileError != nil {
-		// 	fmt.Printf("Error: %s", removeFileError.Error())
-		// 	return removeFileError
-		// }
-	}
-
-	// extract audio from video using ffmpeg library
-	cmd := exec.Command(FFMPEG_PATH, "-y", "-i", inFile, "-ss", "00:00:05.000", "-vframes", "1", outFile)
-	err := cmd.Run()
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
 func fileExists(filename string) bool {
 	info, err := os.Stat(filename)
 	if os.IsNotExist(err) {
@@ -285,3 +251,14 @@ func GetFileType(file string, uploadMode uint) string {
 
 	return fileType
 }
+
+func ExtractThumbnailFromVideo(inFile string, outFile string) error {
+	// extract audio from video using ffmpeg library
+	cmd := exec.Command(FFMPEG_PATH, "-y", "-i", inFile, "-ss", "00:00:05.000", "-vframes", "1", outFile)
+	err := cmd.Run()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
