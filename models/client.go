@@ -21,4 +21,5 @@ type Client struct {
 	Streaming             streaming.Streaming    `json:"streaming" xml:"streaming" form:"streaming"`
 	Recovery              Recovery               `json:"recovery" xml:"recovery" form:"recovery"`
 	PushNotificationDatas []PushNotificationData `json:"push_notification_datas" xml:"push_notification_datas" form:"push_notification_datas"`
+	Payment               []Payment              `json:"payment" xml:"payment" form:"payment"`
 }
