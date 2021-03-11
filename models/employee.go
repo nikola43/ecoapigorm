@@ -14,5 +14,4 @@ type Employee struct {
 	LastName         string        `gorm:"type:varchar(32)" json:"lastname"`
 	Role             string        `gorm:"type:varchar(32) not null; DEFAULT:'employee'" json:"role"`
 	Clinic           Clinic        `json:"clinic"`
-	// PaymentMethod    PaymentMethod `json:"payment_method"`
 }

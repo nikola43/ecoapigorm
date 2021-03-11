@@ -8,7 +8,7 @@ import (
 	"github.com/nikola43/ecoapigorm/utils"
 )
 
-func ClinicRoutes (router fiber.Router) {
+func ClinicRoutes(router fiber.Router) {
 	// /api/v1/clinic
 	clinicRouter := router.Group("/clinic")
 
@@ -24,6 +24,6 @@ func ClinicRoutes (router fiber.Router) {
 	// /api/v1/clinic/create
 	clinicRouter.Post("/create", controllers.CreateClinic)
 
-	// /api/v1/clinic/create
+	// /api/v1/clinic/:clinic_id
 	clinicRouter.Get("/:clinic_id", controllers.GetClinicById)
 }

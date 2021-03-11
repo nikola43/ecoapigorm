@@ -249,7 +249,7 @@ func UploadMultimedia(context *fiber.Ctx, clientID uint, uploadedFile *multipart
 		database.GormDB.Create(&image)
 
 		return err
-	} else if fileType == "video" || fileType == "holo" {
+	} else if fileType == "video" || fileType == "holographic" {
 		// upload video
 		videoUrl, videoSize, storeInAmazonError := utils.UploadObject("tempFiles/"+uploadedFile.Filename, clientID, fileType)
 		if storeInAmazonError != nil {
@@ -269,7 +269,7 @@ func UploadMultimedia(context *fiber.Ctx, clientID uint, uploadedFile *multipart
 			return storeThumbInAmazonError
 		}
 
-		if fileType == "video" || fileType == "holo" {
+		if fileType == "video" {
 			video := models.Video{ClientID: clientID, Url: videoUrl, ThumbnailUrl: thumbUrl, Size: uint(videoSize + thumbSize)}
 			database.GormDB.Create(&video)
 		}
