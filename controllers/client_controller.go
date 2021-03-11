@@ -59,6 +59,33 @@ func GetAllVideosByClientID(context *fiber.Ctx) error {
 	return context.Status(fiber.StatusOK).JSON(videos)
 }
 
+func GetAllHolographicsByClientID(context *fiber.Ctx) error {
+	clientID := context.Params("client_id")
+	holographics := make([]models.Holographic, 0)
+	var err error
+
+	if holographics, err = services.GetAllHolographicsByClientID(clientID); err != nil {
+		return context.SendStatus(fiber.StatusInternalServerError)
+	}
+
+	return context.Status(fiber.StatusOK).JSON(holographics)
+}
+
+func GetHeartbeatByClientID(context *fiber.Ctx) error {
+	clientID, _ := strconv.ParseUint(context.Params("client_id"), 10, 64)
+
+	heartbeat := &models.Heartbeat{}
+	var err error
+
+	if heartbeat, err = services.GetHeartbeatByClientID(uint(clientID)); err != nil {
+		return context.Status(fiber.StatusNotFound).JSON(&fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return context.Status(fiber.StatusOK).JSON(heartbeat)
+}
+
 func CreateClient(context *fiber.Ctx) error {
 	createClientRequest := new(modelsClient.CreateClientRequest)
 	createClientResponse := new(modelsClient.CreateClientResponse)

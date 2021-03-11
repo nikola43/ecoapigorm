@@ -240,7 +240,7 @@ func GetFileType(file string, uploadMode uint) string {
 		fileType = "video"
 
 		if uploadMode == 2 {
-			fileType = "holo"
+			fileType = "holographic"
 		}
 	} else if extension == ".mp3" ||
 		extension == ".wav" {

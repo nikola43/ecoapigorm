@@ -15,6 +15,7 @@ type Client struct {
 	LastName              string                 `gorm:"type:varchar(32)" json:"last_name" xml:"last_name" form:"last_name"`
 	Calculator            Calculator             `json:"calculator" xml:"calculator" form:"calculator"`
 	Videos                []Video                `json:"videos" xml:"videos" form:"videos"`
+	Holographs            []Holographic          `json:"holographics" xml:"holographics" form:"holographics"`
 	Images                []Image                `json:"images" xml:"images" form:"images"`
 	Heartbeat             []Heartbeat            `json:"heartbeat" xml:"heartbeat" form:"heartbeat"`
 	Streaming             streaming.Streaming    `json:"streaming" xml:"streaming" form:"streaming"`

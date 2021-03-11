@@ -42,6 +42,18 @@ func ClientRoutes (router fiber.Router) {
 	// /api/v1/client/videos/:client_id
 	videosRouter.Get("/:client_id", controllers.GetAllVideosByClientID)
 
+	// /api/v1/client/holographics
+	holographicsRouter := clientRouter.Group("/holographics")
+
+	// /api/v1/client/holographics/:client_id
+	holographicsRouter.Get("/:client_id", controllers.GetAllHolographicsByClientID)
+
+	// /api/v1/client/holographics
+	heartbeatRouter := clientRouter.Group("/heartbeat")
+
+	// /api/v1/client/holographics/:client_id
+	heartbeatRouter.Get("/:client_id", controllers.GetHeartbeatByClientID)
+
 	// /api/v1/client/streaming
 	streamingsRouter := clientRouter.Group("/streaming")
 

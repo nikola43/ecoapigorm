@@ -203,6 +203,16 @@ func GetAllVideosByClientID(clientID string) ([]models.Video, error) {
 	return list, nil
 }
 
+func GetAllHolographicsByClientID(clientID string) ([]models.Holographic, error) {
+	var list = make([]models.Holographic, 0)
+
+	if err := database.GormDB.Where("client_id = ?", clientID).Find(&list).Error; err != nil {
+		return nil, err
+	}
+
+	return list, nil
+}
+
 func GetAllStreamingByClientID(clientID string) ([]streaming.Streaming, error) {
 	var list = make([]streaming.Streaming, 0)
 
@@ -239,7 +249,7 @@ func UploadMultimedia(context *fiber.Ctx, clientID uint, uploadedFile *multipart
 		database.GormDB.Create(&image)
 
 		return err
-	} else if fileType == "video" {
+	} else if fileType == "video" || fileType == "holo" {
 		// upload video
 		videoUrl, videoSize, storeInAmazonError := utils.UploadObject("tempFiles/"+uploadedFile.Filename, clientID, fileType)
 		if storeInAmazonError != nil {
@@ -259,9 +269,15 @@ func UploadMultimedia(context *fiber.Ctx, clientID uint, uploadedFile *multipart
 			return storeThumbInAmazonError
 		}
 
-		video := models.Video{ClientID: clientID, Url: videoUrl, ThumbnailUrl: thumbUrl, Size: uint(videoSize + thumbSize)}
-		database.GormDB.Create(&video)
+		if fileType == "video" || fileType == "holo" {
+			video := models.Video{ClientID: clientID, Url: videoUrl, ThumbnailUrl: thumbUrl, Size: uint(videoSize + thumbSize)}
+			database.GormDB.Create(&video)
+		}
 
+		if fileType == "holographic" {
+			video := models.Holographic{ClientID: clientID, Url: videoUrl, ThumbnailUrl: thumbUrl, Size: uint(videoSize + thumbSize)}
+			database.GormDB.Create(&video)
+		}
 
 		e := os.Remove(videoThumbnailFileName)
 		if e != nil {
