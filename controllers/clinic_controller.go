@@ -8,6 +8,8 @@ import (
 	"github.com/nikola43/ecoapigorm/models"
 	"github.com/nikola43/ecoapigorm/models/clients"
 	clinicModels "github.com/nikola43/ecoapigorm/models/clinic"
+	"github.com/nikola43/ecoapigorm/models/promos"
+	"github.com/nikola43/ecoapigorm/models/streaming"
 	"github.com/nikola43/ecoapigorm/services"
 	"strconv"
 )
@@ -100,7 +102,7 @@ func CreateClinic(context *fiber.Ctx) error {
 }
 
 func GetClientsByClinicID(context *fiber.Ctx) error {
-	clientsList := make([]clients.ListClientRequest, 0)
+	clientsList := make([]clients.ListClientResponse, 0)
 	var err error
 
 	clinicID, _ := strconv.ParseUint(context.Params("clinic_id"), 10, 64)
@@ -114,3 +116,79 @@ func GetClientsByClinicID(context *fiber.Ctx) error {
 		return context.JSON(clientsList)
 	}
 }
+
+func CreateClientFromClinic(context *fiber.Ctx) error {
+	createClientRequest := new(clients.CreateClientRequest)
+	listClientResponse := new(clients.ListClientResponse)
+	var err error
+
+	// parse request
+	if err = context.BodyParser(createClientRequest);
+		err != nil {
+		return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	// validation ---------------------------------------------------------------------
+	v := validator.New()
+	err = v.Struct(createClientRequest)
+	if err != nil {
+		for _, e := range err.(validator.ValidationErrors) {
+			if e != nil {
+				return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+					"error": "validation_error: " + e.Field(),
+				})
+			}
+		}
+	}
+
+	// check if client already exist
+	client := models.Client{}
+	GormDBResult := database.GormDB.
+		Where("email = ?", createClientRequest.Email).
+		Find(&client)
+
+	if GormDBResult.Error != nil {
+		return context.Status(fiber.StatusInternalServerError).JSON(&fiber.Map{
+			"error": "internal server",
+		})
+	}
+
+	// create and response
+	if listClientResponse, err = services.CreateClientFromClinic(createClientRequest);
+		err != nil {
+		return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+			"error": err.Error(),
+		})
+	} else {
+		return context.JSON(listClientResponse)
+	}
+}
+
+
+func GetAllStreamingByClinicID(context *fiber.Ctx) error {
+	id := context.Params("clinic_id")
+	streamings := make([]streaming.Streaming, 0)
+	var err error
+
+	if streamings, err = services.GetAllStreamingByClinicID(id); err != nil {
+		return context.SendStatus(fiber.StatusInternalServerError)
+	}
+
+	return context.Status(fiber.StatusOK).JSON(streamings)
+}
+
+func GetAllPromosByClinicID(context *fiber.Ctx) error {
+	id := context.Params("clinic_id")
+	promos := make([]promos.Promo, 0)
+	var err error
+
+	if promos, err = services.GetAllPromosByClinicID(id); err != nil {
+		return context.SendStatus(fiber.StatusInternalServerError)
+	}
+
+	return context.Status(fiber.StatusOK).JSON(promos)
+}
+
+

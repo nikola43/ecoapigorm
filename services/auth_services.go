@@ -37,7 +37,7 @@ func LoginClient(email, password string) (*models.LoginClientResponse, error) {
 
 func LoginEmployee(email, password string) (*models.LoginEmployeeResponse, error) {
 	employee := &models.Employee{}
-	clinic:= models.Clinic{}
+	clinic := models.Clinic{}
 	token := ""
 	var err error
 
@@ -50,26 +50,26 @@ func LoginEmployee(email, password string) (*models.LoginEmployeeResponse, error
 		return nil, errors.New("not found")
 	}
 
-
 	database.GormDB.Model(&clinic).
 		Select("clinics.id").
 		Joins("left join employees on clinics.employee_id = employees.id").
 		Where("employees.id = ?", employee.ID).
 		Scan(&clinic)
 
-	// todo coger clinic id de la relacion
+	database.GormDB.First(&clinic, clinic.ID)
+
 	if token, err = utils.GenerateEmployeeToken(employee.Email, employee.ID, clinic.ID, employee.Role); err != nil {
 		return nil, err
 	}
 
 	clientEmployeeResponse := models.LoginEmployeeResponse{
-		Id:       employee.ID,
-		ClinicID: clinic.ID,
+		ID:       employee.ID,
 		Email:    employee.Email,
 		Name:     employee.Name,
 		Role:     employee.Role,
 		LastName: employee.LastName,
 		Token:    token,
+		Clinic:   clinic,
 	}
 
 	return &clientEmployeeResponse, err

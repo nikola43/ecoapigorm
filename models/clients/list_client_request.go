@@ -1,6 +1,6 @@
 package clients
 
-type ListClientRequest struct {
+type ListClientResponse struct {
 	ID         uint   `json:"id"  xml:"id" form:"id"`
 	ClinicID   uint   `json:"clinic_id"  xml:"clinic_id" form:"clinic_id"`
 	ClinicName string `json:"clinic_name"  xml:"clinic_name" form:"clinic_name"`

@@ -27,6 +27,7 @@ func Migrate() {
 	GormDB.Migrator().DropTable(&models.Calculator{})
 	GormDB.Migrator().DropTable(&kicks.Kick{})
 	GormDB.Migrator().DropTable(&models.Company{})
+	GormDB.Migrator().DropTable(&models.Payment{})
 
 	// CREATE
 	GormDB.AutoMigrate(&models.Client{})
@@ -44,4 +45,5 @@ func Migrate() {
 	GormDB.AutoMigrate(&models.CalculatorDetail{})
 	GormDB.AutoMigrate(&kicks.Kick{})
 	GormDB.AutoMigrate(&models.Company{})
+	GormDB.AutoMigrate(&models.Payment{})
 }

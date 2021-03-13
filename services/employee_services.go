@@ -48,3 +48,13 @@ func GetEmployeesByParentEmployeeID(parentEmployeeID uint) ([]models.Employee, e
 
 	return list, nil
 }
+
+func BuyCredits(sessionID string, clinicID uint) error {
+	payment := models.Payment{}
+
+	if err := database.GormDB.Where("session_id = ? AND clinic_id", sessionID, clinicID).Find(&payment).Error; err != nil {
+		return err
+	}
+
+	return nil
+}

@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	database "github.com/nikola43/ecoapigorm/database"
@@ -75,4 +76,20 @@ func GetEmployeesByParentEmployeeID(context *fiber.Ctx) error {
 	}
 
 	return context.Status(fiber.StatusOK).JSON(employees)
+}
+
+func BuyCredits(context *fiber.Ctx) error {
+	sessionID := context.Params("session_id")
+	clinicID, _ := strconv.ParseUint(context.Params("clinic_id"), 10, 64)
+
+	fmt.Println(sessionID)
+	fmt.Println(clinicID)
+
+	err := services.BuyCredits(sessionID, uint(clinicID))
+	if err != nil {
+		return context.SendStatus(fiber.StatusInternalServerError)
+	}
+
+
+	return context.SendStatus(fiber.StatusOK)
 }
