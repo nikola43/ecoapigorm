@@ -9,14 +9,14 @@ import (
 
 func LoginClient(context *fiber.Ctx) error {
 	clientLoginRequest := new(models.LoginClientRequest)
-	clientLoginResponse := new(models.LoginClientResponse)
-	var err error
 
-	if err = context.BodyParser(clientLoginRequest); err != nil {
+	err := context.BodyParser(clientLoginRequest)
+	if err != nil {
 		return context.SendStatus(fiber.StatusBadRequest)
 	}
 
-	if clientLoginResponse, err = services.LoginClient(clientLoginRequest.Email, clientLoginRequest.Password); err != nil {
+	clientLoginResponse, err := services.LoginClient(clientLoginRequest.Email, clientLoginRequest.Password)
+	if err != nil {
 		return context.Status(fiber.StatusNotFound).JSON(&fiber.Map{
 			"error": errors.New("not found"),
 		})
@@ -26,17 +26,19 @@ func LoginClient(context *fiber.Ctx) error {
 }
 
 func LoginEmployee(context *fiber.Ctx) error {
-	clientEmployeeRequest := new(models.LoginEmployeeRequest)
-	clientEmployeeResponse := new(models.LoginEmployeeResponse)
-	var err error
+	loginEmployeeRequest := new(models.LoginEmployeeRequest)
 
-	if err = context.BodyParser(clientEmployeeRequest); err != nil {
-		return context.SendStatus(fiber.StatusBadRequest)
+	err := context.BodyParser(loginEmployeeRequest)
+	if err != nil {
+		return context.Status(fiber.StatusNotFound).JSON(&fiber.Map{
+			"error": err.Error(),
+		})
 	}
 
-	if clientEmployeeResponse, err = services.LoginEmployee(clientEmployeeRequest.Email, clientEmployeeRequest.Password); err != nil {
+	clientEmployeeResponse, err := services.LoginEmployee(loginEmployeeRequest.Email, loginEmployeeRequest.Password)
+	if err != nil {
 		return context.Status(fiber.StatusNotFound).JSON(&fiber.Map{
-			"error": errors.New("not found"),
+			"error": err.Error(),
 		})
 	}
 

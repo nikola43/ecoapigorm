@@ -1,6 +1,8 @@
 package services
 
 import (
+	"errors"
+	"fmt"
 	database "github.com/nikola43/ecoapigorm/database"
 	"github.com/nikola43/ecoapigorm/models"
 	modelsEmployees "github.com/nikola43/ecoapigorm/models/employee"
@@ -49,11 +51,38 @@ func GetEmployeesByParentEmployeeID(parentEmployeeID uint) ([]models.Employee, e
 	return list, nil
 }
 
-func BuyCredits(sessionID string, clinicID uint) error {
-	payment := models.Payment{}
+func BuyCredits(sessionID string, clinicID uint) (*models.Payment, error) {
+	payment := &models.Payment{}
 
-	if err := database.GormDB.Where("session_id = ? AND clinic_id", sessionID, clinicID).Find(&payment).Error; err != nil {
-		return err
+	err := database.GormDB.
+		Where("session_id = ? AND clinic_id", sessionID, clinicID).
+		Find(&payment).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	if payment.ID > 0 {
+		return payment, nil
+	}
+
+	return nil, errors.New("payment not found")
+}
+
+func Invite(employees []models.Employee) error {
+	fmt.Println(employees)
+
+	// validation ---------------------------------------------------------------------
+	for _, employee := range employees {
+		temp := models.Employee{}
+		database.GormDB.Where("email = ?", employee.Email).Find(&employee)
+
+		if temp.ID > 0 {
+			// send link email
+		} else {
+			// send signup email
+		}
+		fmt.Println(employee)
 	}
 
 	return nil

@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/nikola43/ecoapigorm/models"
 	"github.com/nikola43/ecoapigorm/utils"
@@ -33,7 +34,8 @@ func AdminEmployeeMiddleware(context *fiber.Ctx) error {
 			"error": "unauthorized",
 		})
 	} else if employeeTokenClaims.Role != models.ADMIN_ROLE {
-		return context.Status(fiber.StatusUnauthorized).JSON(&fiber.Map{
+		fmt.Println(employeeTokenClaims)
+		return context.Status(fiber.StatusForbidden).JSON(&fiber.Map{
 			"error": "employee not is admin",
 		})
 	} else {

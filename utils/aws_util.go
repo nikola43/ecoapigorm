@@ -8,6 +8,8 @@ import (
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/aws/aws-sdk-go/service/s3/s3manager"
+	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -19,13 +21,44 @@ const (
 	maxRetries  = 3
 )
 
-func UploadObject(filepath string, clientID uint, tipo string) (string, int64, error) {
+var AwsClient = AwsManager{}
+/*
+AwsClient.InitializeAWSSession(
+utils.GetEnvVariable("AWS_ACCESS_KEY"),
+utils.GetEnvVariable("AWS_SECRET_KEY"),
+utils.GetEnvVariable("AWS_ENDPOINT"),
+utils.GetEnvVariable("AWS_BUCKET_REGION"),
+utils.GetEnvVariable("AWS_BUCKET_NAME"),
+)
+*/
+type AwsManager struct {
+	s3Client  *s3.S3
+	s3Session *session.Session
+	s3BucketName  string
+	s3BucketRegion  string
+}
+
+func (awsManager *AwsManager) DownloadObject(filekey string, filepath string) error {
+	file, err := os.Create(filepath)
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer file.Close()
+
+	downloader := s3manager.NewDownloader(awsManager.s3Session)
+	bytes, err := downloader.Download(file,
+		&s3.GetObjectInput{
+			Bucket: aws.String(GetEnvVariable("AWS_BUCKET_NAME")),
+			Key:    aws.String(filekey),
+		})
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(bytes)
+	return nil
+}
+func (awsManager *AwsManager) UploadObject(filepath string, clientID uint, tipo string) (string, int64, error) {
 	awsBucketName := GetEnvVariable("AWS_BUCKET_NAME")
-	s3Client := InitializeAWSConnection(
-		GetEnvVariable("AWS_ACCESS_KEY"),
-		GetEnvVariable("AWS_SECRET_KEY"),
-		GetEnvVariable("AWS_ENDPOINT"),
-		GetEnvVariable("AWS_BUCKET_REGION"))
 
 	file, err := os.Open("./" + filepath)
 	if err != nil {
@@ -50,7 +83,7 @@ func UploadObject(filepath string, clientID uint, tipo string) (string, int64, e
 		ACL:         aws.String("public-read"),
 		ContentType: aws.String(fileType),
 	}
-	resp, err := s3Client.CreateMultipartUpload(input)
+	resp, err := awsManager.s3Client.CreateMultipartUpload(input)
 	if err != nil {
 		fmt.Println(err.Error())
 		return "No se pudo conectar", 0, err
@@ -66,10 +99,10 @@ func UploadObject(filepath string, clientID uint, tipo string) (string, int64, e
 		} else {
 			partLength = maxPartSize
 		}
-		completedPart, err := UploadPart(s3Client, resp, buffer[curr:curr+partLength], partNumber)
+		completedPart, err := UploadPart(awsManager.s3Client, resp, buffer[curr:curr+partLength], partNumber)
 		if err != nil {
 			fmt.Println(err.Error())
-			err := AbortMultipartUpload(s3Client, resp)
+			err := AbortMultipartUpload(awsManager.s3Client, resp)
 			if err != nil {
 				fmt.Println(err.Error())
 			}
@@ -79,7 +112,7 @@ func UploadObject(filepath string, clientID uint, tipo string) (string, int64, e
 		partNumber++
 		completedParts = append(completedParts, completedPart)
 	}
-	completeResponse, err := CompleteMultipartUpload(s3Client, resp, completedParts)
+	completeResponse, err := CompleteMultipartUpload(awsManager.s3Client, resp, completedParts)
 	if err != nil {
 		fmt.Println(err.Error() + "abc")
 		return "No se pudo subir", 0, err
@@ -91,13 +124,13 @@ func UploadObject(filepath string, clientID uint, tipo string) (string, int64, e
 	return *url, size, nil
 }
 
-func DeleteObject(client *s3.S3, bucket string, key *string) error {
+func (awsManager *AwsManager) DeleteObject(bucket string, key *string) error {
 	request := &s3.DeleteObjectInput{
 		Bucket: &bucket,
 		Key:    key,
 	}
 
-	res, err := client.DeleteObject(request)
+	res, err := awsManager.s3Client.DeleteObject(request)
 	if err != nil {
 		return err
 	}
@@ -106,7 +139,7 @@ func DeleteObject(client *s3.S3, bucket string, key *string) error {
 	return nil
 }
 
-func UploadPart(svc *s3.S3, resp *s3.CreateMultipartUploadOutput, fileBytes []byte, partNumber int) (*s3.CompletedPart, error) {
+func UploadPart(s3Client *s3.S3, resp *s3.CreateMultipartUploadOutput, fileBytes []byte, partNumber int) (*s3.CompletedPart, error) {
 	tryNum := 1
 	partInput := &s3.UploadPartInput{
 		Body:          bytes.NewReader(fileBytes),
@@ -118,7 +151,7 @@ func UploadPart(svc *s3.S3, resp *s3.CreateMultipartUploadOutput, fileBytes []by
 	}
 
 	for tryNum <= maxRetries {
-		uploadResult, err := svc.UploadPart(partInput)
+		uploadResult, err := s3Client.UploadPart(partInput)
 		if err != nil {
 			if tryNum == maxRetries {
 				if aerr, ok := err.(awserr.Error); ok {
@@ -137,17 +170,17 @@ func UploadPart(svc *s3.S3, resp *s3.CreateMultipartUploadOutput, fileBytes []by
 	return nil, nil
 }
 
-func AbortMultipartUpload(svc *s3.S3, resp *s3.CreateMultipartUploadOutput) error {
+func AbortMultipartUpload(s3Client *s3.S3, resp *s3.CreateMultipartUploadOutput) error {
 	abortInput := &s3.AbortMultipartUploadInput{
 		Bucket:   resp.Bucket,
 		Key:      resp.Key,
 		UploadId: resp.UploadId,
 	}
-	_, err := svc.AbortMultipartUpload(abortInput)
+	_, err := s3Client.AbortMultipartUpload(abortInput)
 	return err
 }
 
-func CompleteMultipartUpload(svc *s3.S3, resp *s3.CreateMultipartUploadOutput, completedParts []*s3.CompletedPart) (*s3.CompleteMultipartUploadOutput, error) {
+func CompleteMultipartUpload(s3Client *s3.S3, resp *s3.CreateMultipartUploadOutput, completedParts []*s3.CompletedPart) (*s3.CompleteMultipartUploadOutput, error) {
 	completeInput := &s3.CompleteMultipartUploadInput{
 		Bucket:   resp.Bucket,
 		Key:      resp.Key,
@@ -156,10 +189,11 @@ func CompleteMultipartUpload(svc *s3.S3, resp *s3.CreateMultipartUploadOutput, c
 			Parts: completedParts,
 		},
 	}
-	return svc.CompleteMultipartUpload(completeInput)
+	return s3Client.CompleteMultipartUpload(completeInput)
 }
 
-func InitializeAWSConnection(accessKey, secretKey, endpoint, bucketRegion string) *s3.S3 {
+func (awsManager *AwsManager) InitializeAWSSession(accessKey, secretKey, endpoint, bucketName,bucketRegion string) error {
+	var err error
 	s3Config := &aws.Config{
 		Credentials:      credentials.NewStaticCredentials(accessKey, secretKey, ""),
 		Endpoint:         aws.String(endpoint),
@@ -167,6 +201,15 @@ func InitializeAWSConnection(accessKey, secretKey, endpoint, bucketRegion string
 		S3ForcePathStyle: aws.Bool(true),
 	}
 	newSession := session.New(s3Config)
-	S3Session := s3.New(newSession)
-	return S3Session
+	awsManager.s3Client = s3.New(newSession)
+
+	s3Session, err := session.NewSession(&aws.Config{Region: aws.String(GetEnvVariable("AWS_BUCKET_REGION"))})
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	awsManager.s3Session = s3Session
+	awsManager.s3BucketName = bucketName
+	awsManager.s3BucketRegion = bucketRegion
+
+	return nil
 }

@@ -14,13 +14,13 @@ import (
 func CreateFakeData() {
 
 	// EMPLOYEES ------------------------------------------------------------------------------------------------------------------------------------------------------------------
-	employee1 := models.Employee{Name: "Lucía", LastName: "Soares", Phone: "666666666", Email: "pauloxti@gmail.com", Password: utils.HashPassword([]byte("paulo")), Role: "admin"}
+	employee1 := models.Employee{Name: "Paulo", LastName: "Soares", Phone: "666666666", Email: "pauloxti@gmail.com", Password: utils.HashPassword([]byte("paulo")), Role: "admin"}
 	database.GormDB.Create(&employee1)
 
 	employee2 := models.Employee{Name: "Migue", LastName: "Barrera", Phone: "999999999", Email: "migue@gmail.com", Password: utils.HashPassword([]byte("migue")), Role: "employeee", ParentEmployeeID: employee1.ID}
 	database.GormDB.Create(&employee2)
 
-	employee3 := models.Employee{Name: "Pablo", LastName: "Gutierrez", Phone: "777777777", Email: "pablojoseguit@gmail.com", Password: utils.HashPassword([]byte("pablo")), Role: "employee", ParentEmployeeID: employee1.ID}
+	employee3 := models.Employee{Name: "Pablo", LastName: "Gutierrez", Phone: "777777777", Email: "pablojoseguit@gmail.com", Password: utils.HashPassword([]byte("pablo")), Role: "admin", ParentEmployeeID: employee1.ID}
 	database.GormDB.Create(&employee3)
 
 	// COMPANIES ------------------------------------------------------------------------------------------------------------------------------------------------------------------

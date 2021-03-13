@@ -18,7 +18,7 @@ type Client struct {
 	Holographs            []Holographic          `json:"holographics" xml:"holographics" form:"holographics"`
 	Images                []Image                `json:"images" xml:"images" form:"images"`
 	Heartbeat             []Heartbeat            `json:"heartbeat" xml:"heartbeat" form:"heartbeat"`
-	Streaming             streaming.Streaming    `json:"streaming" xml:"streaming" form:"streaming"`
+	Streaming             []streaming.Streaming  `json:"streamings" xml:"streamings" form:"streamings"`
 	Recovery              Recovery               `json:"recovery" xml:"recovery" form:"recovery"`
 	PushNotificationDatas []PushNotificationData `json:"push_notification_datas" xml:"push_notification_datas" form:"push_notification_datas"`
 }

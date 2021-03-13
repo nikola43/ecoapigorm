@@ -24,4 +24,7 @@ func EmployeeRoutes (router fiber.Router) {
 	// /api/v1/employee/:parent_employee_id/employees
 	employeeRouter.Get("/:parent_employee_id/employees", controllers.GetEmployeesByParentEmployeeID)
 
+	// /api/v1/employee/invite
+	employeeRouter.Post("/invite", controllers.Invite)
+
 }

@@ -193,7 +193,7 @@ func GetAllImagesByClientID(clientID uint) ([]models.Image, error) {
 	return list, nil
 }
 
-func GetAllVideosByClientID(clientID string) ([]models.Video, error) {
+func GetAllVideosByClientID(clientID uint) ([]models.Video, error) {
 	var list = make([]models.Video, 0)
 
 	if err := database.GormDB.Where("client_id = ?", clientID).Find(&list).Error; err != nil {

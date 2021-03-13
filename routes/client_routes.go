@@ -30,33 +30,21 @@ func ClientRoutes (router fiber.Router) {
 	// /api/v1/client/change_password
 	clientRouter.Post("/change_password", controllers.ChangePassClient)
 
-	// /api/v1/client/images
-	imagesRouter := clientRouter.Group("/images")
+	// /api/v1/client/:client_id/images
+	clientRouter.Get("/:client_id/images", controllers.GetAllImagesByClientID)
 
-	// /api/v1/client/images/:client_id
-	imagesRouter.Get("/:client_id", controllers.GetAllImagesByClientID)
+	// /api/v1/client/:client_id/videos
+	clientRouter.Get("/:client_id/videos", controllers.GetAllVideosByClientID)
 
-	// /api/v1/client/videos
-	videosRouter := clientRouter.Group("/videos")
+	// /api/v1/client/:client_id/holographics
+	clientRouter.Get("/:client_id/holographics", controllers.GetAllHolographicsByClientID)
 
-	// /api/v1/client/videos/:client_id
-	videosRouter.Get("/:client_id", controllers.GetAllVideosByClientID)
+	// /api/v1/client/:client_id/heartbeat
+	clientRouter.Get("/:client_id/heartbeat", controllers.GetHeartbeatByClientID)
 
-	// /api/v1/client/holographics
-	holographicsRouter := clientRouter.Group("/holographics")
+	// /api/v1/client/:client_id/heartbeat
+	clientRouter.Get("/:client_id/streamings", controllers.GetAllStreamingByClientID)
 
-	// /api/v1/client/holographics/:client_id
-	holographicsRouter.Get("/:client_id", controllers.GetAllHolographicsByClientID)
-
-	// /api/v1/client/holographics
-	heartbeatRouter := clientRouter.Group("/heartbeat")
-
-	// /api/v1/client/holographics/:client_id
-	heartbeatRouter.Get("/:client_id", controllers.GetHeartbeatByClientID)
-
-	// /api/v1/client/streaming
-	streamingsRouter := clientRouter.Group("/streaming")
-
-	// /api/v1/client/streaming/:client_id
-	streamingsRouter.Get("/:client_id", controllers.GetAllStreamingByClientID)
+	// /api/v1/client/:client_id/download
+	clientRouter.Get("/:client_id/download", controllers.DownloadAllMultimediaContentByClientID)
 }

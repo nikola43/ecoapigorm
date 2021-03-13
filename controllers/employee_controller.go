@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	database "github.com/nikola43/ecoapigorm/database"
@@ -82,14 +81,32 @@ func BuyCredits(context *fiber.Ctx) error {
 	sessionID := context.Params("session_id")
 	clinicID, _ := strconv.ParseUint(context.Params("clinic_id"), 10, 64)
 
-	fmt.Println(sessionID)
-	fmt.Println(clinicID)
 
-	err := services.BuyCredits(sessionID, uint(clinicID))
+	payment, err := services.BuyCredits(sessionID, uint(clinicID))
 	if err != nil {
-		return context.SendStatus(fiber.StatusInternalServerError)
+		return context.Status(fiber.StatusNotFound).JSON(&fiber.Map{
+			"error": err.Error(),
+		})
 	}
 
+	return context.Status(fiber.StatusOK).JSON(&fiber.Map{
+		"credits": payment.Amount,
+	})
+}
+
+func Invite(context *fiber.Ctx) error {
+	var err error
+	var employees = make([]models.Employee, 0)
+
+	// parse request
+	if err = context.BodyParser(&employees);
+		err != nil {
+		return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	services.Invite(employees)
 
 	return context.SendStatus(fiber.StatusOK)
 }
