@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/gofiber/fiber/v2"
+	"github.com/nikola43/ecoapigorm/awsmanager"
 	database "github.com/nikola43/ecoapigorm/database"
 	"github.com/nikola43/ecoapigorm/models"
 	modelsClients "github.com/nikola43/ecoapigorm/models/clients"
@@ -241,7 +242,9 @@ func UploadMultimedia(context *fiber.Ctx, clientID uint, uploadedFile *multipart
 
 	if fileType == "image" {
 		// image
-		url, size, storeInAmazonError := utils.UploadObject("tempFiles/"+uploadedFile.Filename, clientID, fileType)
+
+
+		url, size, storeInAmazonError := awsmanager.AwsManager.UploadObject("tempFiles/"+uploadedFile.Filename, clientID, fileType)
 		if storeInAmazonError != nil {
 			fmt.Println(storeInAmazonError.Error())
 		}
@@ -251,7 +254,7 @@ func UploadMultimedia(context *fiber.Ctx, clientID uint, uploadedFile *multipart
 		return err
 	} else if fileType == "video" || fileType == "holographic" {
 		// upload video
-		videoUrl, videoSize, storeInAmazonError := utils.UploadObject("tempFiles/"+uploadedFile.Filename, clientID, fileType)
+		videoUrl, videoSize, storeInAmazonError := awsmanager.AwsManager.UploadObject("tempFiles/"+uploadedFile.Filename, clientID, fileType)
 		if storeInAmazonError != nil {
 			return err
 		}
@@ -264,7 +267,7 @@ func UploadMultimedia(context *fiber.Ctx, clientID uint, uploadedFile *multipart
 		}
 
 		// thumb video
-		thumbUrl, thumbSize, storeThumbInAmazonError := utils.UploadObject(videoThumbnailFileName, clientID, fileType)
+		thumbUrl, thumbSize, storeThumbInAmazonError := awsmanager.AwsManager.UploadObject(videoThumbnailFileName, clientID, fileType)
 		if storeThumbInAmazonError != nil {
 			return storeThumbInAmazonError
 		}
@@ -298,7 +301,7 @@ func UploadMultimedia(context *fiber.Ctx, clientID uint, uploadedFile *multipart
 		return err
 	} else if fileType == "heartbeat" {
 		// holo
-		url, size, storeInAmazonError := utils.UploadObject("tempFiles/"+uploadedFile.Filename, clientID, fileType)
+		url, size, storeInAmazonError := awsmanager.AwsManager.UploadObject("tempFiles/"+uploadedFile.Filename, clientID, fileType)
 		if storeInAmazonError != nil {
 			fmt.Println(storeInAmazonError.Error())
 		}

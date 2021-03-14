@@ -122,7 +122,7 @@ func CreateFakeByClient(clientId uint) {
 	for i := 1; i < 20; i++ {
 		images := models.Image{
 			ClientID: clientId,
-			Url:      "https://s3.eu-central-1.wasabisys.com/babyandme/4/image/MARIANA VICENTE (10).png",
+			Url:      "https://s3.eu-central-1.wasabisys.com/ecobaby/1/image/MARIANA VICENTE (10).png",
 			Size:     0,
 		}
 
@@ -132,8 +132,8 @@ func CreateFakeByClient(clientId uint) {
 	for i := 1; i < 20; i++ {
 		videos := models.Video{
 			ClientID:     clientId,
-			Url:          "https://s3.eu-central-1.wasabisys.com/babyandme/4/video/MARIANA VICENTE (2) (online-video-cutter.com) copy.mp4-audio.mp4",
-			ThumbnailUrl: "https://s3.eu-central-1.wasabisys.com/babyandme/4/video/MARIANA VICENTE (2) (online-video-cutter.com) copy.mp4-audio.mp4-thumbnail.jpg",
+			Url:          "https://s3.eu-central-1.wasabisys.com/ecobaby/1/video/MARIANA VICENTE (2) (online-video-cutter.com) copy 10.mp4",
+			ThumbnailUrl: "https://s3.eu-central-1.wasabisys.com/ecobaby/1/video/MARIANA VICENTE (2) (online-video-cutter.com) copy 10.mp4-thumb.jpg",
 			Size:         0,
 		}
 

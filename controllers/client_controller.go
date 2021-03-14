@@ -1,6 +1,10 @@
 package controllers
 
 import (
+	"fmt"
+	"github.com/nikola43/ecoapigorm/awsmanager"
+	"strings"
+
 	//"fmt"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
@@ -203,10 +207,8 @@ func PasswordRecovery(context *fiber.Ctx) error {
 }
 
 func DownloadAllMultimediaContentByClientID(context *fiber.Ctx) error {
-	//clientID, _ := strconv.ParseUint(context.Params("client_id"), 10, 64)
+	clientID, _ := strconv.ParseUint(context.Params("client_id"), 10, 64)
 
-
-	/*
 	// download images
 	images, err := services.GetAllImagesByClientID(uint(clientID))
 	os.Mkdir("tempFiles/"+context.Params("client_id")+"/images", os.ModePerm)
@@ -214,27 +216,24 @@ func DownloadAllMultimediaContentByClientID(context *fiber.Ctx) error {
 
 		fmt.Println(image.Url)
 		filename := strings.Split(image.Url, "/")[len(strings.Split(image.Url, "/"))-1]
-		err = app.MANAGER.DownloadObject(filename, "tempFiles/"+context.Params("client_id")+"/images/")
+		fmt.Println(filename)
+		err = awsmanager.AwsManager.DownloadObject(filename, "tempFiles/"+context.Params("client_id")+"/images/"+filename)
 		if err != nil {
 			fmt.Println(err)
 		}
-
 	}
-		*/
 	// download videos
 	/*
-	videos, err := services.GetAllVideosByClientID(uint(clientID))
-	os.Mkdir("tempFiles/"+context.Params("client_id")+"/images", os.ModePerm)
-	for _, video := range videos {
-		filename := strings.Split(video.Url, "/")[len(strings.Split(video.Url, "/"))-1]
-		err = DownloadFile("tempFiles/"+context.Params("client_id")+"/"+filename, video.Url)
-		if err != nil {
-			fmt.Println(err)
+		videos, err := services.GetAllVideosByClientID(uint(clientID))
+		os.Mkdir("tempFiles/"+context.Params("client_id")+"/images", os.ModePerm)
+		for _, video := range videos {
+			filename := strings.Split(video.Url, "/")[len(strings.Split(video.Url, "/"))-1]
+			err = DownloadFile("tempFiles/"+context.Params("client_id")+"/"+filename, video.Url)
+			if err != nil {
+				fmt.Println(err)
+			}
 		}
-	}
 	*/
 
 	return context.SendStatus(fiber.StatusOK)
 }
-
-
