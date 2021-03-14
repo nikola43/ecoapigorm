@@ -41,37 +41,37 @@ func CreateFakeData() {
 	database.GormDB.Create(&clinic3)
 
 	// CLIENTS ------------------------------------------------------------------------------------------------------------------------------------------------------------------
-	client1 := models.Client{ClinicID: clinic1.ID, Name: "Lucía", LastName: "Soares", Phone: "666 666 666", Email: "lucia@gmail.com", Password: utils.HashPassword([]byte("paulo"))}
+	client1 := models.Client{ClinicID: clinic1.ID, Name: "Paulo", LastName: "Soares", Phone: "666 666 666", Email: "paulo@gmail.com", Password: utils.HashPassword([]byte("paulo"))}
 	database.GormDB.Create(&client1)
 
-	client2 := models.Client{ClinicID: clinic1.ID, Name: "Laura", LastName: "Barrera", Phone: "999 999 999", Email: "laura@gmail.com", Password: utils.HashPassword([]byte("migue"))}
+	client2 := models.Client{ClinicID: clinic1.ID, Name: "Migue", LastName: "Barrera", Phone: "999 999 999", Email: "migue@gmail.com", Password: utils.HashPassword([]byte("migue"))}
 	database.GormDB.Create(&client2)
 
-	client3 := models.Client{ClinicID: clinic1.ID, Name: "Marta", LastName: "Martín", Phone: "999 999 999", Email: "marta@gmail.com", Password: utils.HashPassword([]byte("migue"))}
+	client3 := models.Client{ClinicID: clinic1.ID, Name: "Marta", LastName: "Martín", Phone: "999 999 999", Email: "marta@gmail.com", Password: utils.HashPassword([]byte("marta"))}
 	database.GormDB.Create(&client3)
 
-	client4 := models.Client{ClinicID: clinic1.ID, Name: "Fernanda", LastName: "Portal", Phone: "999 999 999", Email: "fernanda@gmail.com", Password: utils.HashPassword([]byte("migue"))}
+	client4 := models.Client{ClinicID: clinic1.ID, Name: "Fernanda", LastName: "Portal", Phone: "999 999 999", Email: "fernanda@gmail.com", Password: utils.HashPassword([]byte("fernanda"))}
 	database.GormDB.Create(&client4)
 
-	client5 := models.Client{ClinicID: clinic1.ID, Name: "Alejandra", LastName: "Fernández", Phone: "999 999 999", Email: "alejandra@gmail.com", Password: utils.HashPassword([]byte("migue"))}
+	client5 := models.Client{ClinicID: clinic1.ID, Name: "Alejandra", LastName: "Fernández", Phone: "999 999 999", Email: "alejandra@gmail.com", Password: utils.HashPassword([]byte("alejandra"))}
 	database.GormDB.Create(&client5)
 
-	client6 := models.Client{ClinicID: clinic1.ID, Name: "Claudia", LastName: "Sánchez", Phone: "999 999 999", Email: "claudia@gmail.com", Password: utils.HashPassword([]byte("migue"))}
+	client6 := models.Client{ClinicID: clinic1.ID, Name: "Claudia", LastName: "Sánchez", Phone: "999 999 999", Email: "claudia@gmail.com", Password: utils.HashPassword([]byte("claudia"))}
 	database.GormDB.Create(&client6)
 
-	client7 := models.Client{ClinicID: clinic1.ID, Name: "Sofía", LastName: "González", Phone: "999 999 999", Email: "sofia@gmail.com", Password: utils.HashPassword([]byte("migue"))}
+	client7 := models.Client{ClinicID: clinic1.ID, Name: "Sofía", LastName: "González", Phone: "999 999 999", Email: "sofia@gmail.com", Password: utils.HashPassword([]byte("sofia"))}
 	database.GormDB.Create(&client7)
 
-	client8 := models.Client{ClinicID: clinic1.ID, Name: "María", LastName: "Ruiz", Phone: "999 999 999", Email: "maria@gmail.com", Password: utils.HashPassword([]byte("migue"))}
+	client8 := models.Client{ClinicID: clinic1.ID, Name: "María", LastName: "Ruiz", Phone: "999 999 999", Email: "maria@gmail.com", Password: utils.HashPassword([]byte("maria"))}
 	database.GormDB.Create(&client8)
 
-	client9 := models.Client{ClinicID: clinic1.ID, Name: "Ana", LastName: "Diaz", Phone: "999 999 999", Email: "ana@gmail.com", Password: utils.HashPassword([]byte("migue"))}
+	client9 := models.Client{ClinicID: clinic1.ID, Name: "Ana", LastName: "Diaz", Phone: "999 999 999", Email: "ana@gmail.com", Password: utils.HashPassword([]byte("ana"))}
 	database.GormDB.Create(&client9)
 
-	client10 := models.Client{ClinicID: clinic1.ID, Name: "Inma", LastName: "Romero", Phone: "999 999 999", Email: "inma@gmail.com", Password: utils.HashPassword([]byte("migue"))}
+	client10 := models.Client{ClinicID: clinic1.ID, Name: "Inma", LastName: "Romero", Phone: "999 999 999", Email: "inma@gmail.com", Password: utils.HashPassword([]byte("inma"))}
 	database.GormDB.Create(&client10)
 
-	client11 := models.Client{ClinicID: clinic1.ID, Name: "Mónica", LastName: "Navarro", Phone: "999 999 999", Email: "monica@gmail.com", Password: utils.HashPassword([]byte("migue"))}
+	client11 := models.Client{ClinicID: clinic1.ID, Name: "Mónica", LastName: "Navarro", Phone: "999 999 999", Email: "monica@gmail.com", Password: utils.HashPassword([]byte("monica"))}
 	database.GormDB.Create(&client11)
 
 	// CALCULATOR ------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -87,9 +87,19 @@ func CreateFakeData() {
 
 	CreateFakeByClient(client1.ID)
 	CreateFakeByClient(client2.ID)
+	CreateFakeByClient(client3.ID)
+	CreateFakeByClient(client4.ID)
+	CreateFakeByClient(client5.ID)
+	CreateFakeByClient(client6.ID)
+	CreateFakeByClient(client7.ID)
+	CreateFakeByClient(client8.ID)
+	CreateFakeByClient(client9.ID)
+	CreateFakeByClient(client10.ID)
+	CreateFakeByClient(client11.ID)
 
 	CreateFakeByClinic(clinic2.ID)
 	CreateFakeByClinic(clinic1.ID)
+	CreateFakeByClinic(clinic3.ID)
 }
 
 func CreateFakeByClinic(clinicId uint) {
