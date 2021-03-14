@@ -87,19 +87,9 @@ func CreateFakeData() {
 
 	CreateFakeByClient(client1.ID)
 	CreateFakeByClient(client2.ID)
-	CreateFakeByClient(client3.ID)
-	CreateFakeByClient(client4.ID)
-	CreateFakeByClient(client5.ID)
-	CreateFakeByClient(client6.ID)
-	CreateFakeByClient(client7.ID)
-	CreateFakeByClient(client8.ID)
-	CreateFakeByClient(client9.ID)
-	CreateFakeByClient(client10.ID)
-	CreateFakeByClient(client11.ID)
 
 	CreateFakeByClinic(clinic2.ID)
 	CreateFakeByClinic(clinic1.ID)
-	CreateFakeByClinic(clinic3.ID)
 }
 
 func CreateFakeByClinic(clinicId uint) {
