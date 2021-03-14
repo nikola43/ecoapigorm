@@ -34,7 +34,7 @@ func ClinicRoutes(router fiber.Router) {
 	clinicRouter.Use(middleware.AdminEmployeeMiddleware)
 
 	// /api/v1/clinic/create
-	clinicRouter.Post("/create", controllers.CreateClinic)
+	clinicRouter.Post("/", controllers.CreateClinic)
 
 	// /api/v1/clinic/:clinic_id
 	clinicRouter.Get("/:clinic_id", controllers.GetClinicById)

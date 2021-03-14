@@ -129,3 +129,16 @@ func GetEmployeesByCompanyID(context *fiber.Ctx) error {
 		return context.JSON(list)
 	}
 }
+
+func GetClinicsByCompanyID(context *fiber.Ctx) error {
+	companyID, _ := strconv.ParseUint(context.Params("company_id"), 10, 64)
+
+	// todo validad solo puede verlo el dueño
+	if list, err := services.GetClinicsByCompanyID(uint(companyID)); err != nil {
+		return context.Status(fiber.StatusNotFound).JSON(&fiber.Map{
+			"error": err.Error(),
+		})
+	} else {
+		return context.JSON(list)
+	}
+}

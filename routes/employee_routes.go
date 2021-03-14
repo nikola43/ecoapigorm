@@ -19,7 +19,7 @@ func EmployeeRoutes (router fiber.Router) {
 	employeeRouter.Use(middleware.AdminEmployeeMiddleware)
 
 	// /api/v1/employee/create
-	employeeRouter.Post("/create", controllers.CreateEmployee)
+	employeeRouter.Post("/", controllers.CreateEmployee)
 
 	// /api/v1/employee/:parent_employee_id/employees
 	employeeRouter.Get("/:parent_employee_id/employees", controllers.GetEmployeesByParentEmployeeID)

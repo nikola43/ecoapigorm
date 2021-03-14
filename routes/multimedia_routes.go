@@ -9,8 +9,7 @@ import (
 
 func MultimediaRoutes (router fiber.Router) {
 	multimediaRouter := router.Group("/multimedia")
-	multimediaClientRouter := router.Group("/client")
-	multimediaRouter.Use(multimediaClientRouter)
+	multimediaClientRouter := multimediaRouter.Group("/client")
 
 	// use middleware
 	multimediaRouter.Use(jwtware.New(jwtware.Config{SigningKey: []byte(utils.GetEnvVariable("JWT_CLIENT_KEY"))}))

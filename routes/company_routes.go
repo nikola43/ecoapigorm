@@ -22,8 +22,11 @@ func CompanyRoutes (router fiber.Router) {
 	clinicRouter.Use(middleware.AdminEmployeeMiddleware)
 
 	// /api/v1/company/create
-	clinicRouter.Post("/create", controllers.CreateCompany)
+	clinicRouter.Post("/", controllers.CreateCompany)
 
 	// /api/v1/company/:company_id
 	clinicRouter.Get("/:company_id", controllers.GetCompanyById)
+
+	// /api/v1/company/:company_id/clinics
+	clinicRouter.Get("/:company_id/clinics", controllers.GetClinicsByCompanyID)
 }

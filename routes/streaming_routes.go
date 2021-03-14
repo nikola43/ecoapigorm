@@ -13,5 +13,5 @@ func StreamingRoutes (router fiber.Router) {
 	streamingRouter.Get("/:code", controllers.GetStreamingByCodeController)
 
 	// /api/v1/streaming/create
-	streamingRouter.Post("/create", controllers.CreateStreaming)
+	streamingRouter.Post("/", controllers.CreateStreaming)
 }
