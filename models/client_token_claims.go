@@ -1,7 +1,7 @@
 package models
 
 type ClientTokenClaims struct {
-	ClientID uint
+	ID uint
 	ClinicID uint
 	Email    string
 	Exp      uint

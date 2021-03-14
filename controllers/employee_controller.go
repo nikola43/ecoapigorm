@@ -1,12 +1,14 @@
 package controllers
 
 import (
+	"fmt"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	database "github.com/nikola43/ecoapigorm/database"
 	"github.com/nikola43/ecoapigorm/models"
 	modelsEmployees "github.com/nikola43/ecoapigorm/models/employee"
 	"github.com/nikola43/ecoapigorm/services"
+	"github.com/nikola43/ecoapigorm/utils"
 	"strconv"
 )
 
@@ -95,12 +97,15 @@ func BuyCredits(context *fiber.Ctx) error {
 }
 
 func Invite(context *fiber.Ctx) error {
-	var err error
+
 	var employees = make([]models.Employee, 0)
+	employeeTokenClaims, err := utils.GetEmployeeTokenClaims(context)
+	fmt.Println(employeeTokenClaims)
+
 
 	// parse request
-	if err = context.BodyParser(&employees);
-		err != nil {
+	err = context.BodyParser(&employees)
+	if err != nil {
 		return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 			"error": err.Error(),
 		})

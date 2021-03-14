@@ -225,7 +225,7 @@ func GetAllStreamingByClientID(clientID string) ([]streaming.Streaming, error) {
 	return list, nil
 }
 
-func UploadMultimedia(context *fiber.Ctx, clientID uint, uploadedFile *multipart.FileHeader, uploadMode uint) error {
+func UploadMultimedia(context *fiber.Ctx, bucketName string, clientID uint, uploadedFile *multipart.FileHeader, uploadMode uint) error {
 	//fmt.Println(context)
 	//fmt.Println(clientID)
 	//fmt.Println(uploadedFile)
@@ -243,8 +243,7 @@ func UploadMultimedia(context *fiber.Ctx, clientID uint, uploadedFile *multipart
 	if fileType == "image" {
 		// image
 
-
-		url, size, storeInAmazonError := awsmanager.AwsManager.UploadObject("tempFiles/"+uploadedFile.Filename, clientID, fileType)
+		url, size, storeInAmazonError := awsmanager.AwsManager.UploadObject(bucketName, "tempFiles/"+uploadedFile.Filename, clientID, fileType)
 		if storeInAmazonError != nil {
 			fmt.Println(storeInAmazonError.Error())
 		}
@@ -254,7 +253,7 @@ func UploadMultimedia(context *fiber.Ctx, clientID uint, uploadedFile *multipart
 		return err
 	} else if fileType == "video" || fileType == "holographic" {
 		// upload video
-		videoUrl, videoSize, storeInAmazonError := awsmanager.AwsManager.UploadObject("tempFiles/"+uploadedFile.Filename, clientID, fileType)
+		videoUrl, videoSize, storeInAmazonError := awsmanager.AwsManager.UploadObject(bucketName,"tempFiles/"+uploadedFile.Filename, clientID, fileType)
 		if storeInAmazonError != nil {
 			return err
 		}
@@ -267,7 +266,7 @@ func UploadMultimedia(context *fiber.Ctx, clientID uint, uploadedFile *multipart
 		}
 
 		// thumb video
-		thumbUrl, thumbSize, storeThumbInAmazonError := awsmanager.AwsManager.UploadObject(videoThumbnailFileName, clientID, fileType)
+		thumbUrl, thumbSize, storeThumbInAmazonError := awsmanager.AwsManager.UploadObject(bucketName,videoThumbnailFileName, clientID, fileType)
 		if storeThumbInAmazonError != nil {
 			return storeThumbInAmazonError
 		}
@@ -301,7 +300,7 @@ func UploadMultimedia(context *fiber.Ctx, clientID uint, uploadedFile *multipart
 		return err
 	} else if fileType == "heartbeat" {
 		// holo
-		url, size, storeInAmazonError := awsmanager.AwsManager.UploadObject("tempFiles/"+uploadedFile.Filename, clientID, fileType)
+		url, size, storeInAmazonError := awsmanager.AwsManager.UploadObject(bucketName,"tempFiles/"+uploadedFile.Filename, clientID, fileType)
 		if storeInAmazonError != nil {
 			fmt.Println(storeInAmazonError.Error())
 		}

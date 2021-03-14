@@ -8,23 +8,26 @@ import (
 	_ "github.com/nikola43/ecoapigorm/utils"
 )
 
-func CreateCompany(createEmployeeRequest *companyModels.CreateCompanyRequest) (*companyModels.CreateCompanyResponse, error) {
+func CreateCompany(employeeID uint, createEmployeeRequest *companyModels.CreateCompanyRequest) (*companyModels.CreateCompanyResponse, error) {
 	company := models.Company{
 		Name:       createEmployeeRequest.Name,
-		EmployeeID: createEmployeeRequest.EmployeeID,
+		EmployeeID: employeeID,
 	}
 
 	if err := database.GormDB.Create(&company).Error; err != nil {
 		return nil, err
 	}
 
-	createEmployeeResponse := &companyModels.CreateCompanyResponse{
+	createCompanyResponse := &companyModels.CreateCompanyResponse{
 		ID:         company.ID,
 		Name:       company.Name,
 		EmployeeID: company.EmployeeID,
 	}
 
-	return createEmployeeResponse, nil
+	database.GormDB.Model(&models.Employee{}).Where("id = ? ", employeeID).
+		Update("company_id", createCompanyResponse.ID)
+
+	return createCompanyResponse, nil
 }
 
 func GetCompanies() ([]models.Company, error) {
@@ -47,7 +50,6 @@ func GetCompanyByID(id uint) (*models.Company, error) {
 
 	return &Company, nil
 }
-
 
 func GetEmployeesByCompanyID(id uint) ([]models.Employee, error) {
 	list := make([]models.Employee, 0)

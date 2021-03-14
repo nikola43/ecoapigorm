@@ -1,13 +1,17 @@
 package controllers
 
 import (
+	"fmt"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
+	"github.com/nikola43/ecoapigorm/awsmanager"
 	database "github.com/nikola43/ecoapigorm/database"
 	"github.com/nikola43/ecoapigorm/models"
 	companyModels "github.com/nikola43/ecoapigorm/models/company"
 	"github.com/nikola43/ecoapigorm/services"
+	"github.com/nikola43/ecoapigorm/utils"
 	"strconv"
+	"strings"
 )
 
 func GetCompanyById(context *fiber.Ctx) error {
@@ -27,13 +31,20 @@ func GetCompanyById(context *fiber.Ctx) error {
 func CreateCompany(context *fiber.Ctx) error {
 	createCompanyRequest := new(companyModels.CreateCompanyRequest)
 	createCompanyResponse := new(companyModels.CreateCompanyResponse)
-	var err error
-	Company := models.Company{}
+	company := models.Company{}
 	employee := models.Employee{}
 
+	employeeTokenClaims, err := utils.GetEmployeeTokenClaims(context)
+	if err != nil {
+		return context.SendStatus(fiber.StatusUnauthorized)
+	}
+
+	fmt.Println("employeeTokenClaims")
+	fmt.Println(employeeTokenClaims)
+
 	// parse request
-	if err = context.BodyParser(createCompanyRequest);
-		err != nil {
+	err = context.BodyParser(createCompanyRequest)
+	if err != nil {
 		return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 			"error": "bad request",
 		})
@@ -54,7 +65,7 @@ func CreateCompany(context *fiber.Ctx) error {
 
 	// check if employee exist
 	GormDBResult := database.GormDB.
-		Where("id = ?", createCompanyRequest.EmployeeID).
+		Where("id = ?", employeeTokenClaims.ID).
 		Find(&employee)
 
 	if GormDBResult.Error != nil {
@@ -71,30 +82,40 @@ func CreateCompany(context *fiber.Ctx) error {
 
 	// check if Company already exist
 	GormDBResult = database.GormDB.
-		Where("name = ? AND employee_id = ?", createCompanyRequest.Name, createCompanyRequest.EmployeeID).
-		Find(&Company)
+		Where("name = ?", createCompanyRequest.Name).
+		Find(&company)
 
 	if GormDBResult.Error != nil {
 		return context.Status(fiber.StatusInternalServerError).JSON(&fiber.Map{
-			"error": "internal server",
+			"error": GormDBResult.Error.Error(),
 		})
 	}
 
-	if Company.ID > 0 {
+	if company.ID > 0 {
 		return context.Status(fiber.StatusConflict).JSON(&fiber.Map{
-			"error": "employee id already associated to other Company",
+			"error": "company already exist",
 		})
 	}
 
 	// create and response
-	if createCompanyResponse, err = services.CreateCompany(createCompanyRequest);
+	if createCompanyResponse, err = services.CreateCompany(employeeTokenClaims.ID, createCompanyRequest);
 		err != nil {
 		return context.Status(fiber.StatusNotFound).JSON(&fiber.Map{
 			"error": err.Error(),
 		})
-	} else {
-		return context.JSON(createCompanyResponse)
 	}
+
+	// create bucket for company
+	bucketName := strings.ToLower(strings.ReplaceAll(createCompanyRequest.Name, " ", "_"))
+	err = awsmanager.AwsManager.CreateBucket(strings.ToLower(bucketName))
+	if err != nil {
+		return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return context.JSON(createCompanyResponse)
+
 }
 
 func GetEmployeesByCompanyID(context *fiber.Ctx) error {

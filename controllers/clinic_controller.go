@@ -96,9 +96,10 @@ func CreateClinic(context *fiber.Ctx) error {
 		return context.Status(fiber.StatusNotFound).JSON(&fiber.Map{
 			"error": err.Error(),
 		})
-	} else {
-		return context.JSON(createClinicResponse)
 	}
+
+	return context.JSON(createClinicResponse)
+
 }
 
 func GetClientsByClinicID(context *fiber.Ctx) error {
@@ -166,7 +167,6 @@ func CreateClientFromClinic(context *fiber.Ctx) error {
 	}
 }
 
-
 func GetAllStreamingByClinicID(context *fiber.Ctx) error {
 	id := context.Params("clinic_id")
 	streamings := make([]streaming.Streaming, 0)
@@ -190,5 +190,3 @@ func GetAllPromosByClinicID(context *fiber.Ctx) error {
 
 	return context.Status(fiber.StatusOK).JSON(promos)
 }
-
-

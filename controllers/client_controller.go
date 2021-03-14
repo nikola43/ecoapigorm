@@ -3,6 +3,7 @@ package controllers
 import (
 	"fmt"
 	"github.com/nikola43/ecoapigorm/awsmanager"
+	"github.com/nikola43/ecoapigorm/utils"
 	"strings"
 
 	//"fmt"
@@ -138,6 +139,8 @@ func CreateClient(context *fiber.Ctx) error {
 			"error": err.Error(),
 		})
 	} else {
+		welcomeEmail := utils.SendEmailManager{ToEmail: createClientRequest.Email}
+		welcomeEmail.SendMail("welcome.html", "Welcome")
 		return context.JSON(createClientResponse)
 	}
 }
@@ -181,13 +184,20 @@ func PassRecoveryClient(context *fiber.Ctx) error {
 func UploadMultimedia(context *fiber.Ctx) error {
 	clientID, _ := strconv.ParseUint(context.Params("client_id"), 10, 64)
 	uploadMode, _ := strconv.ParseUint(context.Params("upload_mode"), 10, 64)
-
 	uploadedFile, err := context.FormFile("file")
+	employeeTokenClaims, err := utils.GetEmployeeTokenClaims(context)
+	if err != nil {
+		return context.SendStatus(fiber.StatusUnauthorized)
+	}
+
+
+
+	bucketName := strings.ToLower(strings.ReplaceAll(employeeTokenClaims.CompanyName, " ", "_"))
 	if err != nil {
 		return err
 	}
 
-	err = services.UploadMultimedia(context, uint(clientID), uploadedFile, uint(uploadMode))
+	err = services.UploadMultimedia(context, bucketName, uint(clientID), uploadedFile, uint(uploadMode))
 	if err != nil {
 		return err
 	}

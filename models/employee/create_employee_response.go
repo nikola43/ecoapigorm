@@ -1,7 +1,7 @@
 package clients
 
 type CreateEmployeeResponse struct {
-	Id     uint `json:"id"`
+	ID     uint `json:"id"`
 	Email     string `json:"email"`
 	Name     string `json:"name"`
 	LastName string `json:"lastname"`

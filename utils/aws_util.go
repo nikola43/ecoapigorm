@@ -46,8 +46,7 @@ func (awsClient *AwsClient) DownloadObject(filekey string, filepath string) erro
 	fmt.Println(bytes)
 	return nil
 }
-func (awsClient *AwsClient) UploadObject(filepath string, clientID uint, tipo string) (string, int64, error) {
-	awsBucketName := GetEnvVariable("AWS_BUCKET_NAME")
+func (awsClient *AwsClient) UploadObject(bucketName,filepath string, clientID uint, tipo string) (string, int64, error) {
 
 	file, err := os.Open("./" + filepath)
 	if err != nil {
@@ -67,7 +66,7 @@ func (awsClient *AwsClient) UploadObject(filepath string, clientID uint, tipo st
 
 	path := "/" + strconv.FormatInt(int64(clientID), 10) + "/" + tipo + "/" + strings.Split(file.Name(), "/")[2]
 	input := &s3.CreateMultipartUploadInput{
-		Bucket:      aws.String(awsBucketName),
+		Bucket:      aws.String(bucketName),
 		Key:         aws.String(path),
 		ACL:         aws.String("public-read"),
 		ContentType: aws.String(fileType),
@@ -111,6 +110,15 @@ func (awsClient *AwsClient) UploadObject(filepath string, clientID uint, tipo st
 	url = completeResponse.Location
 
 	return *url, size, nil
+}
+
+func (awsClient *AwsClient) CreateBucket(bucketName string) error {
+	result, err := awsClient.s3Client.CreateBucket(&s3.CreateBucketInput{
+		Bucket:      aws.String(bucketName),
+		ACL:         aws.String("public-read"),
+	})
+	fmt.Println(result)
+	return err
 }
 
 func (awsClient *AwsClient) DeleteObject(bucket string, key *string) error {

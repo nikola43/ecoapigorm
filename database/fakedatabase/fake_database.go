@@ -20,7 +20,7 @@ func CreateFakeData() {
 	employee2 := models.Employee{Name: "Migue", LastName: "Barrera", Phone: "999999999", Email: "migue@gmail.com", Password: utils.HashPassword([]byte("migue")), Role: "employeee", ParentEmployeeID: employee1.ID}
 	database.GormDB.Create(&employee2)
 
-	employee3 := models.Employee{Name: "Pablo", LastName: "Gutierrez", Phone: "777777777", Email: "pablojoseguit@gmail.com", Password: utils.HashPassword([]byte("pablo")), Role: "admin", ParentEmployeeID: employee1.ID}
+	employee3 := models.Employee{Name: "Pablo", LastName: "Gutierrez", Phone: "777777777", Email: "pablo@gmail.com", Password: utils.HashPassword([]byte("pablo")), Role: "admin", ParentEmployeeID: employee1.ID}
 	database.GormDB.Create(&employee3)
 
 	// COMPANIES ------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -28,7 +28,7 @@ func CreateFakeData() {
 	database.GormDB.Create(&company1)
 	database.GormDB.Model(&employee1).Update("company_id", company1.ID)
 	database.GormDB.Model(&employee2).Update("company_id", company1.ID)
-	database.GormDB.Model(&employee3).Update("company_id", company1.ID)
+	//database.GormDB.Model(&employee3).Update("company_id", company1.ID)
 
 	// CLINIC ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	clinic1 := models.Clinic{Name: "Paulo Clinic", EmployeeID: employee1.ID}

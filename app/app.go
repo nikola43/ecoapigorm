@@ -41,6 +41,8 @@ func (a *App) Initialize(port string) {
 	fmt.Println(utils.GetEnvVariable("MYSQL_PASSWORD"))
 	fmt.Println(utils.GetEnvVariable("MYSQL_DATABASE"))
 	fmt.Println(utils.GetEnvVariable("X_API_KEY"))
+	fmt.Println(utils.GetEnvVariable("FROM_EMAIL"))
+	fmt.Println(utils.GetEnvVariable("FROM_EMAIL_PASSWORD"))
 
 	InitializeHttpServer(port)
 }
@@ -58,6 +60,7 @@ func HandleRoutes(api fiber.Router) {
 	routes.CompanyRoutes(api)
 	routes.PromoRoutes(api)
 	routes.StreamingRoutes(api)
+	routes.MultimediaRoutes(api)
 }
 
 func InitializeHttpServer(port string) {

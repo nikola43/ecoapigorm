@@ -25,13 +25,13 @@ func CreateEmployee(createEmployeeRequest *modelsEmployees.CreateEmployeeRequest
 		return nil, result.Error
 	}
 
-	token, err := utils.GenerateEmployeeToken(employee.Email, employee.ID, 0, "admin")
+	token, err := utils.GenerateEmployeeToken(employee.Name, employee.Email, "", "", employee.ID, 0, 0, "admin")
 	if err != nil {
 		return nil, err
 	}
 
 	createEmployeeResponse := modelsEmployees.CreateEmployeeResponse{
-		Id:       employee.ID,
+		ID:       employee.ID,
 		Email:    employee.Email,
 		Name:     employee.Name,
 		LastName: employee.LastName,
@@ -79,8 +79,23 @@ func Invite(employees []models.Employee) error {
 
 		if temp.ID > 0 {
 			// send link email
+			sendEmailManager := utils.SendEmailManager{
+				ToEmail:         employee.Email,
+				ToName:          employee.Name,
+				FromName:        employee.Email,
+				CompanyName:     employee.Email,
+				InvitationToken: employee.Email,
+			}
+			sendEmailManager.SendMail("invite_to_company.html", "Welcome")
 		} else {
 			// send signup email
+			sendEmailManager := utils.SendEmailManager{
+				ToEmail:         employee.Email,
+				FromName:        employee.Email,
+				CompanyName:     employee.Email,
+				InvitationToken: employee.Email,
+			}
+			sendEmailManager.SendMail("invite_to_company.html", "Welcome")
 		}
 		fmt.Println(employee)
 	}
