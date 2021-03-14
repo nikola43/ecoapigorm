@@ -1,11 +1,7 @@
 package controllers
 
 import (
-	"fmt"
-	"github.com/nikola43/ecoapigorm/awsmanager"
 	"github.com/nikola43/ecoapigorm/utils"
-	"strings"
-
 	//"fmt"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
@@ -15,8 +11,6 @@ import (
 	modelsClient "github.com/nikola43/ecoapigorm/models/clients"
 	"github.com/nikola43/ecoapigorm/models/streaming"
 	"github.com/nikola43/ecoapigorm/services"
-	"log"
-	"os"
 	"strconv"
 	//"strings"
 )
@@ -181,69 +175,10 @@ func PassRecoveryClient(context *fiber.Ctx) error {
 	return context.SendStatus(fiber.StatusOK)
 }
 
-func UploadMultimedia(context *fiber.Ctx) error {
-	clientID, _ := strconv.ParseUint(context.Params("client_id"), 10, 64)
-	uploadMode, _ := strconv.ParseUint(context.Params("upload_mode"), 10, 64)
-	uploadedFile, err := context.FormFile("file")
-	employeeTokenClaims, err := utils.GetEmployeeTokenClaims(context)
-	if err != nil {
-		return context.SendStatus(fiber.StatusUnauthorized)
-	}
 
-
-
-	bucketName := strings.ToLower(strings.ReplaceAll(employeeTokenClaims.CompanyName, " ", "_"))
-	if err != nil {
-		return err
-	}
-
-	err = services.UploadMultimedia(context, bucketName, uint(clientID), uploadedFile, uint(uploadMode))
-	if err != nil {
-		return err
-	}
-
-	e := os.Remove("./tempFiles/" + uploadedFile.Filename)
-	if e != nil {
-		log.Fatal(e)
-	}
-
-	return context.Status(fiber.StatusOK).JSON(&fiber.Map{
-		"file": uploadedFile.Filename,
-	})
-}
 
 func PasswordRecovery(context *fiber.Ctx) error {
 	return context.SendStatus(fiber.StatusOK)
 }
 
-func DownloadAllMultimediaContentByClientID(context *fiber.Ctx) error {
-	clientID, _ := strconv.ParseUint(context.Params("client_id"), 10, 64)
 
-	// download images
-	images, err := services.GetAllImagesByClientID(uint(clientID))
-	os.Mkdir("tempFiles/"+context.Params("client_id")+"/images", os.ModePerm)
-	for _, image := range images {
-
-		fmt.Println(image.Url)
-		filename := strings.Split(image.Url, "/")[len(strings.Split(image.Url, "/"))-1]
-		fmt.Println(filename)
-		err = awsmanager.AwsManager.DownloadObject(filename, "tempFiles/"+context.Params("client_id")+"/images/"+filename)
-		if err != nil {
-			fmt.Println(err)
-		}
-	}
-	// download videos
-	/*
-		videos, err := services.GetAllVideosByClientID(uint(clientID))
-		os.Mkdir("tempFiles/"+context.Params("client_id")+"/images", os.ModePerm)
-		for _, video := range videos {
-			filename := strings.Split(video.Url, "/")[len(strings.Split(video.Url, "/"))-1]
-			err = DownloadFile("tempFiles/"+context.Params("client_id")+"/"+filename, video.Url)
-			if err != nil {
-				fmt.Println(err)
-			}
-		}
-	*/
-
-	return context.SendStatus(fiber.StatusOK)
-}

@@ -9,7 +9,10 @@ import (
 
 func MultimediaRoutes (router fiber.Router) {
 	multimediaRouter := router.Group("/multimedia")
+	multimediaClientRouter := router.Group("/client")
+	multimediaRouter.Use(multimediaClientRouter)
 
+	// use middleware
 	multimediaRouter.Use(jwtware.New(jwtware.Config{SigningKey: []byte(utils.GetEnvVariable("JWT_CLIENT_KEY"))}))
 
 	// /api/v1/multimedia/images/:id
@@ -23,4 +26,26 @@ func MultimediaRoutes (router fiber.Router) {
 
 	// /api/v1/multimedia/heartbeat/:id
 	multimediaRouter.Delete("/heartbeat/:id", controllers.DeleteHeartbeat)
+
+	// CLIENT
+	// /api/v1/multimedia/client/:client_id/upload/:upload_mode
+	multimediaClientRouter.Post("/:client_id/upload/:upload_mode", controllers.UploadMultimedia)
+
+	// /api/v1/multimedia/client/:client_id/images
+	multimediaClientRouter.Get("/:client_id/images", controllers.GetAllImagesByClientID)
+
+	// /api/v1/multimedia/client/:client_id/videos
+	multimediaClientRouter.Get("/:client_id/videos", controllers.GetAllVideosByClientID)
+
+	// /api/v1/multimedia/client/:client_id/holographics
+	multimediaClientRouter.Get("/:client_id/holographics", controllers.GetAllHolographicsByClientID)
+
+	// /api/v1/multimedia/client/:client_id/heartbeat
+	multimediaClientRouter.Get("/:client_id/heartbeat", controllers.GetHeartbeatByClientID)
+
+	// /api/v1/multimedia/client/:client_id/heartbeat
+	multimediaClientRouter.Get("/:client_id/streamings", controllers.GetAllStreamingByClientID)
+
+	// /api/v1/multimedia/client/:client_id/download
+	multimediaClientRouter.Get("/:client_id/download", controllers.DownloadAllMultimediaContentByClientID)
 }
