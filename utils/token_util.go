@@ -141,3 +141,50 @@ func GenerateEmployeeToken(name string, email string, companyName string, clinic
 	}
 	return tokenString, err
 }
+
+func GenerateInvitationToken(fromEmail string, toEmail string, clinicID uint) (string, error) {
+	// Create token
+	token := jwt.New(jwt.SigningMethodHS256)
+
+	// Set claims
+	claims := token.Claims.(jwt.MapClaims)
+	claims["from_email"] = fromEmail
+	claims["to_email"] = toEmail
+	claims["clinic_id"] = clinicID
+	claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
+
+	tokenString, err := token.SignedString([]byte(GetEnvVariable("INVITE_TOKEN")))
+	if err != nil {
+		return "", err
+	}
+	return tokenString, err
+}
+
+func GetInviteTokenClaims(context *fiber.Ctx) (*models.InviteTokenClaims, error) {
+	user := context.Locals("user").(*jwt.Token)
+
+	if claims, ok := user.Claims.(jwt.MapClaims); ok && user.Valid {
+		inviteTokenClaims := &models.InviteTokenClaims{}
+
+		if claims["from_email"] != nil {
+			inviteTokenClaims.FromEmail = claims["from_email"].(string)
+		}
+
+		if claims["to_email"] != nil {
+			inviteTokenClaims.ToEmail = claims["to_email"].(string)
+		}
+
+		if claims["clinic_id"] != nil {
+			inviteTokenClaims.ClinicID = uint(math.Round(claims["clinic_id"].(float64)))
+		}
+
+		if claims["exp"] != nil {
+			inviteTokenClaims.Exp = uint(math.Round(claims["exp"].(float64)))
+		}
+
+		return inviteTokenClaims, nil
+	} else {
+		return nil, errors.New("invalid claims")
+	}
+	return nil, errors.New("invalid claims")
+}

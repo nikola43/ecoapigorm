@@ -14,6 +14,7 @@ type SendEmailManager struct {
 	FromEmail             string
 	FromName              string
 	CompanyName           string
+	ClinicName           string
 	RecoveryToken         string
 	InvitationToken       string
 	RecoveryPasswordToken string

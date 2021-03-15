@@ -69,35 +69,34 @@ func BuyCredits(sessionID string, clinicID uint) (*models.Payment, error) {
 	return nil, errors.New("payment not found")
 }
 
-func Invite(employees []models.Employee) error {
+func Invite(employeeTokenClaims *models.EmployeeTokenClaims, employees []models.Employee) error {
 	fmt.Println(employees)
 
 	// validation ---------------------------------------------------------------------
 	for _, employee := range employees {
 		temp := models.Employee{}
-		database.GormDB.Where("email = ?", employee.Email).Find(&employee)
+		utils.GetModelByField(temp, "email", employee.Email)
+		invitationToken, err := utils.GenerateInvitationToken(employeeTokenClaims.Email, employee.Email, employeeTokenClaims.ClinicID)
+		if err != nil {
+			return err
+		}
+
+		sendEmailManager := utils.SendEmailManager{
+			ToEmail:         employee.Email,
+			ToName:          employee.Name,
+			FromName:        employeeTokenClaims.Name,
+			ClinicName:      employeeTokenClaims.ClinicName,
+			InvitationToken: invitationToken,
+		}
+
+		fmt.Println("temp")
+		fmt.Println(temp)
 
 		if temp.ID > 0 {
-			// send link email
-			sendEmailManager := utils.SendEmailManager{
-				ToEmail:         employee.Email,
-				ToName:          employee.Name,
-				FromName:        employee.Email,
-				CompanyName:     employee.Email,
-				InvitationToken: employee.Email,
-			}
-			sendEmailManager.SendMail("invite_to_company.html", "Welcome")
+			sendEmailManager.SendMail("invite_to_clinic.html", employee.Name+" te ha invitado a su clínica")
 		} else {
-			// send signup email
-			sendEmailManager := utils.SendEmailManager{
-				ToEmail:         employee.Email,
-				FromName:        employee.Email,
-				CompanyName:     employee.Email,
-				InvitationToken: employee.Email,
-			}
-			sendEmailManager.SendMail("invite_to_company.html", "Welcome")
+			sendEmailManager.SendMail("invite_to_register.html", employee.Name+" te ha invitado a registrarte")
 		}
-		fmt.Println(employee)
 	}
 
 	return nil

@@ -109,7 +109,7 @@ func Invite(context *fiber.Ctx) error {
 		})
 	}
 
-	err = services.Invite(employees)
+	err = services.Invite(employeeTokenClaims, employees)
 	if err != nil {
 		return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 			"error": err.Error(),
