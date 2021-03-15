@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"errors"
 	"fmt"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
@@ -11,6 +12,7 @@ import (
 	"github.com/nikola43/ecoapigorm/models/promos"
 	"github.com/nikola43/ecoapigorm/models/streaming"
 	"github.com/nikola43/ecoapigorm/services"
+	"github.com/nikola43/ecoapigorm/utils"
 	"strconv"
 )
 
@@ -33,7 +35,16 @@ func CreateClinic(context *fiber.Ctx) error {
 	createClinicResponse := new(clinicModels.CreateClinicResponse)
 	var err error
 	clinic := models.Clinic{}
-	employee := models.Employee{}
+
+	employeeTokenClaims, err := utils.GetEmployeeTokenClaims(context)
+	if err != nil {
+		return context.Status(fiber.StatusUnauthorized).JSON(&fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	// set clinic creator id
+	createClinicRequest.EmployeeID = employeeTokenClaims.ID
 
 	// parse request
 	if err = context.BodyParser(createClinicRequest);
@@ -56,37 +67,21 @@ func CreateClinic(context *fiber.Ctx) error {
 		}
 	}
 
-	// check if employee exist
-	GormDBResult := database.GormDB.
-		Where("id = ?", createClinicRequest.EmployeeID).
-		Find(&employee)
-
-	if GormDBResult.Error != nil {
-		return context.Status(fiber.StatusInternalServerError).JSON(&fiber.Map{
-			"error": "internal server",
-		})
-	}
-
-	if employee.ID < 1 {
-		return context.Status(fiber.StatusNotFound).JSON(&fiber.Map{
-			"error": "employee id not found",
-		})
-	}
 
 	// check if clinic already exist
-	GormDBResult = database.GormDB.
-		Where("name = ? AND employee_id = ?", createClinicRequest.Name, createClinicRequest.EmployeeID).
+	result := database.GormDB.
+		Where("name = ?", createClinicRequest.Name).
 		Find(&clinic)
 
-	if GormDBResult.Error != nil {
-		return context.Status(fiber.StatusInternalServerError).JSON(&fiber.Map{
-			"error": "internal server",
+	if result.Error != nil {
+		return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+			"error": result.Error,
 		})
 	}
 
 	if clinic.ID > 0 {
 		return context.Status(fiber.StatusConflict).JSON(&fiber.Map{
-			"error": "employee id already associated to other clinic",
+			"error": errors.New("clinic already exist"),
 		})
 	}
 

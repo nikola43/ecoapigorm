@@ -6,6 +6,7 @@ import (
 	"github.com/nikola43/ecoapigorm/models/streaming"
 	streamings "github.com/nikola43/ecoapigorm/models/streamings"
 	"github.com/nikola43/ecoapigorm/services"
+	"strconv"
 )
 
 func GetStreamingByCodeController(context *fiber.Ctx) error {
@@ -20,6 +21,7 @@ func GetStreamingByCodeController(context *fiber.Ctx) error {
 
 	return context.Status(fiber.StatusOK).JSON(streaming)
 }
+
 
 func CreateStreaming(context *fiber.Ctx) error {
 	createStreamingRequest := new(streamings.CreateStreamingRequest)
@@ -43,4 +45,21 @@ func CreateStreaming(context *fiber.Ctx) error {
 	}
 	fmt.Println(createStreamingResponse)
 	return context.Status(fiber.StatusOK).JSON(createStreamingResponse)
+}
+
+
+
+func DeleteStreamingByID(context *fiber.Ctx) error {
+	streamingID, _ := strconv.ParseUint(context.Params("streaming_id"), 10, 64)
+
+	err := services.DeleteStreamingByID(uint(streamingID))
+	if err != nil {
+		return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return context.Status(fiber.StatusOK).JSON(&fiber.Map{
+		"success": true,
+	})
 }

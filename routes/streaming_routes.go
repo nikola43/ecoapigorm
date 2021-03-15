@@ -6,7 +6,7 @@ import (
 	"github.com/nikola43/ecoapigorm/controllers"
 )
 
-func StreamingRoutes (router fiber.Router) {
+func StreamingRoutes(router fiber.Router) {
 	streamingRouter := router.Group("/streaming")
 
 	// /api/v1/streaming/:code
@@ -14,4 +14,7 @@ func StreamingRoutes (router fiber.Router) {
 
 	// /api/v1/streaming/create
 	streamingRouter.Post("/", controllers.CreateStreaming)
+
+	// /api/v1/streaming
+	streamingRouter.Delete("/:streaming_id", controllers.DeleteStreamingByID)
 }

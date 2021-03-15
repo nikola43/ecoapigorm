@@ -83,7 +83,6 @@ func BuyCredits(context *fiber.Ctx) error {
 	sessionID := context.Params("session_id")
 	clinicID, _ := strconv.ParseUint(context.Params("clinic_id"), 10, 64)
 
-
 	payment, err := services.BuyCredits(sessionID, uint(clinicID))
 	if err != nil {
 		return context.Status(fiber.StatusNotFound).JSON(&fiber.Map{
@@ -101,7 +100,6 @@ func Invite(context *fiber.Ctx) error {
 	var employees = make([]models.Employee, 0)
 	employeeTokenClaims, err := utils.GetEmployeeTokenClaims(context)
 	fmt.Println(employeeTokenClaims)
-
 
 	// parse request
 	err = context.BodyParser(&employees)
@@ -121,7 +119,7 @@ func GetCompaniesByEmployeeID(context *fiber.Ctx) error {
 
 	var err error
 
-	list, err := services.GetCompaniesByEmployeeID(uint(employeeID));
+	list, err := services.GetCompaniesByEmployeeID(uint(employeeID))
 
 	if err != nil {
 		return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
@@ -141,12 +139,14 @@ func DeleteEmployeeByEmployeeID(context *fiber.Ctx) error {
 		})
 	}
 
-	err = services.DeleteEmployeeByEmployeeID(employeeTokenClaims.ID,uint(employeeID))
+	err = services.DeleteEmployeeByEmployeeID(employeeTokenClaims.ID, uint(employeeID))
 	if err != nil {
 		return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 			"error": err.Error(),
 		})
 	}
 
-	return context.SendStatus(fiber.StatusOK)
+	return context.Status(fiber.StatusOK).JSON(&fiber.Map{
+		"success": true,
+	})
 }

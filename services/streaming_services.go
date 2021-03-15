@@ -1,10 +1,12 @@
 package services
 
 import (
+	"errors"
 	"fmt"
 	database "github.com/nikola43/ecoapigorm/database"
 	"github.com/nikola43/ecoapigorm/models/streaming"
 	streamings "github.com/nikola43/ecoapigorm/models/streamings"
+	"github.com/nikola43/ecoapigorm/utils"
 	"math/rand"
 	"strings"
 	"time"
@@ -52,4 +54,23 @@ func GenerateRandomCode(length int) string {
 		code[i] = charset[seededRand.Intn(len(charset))]
 	}
 	return strings.ToUpper(string(code))
+}
+
+func DeleteStreamingByID(streamingID uint) error {
+	deleteStreaming := new(streaming.Streaming)
+
+	// todo check clinic is who make action
+	// check if employee exist
+	utils.GetModelByField(deleteStreaming, "id", streamingID)
+	if deleteStreaming.ID < 1 {
+		return errors.New("streaming not found")
+	}
+
+	// delete employee
+	result := database.GormDB.Delete(deleteStreaming)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
 }

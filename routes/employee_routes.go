@@ -32,5 +32,4 @@ func EmployeeRoutes (router fiber.Router) {
 
 	// /api/v1/employee/:employee_id
 	employeeRouter.Delete("/:employee_id", controllers.DeleteEmployeeByEmployeeID)
-
 }
