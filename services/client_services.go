@@ -11,74 +11,70 @@ import (
 
 func CreateClient(createClientRequest *modelsClients.CreateClientRequest) (*modelsClients.CreateClientResponse, error) {
 	//TODO validate
-	client := models.Client{}
-	clinic := models.Clinic{}
-	clinicOwnerParentEmployeeClinic := models.Clinic{}
+	client := new(models.Client)
+	clinic := new(models.Clinic)
+	clinicOwnerParentEmployeeClinic := new(models.Clinic)
 	useParentEmployeeClinicAvailableUsers := false
 	useClinicAvailableUsers := false
 
 	// check if client already exist
-	if err := database.GormDB.
-		Where("email = ?", createClientRequest.Email).
-		Find(&client).Error; err != nil {
-		return nil, err
-	}
-
-	if client.ID > 0 {
+	utils.GetModelByField(client, "email", createClientRequest.Email)
+	if client != nil && client.ID > 0 {
 		return nil, errors.New("client already exist")
 	}
 
-	// check if client has been created by clinic
-	if createClientRequest.ClinicID > 0 {
-		if err := database.GormDB.First(&clinic, createClientRequest.ClinicID).Error; err != nil {
-			return nil, errors.New("clinic_id not found")
+	// find clinic
+	utils.GetModelByField(clinic, "id", createClientRequest.ClinicID)
+	if clinic == nil {
+		return nil, errors.New("clinic not found")
+	}
+
+	// check if clinic has sufficient credits
+	if clinic.AvailableCredits > 0 {
+		useClinicAvailableUsers = true
+	} else {
+		// get clinic owner
+		clinicOwnerEmployee := new(models.Employee)
+		utils.GetModelByField(clinicOwnerEmployee, "id", clinic.EmployeeID)
+		if clinicOwnerEmployee == nil {
+			return nil, errors.New("employee_id not found")
 		}
 
-		// check if clinic has sufficient credits
-		if clinic.AvailableCredits > 0 {
-			useClinicAvailableUsers = true
-		} else {
-			// get clinic owner
-			clinicOwnerEmployee := models.Employee{}
-			if err := database.GormDB.First(&clinicOwnerEmployee, clinic.EmployeeID).Error; err != nil {
-				return nil, errors.New("employee_id not found")
+		// check if has parent employee
+		if clinicOwnerEmployee.ParentEmployeeID > 0 {
+			// find parent employee
+			clinicOwnerParentEmployee := models.Employee{}
+			utils.GetModelByField(clinicOwnerParentEmployee, "id", clinicOwnerEmployee.ParentEmployeeID)
+			if clinicOwnerEmployee == nil {
+				return nil, errors.New("parent_employee_id not found")
 			}
 
-			// check if has parent employee
-			if clinicOwnerEmployee.ParentEmployeeID > 0 {
-				// find parent employee
-				clinicOwnerParentEmployee := models.Employee{}
-				if err := database.GormDB.First(&clinicOwnerParentEmployee, clinicOwnerEmployee.ParentEmployeeID).Error; err != nil {
-					return nil, errors.New("parent_employee_id not found")
-				}
+			// if find parent employee
+			if clinicOwnerParentEmployee.ID > 0 {
+				// get clinic owner employee clinic
+				database.GormDB.Model(models.Clinic{}).Select(
+					"clinics.id, clinics.extend_clients, clinics.available_clients").Joins(
+					"inner join employees on clinics.employee_id = employees.id").Where(
+					"employees.id = ?", clinicOwnerParentEmployee.ID).Scan(&clinicOwnerParentEmployeeClinic)
 
-				// if find parent employee
-				if clinicOwnerParentEmployee.ID > 0 {
-					// get clinic owner employee clinic
-					database.GormDB.Model(models.Clinic{}).Select(
-						"clinics.id, clinics.extend_clients, clinics.available_clients").Joins(
-						"inner join employees on clinics.employee_id = employees.id").Where(
-						"employees.id = ?", clinicOwnerParentEmployee.ID).Scan(&clinicOwnerParentEmployeeClinic)
-
-					if clinicOwnerParentEmployeeClinic.ExtendCredits {
-						if clinicOwnerParentEmployeeClinic.AvailableCredits > 0 {
-							useParentEmployeeClinicAvailableUsers = true
-						} else {
-							return nil, errors.New("insufficient parent employee credits")
-						}
+				if clinicOwnerParentEmployeeClinic.ExtendCredits {
+					if clinicOwnerParentEmployeeClinic.AvailableCredits > 0 {
+						useParentEmployeeClinicAvailableUsers = true
 					} else {
-						return nil, errors.New("parent employee not extends clients, insufficient credits")
+						return nil, errors.New("insufficient parent employee credits")
 					}
 				} else {
-					return nil, errors.New("parent_employee_id not found, insufficient credits")
+					return nil, errors.New("parent employee not extends credits, insufficient credits")
 				}
 			} else {
-				return nil, errors.New("insufficient credits")
+				return nil, errors.New("parent_employee_id not found, insufficient credits")
 			}
+		} else {
+			return nil, errors.New("insufficient credits")
 		}
 	}
 
-	client = models.Client{
+	client = &models.Client{
 		ClinicID: createClientRequest.ClinicID,
 		Email:    createClientRequest.Email,
 		Password: utils.HashPassword([]byte(createClientRequest.Password)),
@@ -108,13 +104,13 @@ func CreateClient(createClientRequest *modelsClients.CreateClientRequest) (*mode
 
 	// check if client has been created by clinic
 	if useClinicAvailableUsers {
-		database.GormDB.Model(&clinic).Update("available_clients", clinic.AvailableCredits-1)
+		database.GormDB.Model(&clinic).Update("available_credits", clinic.AvailableCredits-1)
 	}
 
 	// check if client has been created by clinic
 	if useParentEmployeeClinicAvailableUsers {
 		database.GormDB.Model(&clinicOwnerParentEmployeeClinic).Update(
-			"available_clients", clinicOwnerParentEmployeeClinic.AvailableCredits-1)
+			"available_credits", clinicOwnerParentEmployeeClinic.AvailableCredits-1)
 	}
 
 	return &createClientResponse, result.Error
@@ -218,5 +214,3 @@ func GetAllStreamingByClientID(clientID string) ([]streaming.Streaming, error) {
 
 	return list, nil
 }
-
-

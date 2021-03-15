@@ -2,6 +2,7 @@ package utils
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"github.com/joho/godotenv"
 	"log"
@@ -18,12 +19,11 @@ const FFMPEG_PATH = "/usr/local/bin/ffmpeg"
 /**
 Check if file exist and its size
 */
-func CheckIfFileExists(f string) error {
-	var err error
+func CheckIfFileExists(f string) bool {
 	if f, err := os.Stat(f); err == nil && f.Size() > 0 {
-		return nil
+		return true
 	}
-	return err
+	return false
 }
 
 /**
@@ -31,13 +31,10 @@ Add audio to video and generate video
 */
 func AddAudioToVideo(inFile string, outFile string) error {
 	// check if input file exists
-	inFileError := CheckIfFileExists(inFile)
-	if inFileError != nil {
-		fmt.Printf("Error: %s", inFileError.Error())
-		return inFileError
+	if !CheckIfFileExists(inFile) {
+		return errors.New("not such file")
 	}
 
-	// extract audio from video using ffmpeg library
 	cmd := exec.Command(FFMPEG_PATH, "-y", "-i", inFile, "-i", "music_video.m4a", "-c", "copy", "-shortest", outFile)
 	//cmd := execontext.Command("ffmpeg", "-i", inFile, "-i", "/home/ecodadys/go/src/github.com/nikola43/ecoapigorm/video_musicontext.mp3", "-c", "copy", "-map", "0:v", "-map", "1:a", outFile)
 	err := cmd.Run()
@@ -52,43 +49,20 @@ func AddAudioToVideo(inFile string, outFile string) error {
 /**
 Extract audio from video and generate audio file
 */
-func ExtractAudioFromVideo(inFile string, outFile string) error {
+func ExtractAudioFromVideo(inFile string) (string, error) {
+	outFile := inFile + "_audio.mp3"
 	// check if input file exists
-	inFileError := CheckIfFileExists(inFile)
-	if inFileError != nil {
-		fmt.Printf("Error: %s", inFileError.Error())
-		return inFileError
-	}
-
-	// check if output file exists
-	outFileError := CheckIfFileExists(outFile)
-	if outFileError != nil {
-		fmt.Printf("Error: %s", outFileError.Error())
-		return outFileError
-	} else {
-		// // if exists then remove
-		// removeFileError := os.Remove(outFile)
-		// if removeFileError != nil {
-		// 	fmt.Printf("Error: %s", removeFileError.Error())
-		// 	return removeFileError
-		// }
+	if !CheckIfFileExists(inFile) {
+		return "", errors.New("not such file")
 	}
 
 	// extract audio from video using ffmpeg library
 	cmd := exec.Command(FFMPEG_PATH, "-y", "-i", inFile, "-f", "mp3", "-ab", "192000", "-vn", outFile)
 	err := cmd.Run()
 	if err != nil {
-		return err
+		return "", err
 	}
-	return nil
-}
-
-func fileExists(filename string) bool {
-	info, err := os.Stat(filename)
-	if os.IsNotExist(err) {
-		return false
-	}
-	return !info.IsDir()
+	return outFile, nil
 }
 
 func WriteLog(message string) {
@@ -97,7 +71,8 @@ func WriteLog(message string) {
 	var err error
 	//var logPath = "/home/ecodadys/go/src/github.com/nikola43/ecoapigorm/logs/"
 	var logPath = "logs/"
-	if fileExists(logPath + date + ".txt") {
+
+	if CheckIfFileExists(logPath + date + ".txt") {
 		f, err = os.OpenFile(logPath+date+".txt", os.O_APPEND|os.O_WRONLY, 0644)
 		if err != nil {
 			fmt.Println(err)
@@ -125,75 +100,46 @@ func WriteLog(message string) {
 	}
 }
 
-func GenerateHologramVideo(inFile string, outFile string) error {
-
+func GenerateHologramVideo(inFile string) (string, error) {
+	outFile := inFile + "_holo.mp4"
 	command := "/Library/Frameworks/Python.framework/Versions/3.8/bin/python3"
 
 	// check if input file exists
-	err := CheckIfFileExists(inFile)
-	if err != nil {
-		return err
+	if !CheckIfFileExists(inFile) {
+		return "", errors.New("not such file")
 	}
 
-	err = executeCommandVerbose(command, inFile)
+	err := ExecuteSystemCommandVerbose(command, inFile)
+	if err != nil {
+		return "", err
+	}
 
-	if err != nil {
-		return err
-	}
-	err = CheckIfFileExists(outFile)
-	if err != nil {
-		return err
-	}
-	return nil
+	return outFile, nil
 }
 
-func CompressMP4(inFile string, outFile string) error {
-	// check if input file exists
-	err := CheckIfFileExists(inFile)
-	if err != nil {
-		return err
-	}
+func CompressMP4(inFile string) (string, error) {
+	outFile := inFile + "_compress.mp4"
 
-	/*
-		// check if input file exists
-		err = CheckIfFileExists(outFile)
-		if err != nil {
-			return err
-		} else {
-			//if exists then remove
-			fmt.Println("output file called " + outFile + " already exist. Removing...")
-			removeError := os.Remove(outFile)
-			if removeError != nil {
-				return removeError
-			}
-			fmt.Println("file " + outFile + " has been removed successfully")
-		}
-	*/
+	// check if input file exists
+	if !CheckIfFileExists(inFile) {
+		return "", errors.New("not such file")
+	}
 
 	// extract audio from video using ffmpeg library
 	// ffmpeg -i input.mp4 -vcodec h264 -acodec aac output.mp4
-	//err = executeCommandVerbose(FFMPEG_PATH, "-y", "-i", inFile, "-vcodec", "h264", "-acodec", "aac", outFile)
+	//err = ExecuteSystemCommandVerbose(FFMPEG_PATH, "-y", "-i", inFile, "-vcodec", "h264", "-acodec", "aac", outFile)
 	// -y -preset veryfast -c:v libx264 -crf 30 -c:a aac tatiana.mp4
-	err = executeCommandVerbose(FFMPEG_PATH, "-i", inFile, "-y", "-preset", "veryfast", "-c:v", "libx264", "-crf", "30", "-c:a", "aac", outFile)
+	err := ExecuteSystemCommandVerbose(FFMPEG_PATH, "-i", inFile, "-y", "-preset", "veryfast", "-c:v", "libx264", "-crf", "30", "-c:a", "aac", outFile)
 
 	if err != nil {
-		return err
+		return "", err
 	}
-	err = CheckIfFileExists(outFile)
-	if err != nil {
-		return err
-	}
-	return nil
+
+	return outFile, err
 }
 
-func checkError(err error) {
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-	}
-}
-
-func executeCommandVerbose(name string, arg ...string) error {
-	cmd := exec.Command(name, arg...)
+func ExecuteSystemCommandVerbose(commandName string, arg ...string) error {
+	cmd := exec.Command(commandName, arg...)
 	var out bytes.Buffer
 	var stderr bytes.Buffer
 	cmd.Stdout = &out
@@ -252,13 +198,21 @@ func GetFileType(file string, uploadMode uint) string {
 	return fileType
 }
 
-func ExtractThumbnailFromVideo(inFile string, outFile string) error {
+func ExtractThumbnailFromVideo(inFile string) (string,error) {
+	outFile := inFile + "_thumbnail.jpg"
+
+	// check if input file exists
+	if !CheckIfFileExists(inFile) {
+		return "", errors.New("not such file")
+	}
+
+
 	// extract audio from video using ffmpeg library
 	cmd := exec.Command(FFMPEG_PATH, "-y", "-i", inFile, "-ss", "00:00:05.000", "-vframes", "1", outFile)
 	err := cmd.Run()
 	if err != nil {
-		return err
+		return "", err
 	}
-	return nil
-}
 
+	return outFile, err
+}

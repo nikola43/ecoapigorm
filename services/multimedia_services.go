@@ -47,14 +47,13 @@ func UploadMultimedia(context *fiber.Ctx, bucketName string, clientID uint, uplo
 		}
 
 		// create thumb
-		videoThumbnailFileName := "tempFiles/" + uploadedFile.Filename + "-thumb.jpg"
-		extractThumbnailFromVideoError := utils.ExtractThumbnailFromVideo("tempFiles/"+uploadedFile.Filename, videoThumbnailFileName)
+		thumbnailPath, extractThumbnailFromVideoError := utils.ExtractThumbnailFromVideo("tempFiles/"+uploadedFile.Filename)
 		if extractThumbnailFromVideoError != nil {
 			return extractThumbnailFromVideoError
 		}
 
 		// thumb video
-		thumbUrl, thumbSize, storeThumbInAmazonError := awsmanager.AwsManager.UploadObject(bucketName,videoThumbnailFileName, clientID, fileType)
+		thumbUrl, thumbSize, storeThumbInAmazonError := awsmanager.AwsManager.UploadObject(bucketName,thumbnailPath, clientID, fileType)
 		if storeThumbInAmazonError != nil {
 			return storeThumbInAmazonError
 		}
@@ -69,7 +68,7 @@ func UploadMultimedia(context *fiber.Ctx, bucketName string, clientID uint, uplo
 			database.GormDB.Create(&video)
 		}
 
-		e := os.Remove(videoThumbnailFileName)
+		e := os.Remove(thumbnailPath)
 		if e != nil {
 			log.Fatal(e)
 		}

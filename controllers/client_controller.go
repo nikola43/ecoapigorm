@@ -5,8 +5,7 @@ import (
 	//"fmt"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
-	//"github.com/nikola43/ecoapigorm/app"
-	database "github.com/nikola43/ecoapigorm/database"
+
 	"github.com/nikola43/ecoapigorm/models"
 	modelsClient "github.com/nikola43/ecoapigorm/models/clients"
 	"github.com/nikola43/ecoapigorm/models/streaming"
@@ -114,17 +113,7 @@ func CreateClient(context *fiber.Ctx) error {
 		}
 	}
 
-	// check if client already exist
-	client := models.Client{}
-	GormDBResult := database.GormDB.
-		Where("email = ?", createClientRequest.Email).
-		Find(&client)
 
-	if GormDBResult.Error != nil {
-		return context.Status(fiber.StatusInternalServerError).JSON(&fiber.Map{
-			"error": "internal server",
-		})
-	}
 
 	// create and response
 	if createClientResponse, err = services.CreateClient(createClientRequest);
