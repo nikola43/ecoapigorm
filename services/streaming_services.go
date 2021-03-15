@@ -47,8 +47,7 @@ func CreateStreaming(createStreamingRequest *streamings.CreateStreamingRequest) 
 func GenerateRandomCode(length int) string {
 	var seededRand = rand.New(
 		rand.NewSource(time.Now().UnixNano()))
-	const charset = "abcdefghijklmnopqrstuvwxyz" +
-		"ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 	code := make([]byte, length)
 	for i := range code {
 		code[i] = charset[seededRand.Intn(len(charset))]
