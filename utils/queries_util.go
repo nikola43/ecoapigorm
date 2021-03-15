@@ -6,7 +6,7 @@ import (
 	"github.com/nikola43/ecoapigorm/models"
 )
 
-func GetModelByField(dest interface{}, fieldName string, fieldValue interface{}) interface{} {
+func GetModelByField(dest interface{}, fieldName string, fieldValue interface{}) error {
 	var model interface{}
 
 	// todo crear todos los casos
@@ -15,13 +15,15 @@ func GetModelByField(dest interface{}, fieldName string, fieldValue interface{})
 		model = dest.(*models.Client)
 	case *models.Clinic:
 		model = dest.(*models.Clinic)
+	case *models.Employee:
+		model = dest.(*models.Employee)
 	}
 
-	err := database.GormDB.Where(fieldName+" = ?", fieldValue).First(model)
-	if err != nil {
-		fmt.Println(err.Error)
-		return nil
+	result := database.GormDB.Where(fieldName+" = ?", fieldValue).First(model)
+	if result != nil {
+		fmt.Println(result.Error)
+		return result.Error
 	}
 
-	return model
+	return nil
 }

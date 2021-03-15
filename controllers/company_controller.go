@@ -4,14 +4,12 @@ import (
 	"fmt"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
-	"github.com/nikola43/ecoapigorm/awsmanager"
 	database "github.com/nikola43/ecoapigorm/database"
 	"github.com/nikola43/ecoapigorm/models"
 	companyModels "github.com/nikola43/ecoapigorm/models/company"
 	"github.com/nikola43/ecoapigorm/services"
 	"github.com/nikola43/ecoapigorm/utils"
 	"strconv"
-	"strings"
 )
 
 func GetCompanyById(context *fiber.Ctx) error {
@@ -43,10 +41,10 @@ func CreateCompany(context *fiber.Ctx) error {
 	fmt.Println(employeeTokenClaims)
 
 	// parse request
-	err = context.BodyParser(createCompanyRequest)
-	if err != nil {
+	if err = context.BodyParser(createCompanyRequest);
+		err != nil {
 		return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-			"error": "bad request",
+			"error": err.Error(),
 		})
 	}
 
@@ -74,7 +72,7 @@ func CreateCompany(context *fiber.Ctx) error {
 		})
 	}
 
-	if employee.ID < 1 {
+	if employeeTokenClaims.ID < 1 {
 		return context.Status(fiber.StatusNotFound).JSON(&fiber.Map{
 			"error": "employee id not found",
 		})
@@ -105,14 +103,27 @@ func CreateCompany(context *fiber.Ctx) error {
 		})
 	}
 
-	// create bucket for company
-	bucketName := strings.ToLower(strings.ReplaceAll(createCompanyRequest.Name, " ", "_"))
-	err = awsmanager.AwsManager.CreateBucket(strings.ToLower(bucketName))
-	if err != nil {
-		return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-			"error": err.Error(),
-		})
-	}
+	employeeToken, err := utils.GenerateEmployeeToken(employee.Name,
+		employee.Email,
+		company.Name,
+		employee.Clinic.Name,
+		employee.ID,
+		createCompanyResponse.ID,
+		employee.Clinic.ID,
+		employee.Role)
+
+	createCompanyResponse.Token = employeeToken
+
+	/*
+		// create bucket for company
+		bucketName := strings.ToLower(strings.ReplaceAll(createCompanyRequest.Name, " ", "_"))
+		err = awsmanager.AwsManager.CreateBucket(strings.ToLower(bucketName))
+		if err != nil {
+			return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+				"error": err.Error(),
+			})
+		}
+	*/
 
 	return context.JSON(createCompanyResponse)
 

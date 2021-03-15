@@ -187,7 +187,6 @@ func CreateClientFromClinic(createClientRequest *clients.CreateClientRequest) (*
 	return listClientResponse, result.Error
 }
 
-
 func GetAllPromosByClinicID(clinicID string) ([]promos.Promo, error) {
 	var promos = make([]promos.Promo, 0)
 
@@ -198,7 +197,6 @@ func GetAllPromosByClinicID(clinicID string) ([]promos.Promo, error) {
 
 	return promos, nil
 }
-
 
 func GetAllStreamingByClinicID(clinicID string) ([]streaming.Streaming, error) {
 	var list = make([]streaming.Streaming, 0)
@@ -219,6 +217,16 @@ func GetAllStreamingByClinicID(clinicID string) ([]streaming.Streaming, error) {
 	if err := database.GormDB.Where("client_id IN (?)", clientsIds).Find(&list).Error;
 		err != nil {
 		fmt.Println(err.Error())
+		return nil, err
+	}
+
+	return list, nil
+}
+
+func GetEmployeesByClinicID(clinicID uint) ([]models.Employee, error) {
+	list := make([]models.Employee, 0)
+
+	if err := database.GormDB.Where("clinic_id = ?", clinicID).Find(&list).Error; err != nil {
 		return nil, err
 	}
 

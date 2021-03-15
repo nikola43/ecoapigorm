@@ -19,13 +19,13 @@ func CreateClient(createClientRequest *modelsClients.CreateClientRequest) (*mode
 
 	// check if client already exist
 	utils.GetModelByField(client, "email", createClientRequest.Email)
-	if client != nil && client.ID > 0 {
+	if client.ID > 0 {
 		return nil, errors.New("client already exist")
 	}
 
 	// find clinic
 	utils.GetModelByField(clinic, "id", createClientRequest.ClinicID)
-	if clinic == nil {
+	if clinic.ID < 1 {
 		return nil, errors.New("clinic not found")
 	}
 

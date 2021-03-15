@@ -22,6 +22,7 @@ func CreateCompany(employeeID uint, createEmployeeRequest *companyModels.CreateC
 		ID:         company.ID,
 		Name:       company.Name,
 		EmployeeID: company.EmployeeID,
+		CreatedAt:  company.CreatedAt.String(),
 	}
 
 	database.GormDB.Model(&models.Employee{}).Where("id = ? ", employeeID).
@@ -82,3 +83,13 @@ func GetClinicsByCompanyID(company_id uint) ([]models.Clinic, error) {
 	return clinics, nil
 }
 
+func GetCompaniesByEmployeeID(employeeID uint) ([]models.Company, error) {
+	var list []models.Company
+
+	result := database.GormDB.Where("employee_id = ?", employeeID).Find(&list)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return list, nil
+}

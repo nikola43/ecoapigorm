@@ -27,4 +27,10 @@ func EmployeeRoutes (router fiber.Router) {
 	// /api/v1/employee/invite
 	employeeRouter.Post("/invite", controllers.Invite)
 
+	// /api/v1/employee/:employee_id/companies
+	employeeRouter.Get("/:employee_id/companies", controllers.GetCompaniesByEmployeeID)
+
+	// /api/v1/employee/:employee_id
+	employeeRouter.Delete("/:employee_id", controllers.DeleteEmployeeByEmployeeID)
+
 }

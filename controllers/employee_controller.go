@@ -115,3 +115,38 @@ func Invite(context *fiber.Ctx) error {
 
 	return context.SendStatus(fiber.StatusOK)
 }
+
+func GetCompaniesByEmployeeID(context *fiber.Ctx) error {
+	employeeID, _ := strconv.ParseUint(context.Params("employee_id"), 10, 64)
+
+	var err error
+
+	list, err := services.GetCompaniesByEmployeeID(uint(employeeID));
+
+	if err != nil {
+		return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return context.Status(fiber.StatusOK).JSON(list)
+}
+
+func DeleteEmployeeByEmployeeID(context *fiber.Ctx) error {
+	employeeID, _ := strconv.ParseUint(context.Params("employee_id"), 10, 64)
+	employeeTokenClaims, err := utils.GetEmployeeTokenClaims(context)
+	if err != nil {
+		return context.Status(fiber.StatusUnauthorized).JSON(&fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	err = services.DeleteEmployeeByEmployeeID(employeeTokenClaims.ID,uint(employeeID))
+	if err != nil {
+		return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return context.SendStatus(fiber.StatusOK)
+}

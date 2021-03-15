@@ -102,3 +102,34 @@ func Invite(employees []models.Employee) error {
 
 	return nil
 }
+func DeleteEmployeeByEmployeeID(parentEmployeeID, deletedEmployeeID uint) error {
+	deleteEmployee := new(models.Employee)
+	deleteEmployeeClinic := new(models.Clinic)
+
+	// check if employee exist
+	utils.GetModelByField(deleteEmployee, "id", deletedEmployeeID)
+	if deleteEmployee.ID < 1 {
+		return errors.New("employee not found")
+	}
+
+	// check if employee is owner of any clinic
+	utils.GetModelByField(deleteEmployeeClinic, "employee_id", deletedEmployeeID)
+	if deleteEmployeeClinic.ID > 1 {
+		// update clinic employee id with parent employee id
+		database.GormDB.Model(&deleteEmployeeClinic).Update("employee_id", parentEmployeeID)
+	}
+
+	// check if employee who make action has deleted employee parent
+	if deleteEmployeeClinic.EmployeeID != parentEmployeeID {
+		// update clinic employee id with parent employee id
+		return errors.New("only parent employee can delete employee")
+	}
+
+	// delete employee
+	result := database.GormDB.Delete(deleteEmployee)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
+}

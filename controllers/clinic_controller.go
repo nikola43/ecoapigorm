@@ -190,3 +190,15 @@ func GetAllPromosByClinicID(context *fiber.Ctx) error {
 
 	return context.Status(fiber.StatusOK).JSON(promos)
 }
+
+func GetEmployeesByClinicID(context *fiber.Ctx) error {
+	clinicID, _ := strconv.ParseUint(context.Params("clinic_id"), 10, 64)
+
+	if list, err := services.GetEmployeesByClinicID(uint(clinicID)); err != nil {
+		return context.Status(fiber.StatusNotFound).JSON(&fiber.Map{
+			"error": "Company not found",
+		})
+	} else {
+		return context.JSON(list)
+	}
+}

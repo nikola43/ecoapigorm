@@ -96,7 +96,7 @@ func CreateClient(context *fiber.Ctx) error {
 	if err = context.BodyParser(createClientRequest);
 		err != nil {
 		return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-			"error": "bad request",
+			"error": err.Error(),
 		})
 	}
 
