@@ -109,9 +109,16 @@ func Invite(context *fiber.Ctx) error {
 		})
 	}
 
-	services.Invite(employees)
+	err = services.Invite(employees)
+	if err != nil {
+		return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+			"error": err.Error(),
+		})
+	}
 
-	return context.SendStatus(fiber.StatusOK)
+	return context.Status(fiber.StatusOK).JSON(&fiber.Map{
+		"success": true,
+	})
 }
 
 func GetCompaniesByEmployeeID(context *fiber.Ctx) error {

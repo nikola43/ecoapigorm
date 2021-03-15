@@ -20,7 +20,8 @@ type SendEmailManager struct {
 }
 
 func (i SendEmailManager) SendMail(htmlTemplate string, subject string) {
-	senderEmail := GetEnvVariable("FROM_EMAIL")
+	senderEmail := "babyandme@stelast.com"
+	// senderEmail := GetEnvVariable("FROM_EMAIL")
 	// fromEmailPassword := GetEnvVariable("FROM_EMAIL")
 
 	t := template.New(htmlTemplate)
