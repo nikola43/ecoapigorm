@@ -74,8 +74,11 @@ func Invite(employeeTokenClaims *models.EmployeeTokenClaims, employees []models.
 
 	// validation ---------------------------------------------------------------------
 	for _, employee := range employees {
-		temp := models.Employee{}
-		utils.GetModelByField(temp, "email", employee.Email)
+		temp := &models.Employee{}
+		fmt.Println("employee")
+		fmt.Println(employee)
+
+		database.GormDB.Where("email = ?", employee.Email).Find(&employee)
 		invitationToken, err := utils.GenerateInvitationToken(employeeTokenClaims.Email, employee.Email, employeeTokenClaims.ClinicID)
 		if err != nil {
 			return err
