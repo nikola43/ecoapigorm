@@ -8,18 +8,21 @@ import (
 	"github.com/nikola43/ecoapigorm/utils"
 )
 
-func EmployeeRoutes (router fiber.Router) {
+func EmployeeRoutes(router fiber.Router) {
 	// /api/v1/employee
 	employeeRouter := router.Group("/employee")
+
+	// /api/v1/employee/create
+	employeeRouter.Post("/", controllers.CreateEmployee)
+
+	// /api/v1/employee/validate_invitation/:invitation_token
+	employeeRouter.Get("/validate_invitation/:invitation_token", controllers.ValidateInvitation)
 
 	// use jwt
 	employeeRouter.Use(jwtware.New(jwtware.Config{SigningKey: []byte(utils.GetEnvVariable("JWT_CLIENT_KEY"))}))
 
 	// check Employee.Role == 'admin'
 	employeeRouter.Use(middleware.AdminEmployeeMiddleware)
-
-	// /api/v1/employee/create
-	employeeRouter.Post("/", controllers.CreateEmployee)
 
 	// /api/v1/employee/:parent_employee_id/employees
 	employeeRouter.Get("/:parent_employee_id/employees", controllers.GetEmployeesByParentEmployeeID)

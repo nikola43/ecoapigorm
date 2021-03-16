@@ -26,6 +26,7 @@ func GetCompanyById(context *fiber.Ctx) error {
 	return context.JSON(company)
 }
 
+
 func CreateCompany(context *fiber.Ctx) error {
 	createCompanyRequest := new(companyModels.CreateCompanyRequest)
 	createCompanyResponse := new(companyModels.CreateCompanyResponse)
@@ -103,13 +104,14 @@ func CreateCompany(context *fiber.Ctx) error {
 		})
 	}
 
-	employeeToken, err := utils.GenerateEmployeeToken(employee.Name,
+	employeeToken, err := utils.GenerateEmployeeToken(
+		employee.Name,
+		company.ID,
+		employee.Clinic.ID,
+		employee.ID,
 		employee.Email,
 		company.Name,
 		employee.Clinic.Name,
-		employee.ID,
-		createCompanyResponse.ID,
-		employee.Clinic.ID,
 		employee.Role)
 
 	createCompanyResponse.Token = employeeToken
@@ -128,6 +130,7 @@ func CreateCompany(context *fiber.Ctx) error {
 	return context.JSON(createCompanyResponse)
 
 }
+
 
 func GetEmployeesByCompanyID(context *fiber.Ctx) error {
 	companyID, _ := strconv.ParseUint(context.Params("company_id"), 10, 64)
@@ -153,3 +156,4 @@ func GetClinicsByCompanyID(context *fiber.Ctx) error {
 		return context.JSON(list)
 	}
 }
+

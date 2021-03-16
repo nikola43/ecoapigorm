@@ -8,6 +8,7 @@ import (
 	"github.com/nikola43/ecoapigorm/models/streaming"
 )
 
+
 func GetModelByField(dest interface{}, fieldName string, fieldValue interface{}) error {
 	var model interface{}
 
@@ -33,6 +34,8 @@ func GetModelByField(dest interface{}, fieldName string, fieldValue interface{})
 		model = dest.(*models.Holographic)
 	case *models.Heartbeat:
 		model = dest.(*models.Heartbeat)
+	case *models.Invitation:
+		model = dest.(*models.Invitation)
 	}
 
 	result := database.GormDB.Where(fieldName+" = ?", fieldValue).First(model)

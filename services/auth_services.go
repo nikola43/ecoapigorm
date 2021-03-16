@@ -2,6 +2,7 @@ package services
 
 import (
 	"errors"
+	"fmt"
 	database "github.com/nikola43/ecoapigorm/database"
 	"github.com/nikola43/ecoapigorm/models"
 	"github.com/nikola43/ecoapigorm/utils"
@@ -57,11 +58,23 @@ func LoginEmployee(email, password string) (*models.LoginEmployeeResponse, error
 		Find(&clinic)
 
 	database.GormDB.Model(&company).
-		Select("name").
 		Where("id = ?", employee.CompanyID).
 		Find(&company)
 
-	if token, err = utils.GenerateEmployeeToken(employee.Name, employee.Email, clinic.Name, company.Name, employee.ID, employee.CompanyID, clinic.ID, employee.Role); err != nil {
+	fmt.Println("clinicID")
+	fmt.Println(clinic.ID)
+
+
+	token, err = utils.GenerateEmployeeToken(
+		employee.Name,
+		company.ID,
+		clinic.ID,
+		employee.ID,
+		employee.Email,
+		company.Name,
+		clinic.Name,
+		employee.Role)
+	if err != nil {
 		return nil, err
 	}
 

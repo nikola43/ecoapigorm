@@ -22,7 +22,7 @@ func CreateEmployee(context *fiber.Ctx) error {
 	if err = context.BodyParser(createEmployeeRequest);
 		err != nil {
 		return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-			"error": "bad request",
+			"error": err.Error(),
 		})
 	}
 
@@ -57,12 +57,22 @@ func CreateEmployee(context *fiber.Ctx) error {
 		})
 	}
 
+	// check if token exist
+	invitation := new(models.Invitation)
+	result := database.GormDB.Where("to_email = ? AND token = ?", createEmployeeRequest.Email, createEmployeeRequest.Token).Find(&invitation)
+	if result.Error != nil {
+		return result.Error
+	}
+
 	// create and response
-	if createEmployeeResponse, err = services.CreateEmployee(createEmployeeRequest); err != nil {
+	if createEmployeeResponse, err = services.CreateEmployeeFromPanel(createEmployeeRequest); err != nil {
 		return context.Status(fiber.StatusInternalServerError).JSON(&fiber.Map{
 			"error": "internal server",
 		})
 	}
+
+	database.GormDB.Delete(invitation)
+
 	return context.JSON(createEmployeeResponse)
 }
 
@@ -99,6 +109,8 @@ func Invite(context *fiber.Ctx) error {
 
 	var employees = make([]models.Employee, 0)
 	employeeTokenClaims, err := utils.GetEmployeeTokenClaims(context)
+	fmt.Println("Invite")
+	fmt.Println("employeeTokenClaims")
 	fmt.Println(employeeTokenClaims)
 
 	// parse request
@@ -155,5 +167,26 @@ func DeleteEmployeeByEmployeeID(context *fiber.Ctx) error {
 
 	return context.Status(fiber.StatusOK).JSON(&fiber.Map{
 		"success": true,
+	})
+}
+
+func ValidateInvitation(context *fiber.Ctx) error {
+	invitationToken := context.Params("invitation_token")
+	fmt.Println(invitationToken)
+
+	invitation := new(models.Invitation)
+	utils.GetModelByField(invitation, "token", invitationToken)
+
+	if invitation.ID < 1 {
+		return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+			"error": "invalid invitation token",
+		})
+	}
+
+	return context.Status(fiber.StatusOK).JSON(&fiber.Map{
+		"success": true,
+		"clinic_id": invitation.FromClinicID,
+		"employee_email": invitation.ToEmail,
+		"token": invitationToken,
 	})
 }

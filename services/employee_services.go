@@ -2,39 +2,47 @@ package services
 
 import (
 	"errors"
+	"fmt"
 	database "github.com/nikola43/ecoapigorm/database"
 	"github.com/nikola43/ecoapigorm/models"
 	modelsEmployees "github.com/nikola43/ecoapigorm/models/employee"
 	"github.com/nikola43/ecoapigorm/utils"
 )
 
-func CreateEmployee(createEmployeeRequest *modelsEmployees.CreateEmployeeRequest) (*modelsEmployees.CreateEmployeeResponse, error) {
-	//TODO validate
+func CreateEmployeeFromPanel(createEmployeeRequest *modelsEmployees.CreateEmployeeRequest) (*modelsEmployees.CreateEmployeeResponse, error) {
 
-	employee := models.Employee{
-		Email:    createEmployeeRequest.Email,
-		Password: utils.HashPassword([]byte(createEmployeeRequest.Password)),
+	// todo if has clinic id, check if clinic exist
+
+
+
+
+	// todo cambiar role por constantes
+	// create newEmployee on DB
+	newEmployee := models.Employee{
+		ClinicID: createEmployeeRequest.ClinicID,
 		Name:     createEmployeeRequest.Name,
+		Email:    createEmployeeRequest.Email,
 		LastName: createEmployeeRequest.LastName,
-		Phone:    createEmployeeRequest.Phone,
+		Role:     "employee",
+		Password: utils.HashPassword([]byte(createEmployeeRequest.Password)),
 	}
-	result := database.GormDB.Create(&employee)
 
+	fmt.Println("createEmployeeRequest")
+	fmt.Println(createEmployeeRequest)
+
+	result := database.GormDB.Create(&newEmployee)
 	if result.Error != nil {
 		return nil, result.Error
 	}
 
-	token, err := utils.GenerateEmployeeToken(employee.Name, employee.Email, "", "", employee.ID, 0, 0, "admin")
-	if err != nil {
-		return nil, err
-	}
-
+	// generate response
 	createEmployeeResponse := modelsEmployees.CreateEmployeeResponse{
-		ID:       employee.ID,
-		Email:    employee.Email,
-		Name:     employee.Name,
-		LastName: employee.LastName,
-		Token:    token,
+		ID:       newEmployee.ID,
+		ClinicID: newEmployee.ClinicID,
+		Email:    newEmployee.Email,
+		Name:     newEmployee.Name,
+		LastName: newEmployee.LastName,
+		Role:     newEmployee.Role,
 	}
 
 	return &createEmployeeResponse, result.Error
@@ -73,18 +81,28 @@ func Invite(employeeTokenClaims *models.EmployeeTokenClaims, employees []models.
 	for _, employee := range employees {
 		temp := new(models.Employee)
 		utils.GetModelByField(temp, "email", employee.Email)
-		invitationToken, err := utils.GenerateInvitationToken(employeeTokenClaims.Email, employee.Email, employeeTokenClaims.ClinicID)
+		invitationToken, err := utils.GenerateInvitationToken()
 		if err != nil {
 			return err
+		}
+		fmt.Println("employeeTokenClaims.ClinicID")
+		fmt.Println(employeeTokenClaims.ClinicID)
+
+		invitation := &models.Invitation{
+			Token:     invitationToken,
+			FromEmail: employeeTokenClaims.Name,
+			ToEmail:   employee.Email,
+			FromClinicID:   employeeTokenClaims.ClinicID,
 		}
 
 		sendEmailManager := utils.SendEmailManager{
 			ToEmail:         employee.Email,
-			ToName:          employee.Name,
 			FromName:        employeeTokenClaims.Name,
 			ClinicName:      employeeTokenClaims.ClinicName,
 			InvitationToken: invitationToken,
 		}
+
+		database.GormDB.Create(invitation)
 
 		if temp.ID > 0 {
 			sendEmailManager.SendMail("invite_to_clinic.html", employeeTokenClaims.Name+" te ha invitado a su clínica")
@@ -123,6 +141,11 @@ func DeleteEmployeeByEmployeeID(parentEmployeeID, deletedEmployeeID uint) error 
 	if result.Error != nil {
 		return result.Error
 	}
+
+	return nil
+}
+
+func ValidateInvitation(parentEmployeeID, deletedEmployeeID uint) error {
 
 	return nil
 }
