@@ -64,7 +64,6 @@ func LoginEmployee(email, password string) (*models.LoginEmployeeResponse, error
 	fmt.Println("clinicID")
 	fmt.Println(clinic.ID)
 
-
 	token, err = utils.GenerateEmployeeToken(
 		employee.Name,
 		company.ID,
@@ -79,14 +78,15 @@ func LoginEmployee(email, password string) (*models.LoginEmployeeResponse, error
 	}
 
 	clientEmployeeResponse := models.LoginEmployeeResponse{
-		ID:        employee.ID,
-		CompanyID: employee.CompanyID,
-		Email:     employee.Email,
-		Name:      employee.Name,
-		Role:      employee.Role,
-		LastName:  employee.LastName,
-		Token:     token,
-		Clinic:    clinic,
+		ID:           employee.ID,
+		CompanyID:    employee.CompanyID,
+		Email:        employee.Email,
+		Name:         employee.Name,
+		Role:         employee.Role,
+		IsFirstLogin: employee.IsFirstLogin,
+		LastName:     employee.LastName,
+		Token:        token,
+		Clinic:       clinic,
 	}
 
 	return &clientEmployeeResponse, err

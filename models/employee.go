@@ -13,7 +13,7 @@ type Employee struct {
 	Name             string    `gorm:"type:varchar(32) not null" json:"name"`
 	Phone            string    `json:"phone" xml:"phone" form:"phone" validate:"required"`
 	LastName         string    `gorm:"type:varchar(32)" json:"last_name"`
-	IsFirstLogin     bool      `json:"is_first_login"`
+	IsFirstLogin     bool      `gorm:"type:INTEGER NULL; DEFAULT:1" json:"is_first_login"`
 	Role             string    `gorm:"type:varchar(32) not null; DEFAULT:'employee'" json:"role"`
 	Clinic           Clinic    `json:"clinic"`
 	Payment          []Payment `json:"payment" xml:"payment" form:"payment"`

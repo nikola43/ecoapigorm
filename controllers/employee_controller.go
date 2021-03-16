@@ -188,5 +188,6 @@ func ValidateInvitation(context *fiber.Ctx) error {
 		"clinic_id": invitation.FromClinicID,
 		"employee_email": invitation.ToEmail,
 		"token": invitationToken,
+		"parent_employee_id": invitation.ParentEmployeeID,
 	})
 }

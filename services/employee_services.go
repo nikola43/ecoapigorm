@@ -13,18 +13,16 @@ func CreateEmployeeFromPanel(createEmployeeRequest *modelsEmployees.CreateEmploy
 
 	// todo if has clinic id, check if clinic exist
 
-
-
-
 	// todo cambiar role por constantes
 	// create newEmployee on DB
 	newEmployee := models.Employee{
-		ClinicID: createEmployeeRequest.ClinicID,
-		Name:     createEmployeeRequest.Name,
-		Email:    createEmployeeRequest.Email,
-		LastName: createEmployeeRequest.LastName,
-		Role:     "employee",
-		Password: utils.HashPassword([]byte(createEmployeeRequest.Password)),
+		ParentEmployeeID: createEmployeeRequest.ParentEmployeeID,
+		ClinicID:         createEmployeeRequest.ClinicID,
+		Name:             createEmployeeRequest.Name,
+		Email:            createEmployeeRequest.Email,
+		LastName:         createEmployeeRequest.LastName,
+		Role:             "employee",
+		Password:         utils.HashPassword([]byte(createEmployeeRequest.Password)),
 	}
 
 	fmt.Println("createEmployeeRequest")
@@ -89,10 +87,11 @@ func Invite(employeeTokenClaims *models.EmployeeTokenClaims, employees []models.
 		fmt.Println(employeeTokenClaims.ClinicID)
 
 		invitation := &models.Invitation{
-			Token:     invitationToken,
-			FromEmail: employeeTokenClaims.Name,
-			ToEmail:   employee.Email,
-			FromClinicID:   employeeTokenClaims.ClinicID,
+			ParentEmployeeID: employeeTokenClaims.ID,
+			Token:            invitationToken,
+			FromEmail:        employeeTokenClaims.Name,
+			ToEmail:          employee.Email,
+			FromClinicID:     employeeTokenClaims.ClinicID,
 		}
 
 		sendEmailManager := utils.SendEmailManager{
@@ -131,7 +130,7 @@ func DeleteEmployeeByEmployeeID(parentEmployeeID, deletedEmployeeID uint) error 
 	}
 
 	// check if employee who make action has deleted employee parent
-	if deleteEmployeeClinic.EmployeeID != parentEmployeeID {
+	if deleteEmployee.ParentEmployeeID != parentEmployeeID {
 		// update clinic employee id with parent employee id
 		return errors.New("only parent employee can delete employee")
 	}

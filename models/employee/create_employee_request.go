@@ -1,6 +1,7 @@
 package clients
 
 type CreateEmployeeRequest struct {
+	ParentEmployeeID uint   `json:"parent_employee_id"`
 	ClinicID uint   `json:"clinic_id"`
 	Name     string `json:"name" validate:"required"`
 	LastName string `json:"last_name" validate:"required"`
