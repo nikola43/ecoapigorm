@@ -2,7 +2,6 @@ package services
 
 import (
 	"errors"
-	"fmt"
 	database "github.com/nikola43/ecoapigorm/database"
 	"github.com/nikola43/ecoapigorm/models"
 	modelsEmployees "github.com/nikola43/ecoapigorm/models/employee"
@@ -70,15 +69,10 @@ func BuyCredits(sessionID string, clinicID uint) (*models.Payment, error) {
 }
 
 func Invite(employeeTokenClaims *models.EmployeeTokenClaims, employees []models.Employee) error {
-	fmt.Println(employees)
-
 	// validation ---------------------------------------------------------------------
 	for _, employee := range employees {
-		temp := &models.Employee{}
-		fmt.Println("employee")
-		fmt.Println(employee)
-
-		database.GormDB.Where("email = ?", employee.Email).Find(&employee)
+		temp := new(models.Employee)
+		utils.GetModelByField(temp, "email", employee.Email)
 		invitationToken, err := utils.GenerateInvitationToken(employeeTokenClaims.Email, employee.Email, employeeTokenClaims.ClinicID)
 		if err != nil {
 			return err
@@ -92,13 +86,10 @@ func Invite(employeeTokenClaims *models.EmployeeTokenClaims, employees []models.
 			InvitationToken: invitationToken,
 		}
 
-		fmt.Println("temp")
-		fmt.Println(temp)
-
 		if temp.ID > 0 {
-			sendEmailManager.SendMail("invite_to_clinic.html", employee.Name+" te ha invitado a su clínica")
+			sendEmailManager.SendMail("invite_to_clinic.html", employeeTokenClaims.Name+" te ha invitado a su clínica")
 		} else {
-			sendEmailManager.SendMail("invite_to_register.html", employee.Name+" te ha invitado a registrarte")
+			sendEmailManager.SendMail("invite_to_register.html", employeeTokenClaims.Name+" te ha invitado a registrarte")
 		}
 	}
 
