@@ -14,10 +14,10 @@ import (
 	_ "github.com/nikola43/ecoapigorm/utils"
 )
 
-func CreateClinic(createEmployeeRequest *clinicModels.CreateClinicRequest) (*clinicModels.CreateClinicResponse, error) {
+func CreateClinic(EmployeeID uint, createEmployeeRequest *clinicModels.CreateClinicRequest) (*clinicModels.CreateClinicResponse, error) {
 	clinic := models.Clinic{
 		Name:       createEmployeeRequest.Name,
-		EmployeeID: createEmployeeRequest.EmployeeID,
+		EmployeeID: EmployeeID,
 	}
 	result := database.GormDB.Create(&clinic)
 

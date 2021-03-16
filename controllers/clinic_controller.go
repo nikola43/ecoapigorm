@@ -43,14 +43,12 @@ func CreateClinic(context *fiber.Ctx) error {
 		})
 	}
 
-	// set clinic creator id
-	createClinicRequest.EmployeeID = employeeTokenClaims.ID
-
 	// parse request
-	if err = context.BodyParser(createClinicRequest);
-		err != nil {
+
+	err = context.BodyParser(createClinicRequest)
+	if err != nil {
 		return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-			"error": "bad request",
+			"error": err.Error(),
 		})
 	}
 
@@ -66,7 +64,6 @@ func CreateClinic(context *fiber.Ctx) error {
 			}
 		}
 	}
-
 
 	// check if clinic already exist
 	result := database.GormDB.
@@ -86,7 +83,7 @@ func CreateClinic(context *fiber.Ctx) error {
 	}
 
 	// create and response
-	if createClinicResponse, err = services.CreateClinic(createClinicRequest);
+	if createClinicResponse, err = services.CreateClinic(employeeTokenClaims.ID, createClinicRequest);
 		err != nil {
 		return context.Status(fiber.StatusNotFound).JSON(&fiber.Map{
 			"error": err.Error(),
