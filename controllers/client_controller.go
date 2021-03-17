@@ -171,3 +171,17 @@ func PasswordRecovery(context *fiber.Ctx) error {
 }
 
 
+func DeleteClientByID(context *fiber.Ctx) error {
+	clientID, _ := strconv.ParseUint(context.Params("client_id"), 10, 64)
+
+	err := services.DeleteClientByID(uint(clientID))
+	if err != nil {
+		return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return context.Status(fiber.StatusOK).JSON(&fiber.Map{
+		"success": true,
+	})
+}

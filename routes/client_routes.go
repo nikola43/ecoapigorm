@@ -31,4 +31,7 @@ func ClientRoutes(router fiber.Router) {
 
 	// /api/v1/client/change_password
 	clientRouter.Post("/change_password", controllers.ChangePassClient)
+
+	// /api/v1/client/:client_id
+	clientRouter.Delete("/:client_id", controllers.DeleteClientByID)
 }

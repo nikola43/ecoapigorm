@@ -214,3 +214,24 @@ func GetAllStreamingByClientID(clientID string) ([]streaming.Streaming, error) {
 
 	return list, nil
 }
+
+func DeleteClientByID(clientID uint) error {
+	deleteClient := new(models.Client)
+
+	// todo check clinic is who make action
+	// check if employee exist
+	utils.GetModelByField(deleteClient, "id", clientID)
+	if deleteClient.ID < 1 {
+		return errors.New("client not found")
+	}
+
+	// delete employee
+	result := database.GormDB.Delete(deleteClient)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	// todo remove content
+
+	return nil
+}
