@@ -113,8 +113,6 @@ func CreateClient(context *fiber.Ctx) error {
 		}
 	}
 
-
-
 	// create and response
 	if createClientResponse, err = services.CreateClient(createClientRequest);
 		err != nil {
@@ -122,8 +120,10 @@ func CreateClient(context *fiber.Ctx) error {
 			"error": err.Error(),
 		})
 	} else {
-		welcomeEmail := utils.SendEmailManager{ToEmail: createClientRequest.Email}
-		welcomeEmail.SendMail("welcome.html", "Welcome")
+		welcomeEmail := utils.SendEmailManager{ToEmail: createClientRequest.Email,
+			ToName: createClientRequest.Name,
+		}
+		welcomeEmail.SendMail("welcome.html", "Bienvenido "+createClientRequest.Name)
 		return context.JSON(createClientResponse)
 	}
 }
@@ -164,12 +164,9 @@ func PassRecoveryClient(context *fiber.Ctx) error {
 	return context.SendStatus(fiber.StatusOK)
 }
 
-
-
 func PasswordRecovery(context *fiber.Ctx) error {
 	return context.SendStatus(fiber.StatusOK)
 }
-
 
 func DeleteClientByID(context *fiber.Ctx) error {
 	clientID, _ := strconv.ParseUint(context.Params("client_id"), 10, 64)
