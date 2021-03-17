@@ -75,7 +75,8 @@ func GetClinicsByCompanyID(company_id uint) ([]models.Clinic, error) {
 		employeesIds = append(employeesIds, employee.ID)
 	}
 
-	if err := database.GormDB.Where("employee_id IN (?)", employeesIds).Find(&clinics).Error;
+	//if err := database.GormDB.Where("employee_id IN (?)", employeesIds).Find(&clinics).Error;
+	if err := database.GormDB.Where("employee_id IN (?)", employeesIds).Preload("Clients").Preload("Employees").Find(&clinics).Error
 		err != nil {
 		return nil, err
 	}

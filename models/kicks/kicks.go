@@ -1,12 +1,12 @@
 package kicks
 
 import (
-	"gorm.io/gorm"
+	"github.com/nikola43/ecoapigorm/models/base"
 	"time"
 )
 
 type Kick struct {
-	gorm.Model
+	base.CustomGormModel
 	Date time.Time   `json:"date"`
 	ClientId uint   `json:"client_id"`
 }

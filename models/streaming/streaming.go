@@ -1,6 +1,8 @@
 package streaming
 
-import "github.com/nikola43/ecoapigorm/models/base"
+import (
+	"github.com/nikola43/ecoapigorm/models/base"
+)
 
 type Streaming struct {
 	base.CustomGormModel

@@ -16,5 +16,5 @@ type Clinic struct {
 	AvailableCredits uint           `gorm:"type:INTEGER not null; DEFAULT:10" json:"available_credits"`
 	Clients          []Client       `json:"clients"`
 	Promos           []promos.Promo `json:"promos"`
-	Employee         []Employee     `json:"employees"`
+	Employees         []Employee     `json:"employees"`
 }

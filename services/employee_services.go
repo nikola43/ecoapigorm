@@ -122,6 +122,9 @@ func DeleteEmployeeByEmployeeID(parentEmployeeID, deletedEmployeeID uint) error 
 		return errors.New("employee not found")
 	}
 
+	fmt.Println("deleteEmployee.ParentEmployeeID")
+	fmt.Println(deleteEmployee)
+
 	// check if employee is owner of any clinic
 	utils.GetModelByField(deleteEmployeeClinic, "employee_id", deletedEmployeeID)
 	if deleteEmployeeClinic.ID > 1 {

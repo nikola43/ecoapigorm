@@ -1,6 +1,8 @@
 package models
 
-import "github.com/nikola43/ecoapigorm/models/base"
+import (
+	"github.com/nikola43/ecoapigorm/models/base"
+)
 
 type Payment struct {
 	base.CustomGormModel
