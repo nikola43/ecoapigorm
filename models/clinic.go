@@ -13,7 +13,7 @@ type Clinic struct {
 	EmployeeID       uint           `json:"employee_id"`
 	DiskQuote        uint           `gorm:"type:INTEGER not null; DEFAULT:1073741824" json:"disk_quote"`
 	ExtendCredits    bool           `gorm:"type:INTEGER not null; DEFAULT:0" json:"extent_credits"`
-	AvailableCredits uint           `gorm:"type:INTEGER not null; DEFAULT:10" json:"available_credits"`
+	AvailableCredits uint           `gorm:"type:INTEGER not null; DEFAULT:0" json:"available_credits"`
 	Clients          []Client       `json:"clients"`
 	Promos           []promos.Promo `json:"promos"`
 	Employees         []Employee     `json:"employees"`

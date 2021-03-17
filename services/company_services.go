@@ -28,6 +28,11 @@ func CreateCompany(employeeID uint, createEmployeeRequest *companyModels.CreateC
 	database.GormDB.Model(&models.Employee{}).Where("id = ? ", employeeID).
 		Update("company_id", createCompanyResponse.ID)
 
+	database.GormDB.Model(&models.Employee{}).Where("id = ? ", employeeID).
+		Update("is_first_login", false)
+
+
+
 	return createCompanyResponse, nil
 }
 

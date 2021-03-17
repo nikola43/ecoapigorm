@@ -70,12 +70,9 @@ func CreateClinic(context *fiber.Ctx) error {
 		Where("name = ?", createClinicRequest.Name).
 		Find(&clinic)
 
-	if result.Error != nil {
-		return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-			"error": result.Error,
-		})
-	}
+	if result.Error == nil {
 
+	}
 	if clinic.ID > 0 {
 		return context.Status(fiber.StatusConflict).JSON(&fiber.Map{
 			"error": errors.New("clinic already exist"),
