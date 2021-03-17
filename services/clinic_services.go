@@ -233,3 +233,18 @@ func GetEmployeesByClinicID(clinicID uint) ([]models.Employee, error) {
 
 	return list, nil
 }
+
+func UpdateClinic(clinic *models.Clinic) (*models.Clinic, error) {
+	findClinic := &models.Clinic{}
+
+	result := database.GormDB.Where("id = ?", clinic.ID).First(&findClinic)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	result = database.GormDB.Save(&clinic)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return clinic, nil
+}

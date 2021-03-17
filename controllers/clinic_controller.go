@@ -194,3 +194,27 @@ func GetEmployeesByClinicID(context *fiber.Ctx) error {
 		return context.JSON(list)
 	}
 }
+
+func UpdateClinicByID(context *fiber.Ctx) error {
+	clinic := new(models.Clinic)
+
+	// parse request
+	err := context.BodyParser(clinic)
+	if err != nil {
+		return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	// todo validate
+	// validation ---------------------------------------------------------------------
+
+	list, err := services.UpdateClinic(clinic)
+	if err != nil {
+		return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+			"error": err.Error(),
+		})
+	}
+	return context.JSON(list)
+
+}

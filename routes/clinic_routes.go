@@ -39,6 +39,9 @@ func ClinicRoutes(router fiber.Router) {
 	// /api/v1/clinic/:clinic_id
 	clinicRouter.Get("/:clinic_id", controllers.GetClinicById)
 
+	// /api/v1/clinic
+	clinicRouter.Patch("/", controllers.UpdateClinicByID)
+
 	// /api/v1/clinic/:clinic_id/employees
 	clinicRouter.Get("/:clinic_id/employees", controllers.GetEmployeesByClinicID)
 
