@@ -12,6 +12,7 @@ import (
 	"github.com/nikola43/ecoapigorm/models/streaming"
 	"github.com/nikola43/ecoapigorm/utils"
 	_ "github.com/nikola43/ecoapigorm/utils"
+	"time"
 )
 
 func CreateClinic(EmployeeID uint, createEmployeeRequest *clinicModels.CreateClinicRequest) (*clinicModels.CreateClinicResponse, error) {
@@ -170,7 +171,7 @@ func CreateClientFromClinic(createClientRequest *clients.CreateClientRequest) (*
 		LastName:  client.LastName,
 		Phone:     client.Phone,
 		Week:      createClientRequest.Week,
-		CreatedAt: client.CreatedAt.String(),
+		CreatedAt: fmt.Sprintf(time.Now().Format("2006-01-02 15:04:05")),
 	}
 
 	// check if client has been created by clinic
