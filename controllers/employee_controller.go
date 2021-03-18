@@ -112,6 +112,7 @@ func Invite(context *fiber.Ctx) error {
 	fmt.Println("Invite")
 	fmt.Println("employeeTokenClaims")
 	fmt.Println(employeeTokenClaims)
+	fmt.Println(employeeTokenClaims.CompanyID)
 
 	// parse request
 	err = context.BodyParser(&employees)
@@ -184,10 +185,11 @@ func ValidateInvitation(context *fiber.Ctx) error {
 	}
 
 	return context.Status(fiber.StatusOK).JSON(&fiber.Map{
-		"success": true,
-		"clinic_id": invitation.FromClinicID,
-		"employee_email": invitation.ToEmail,
-		"token": invitationToken,
+		"success":            true,
+		"clinic_id":          invitation.FromClinicID,
+		"company_id":         invitation.CompanyID,
+		"employee_email":     invitation.ToEmail,
+		"token":              invitationToken,
 		"parent_employee_id": invitation.ParentEmployeeID,
 	})
 }

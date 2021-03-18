@@ -4,12 +4,14 @@ import (
 	"fmt"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
+	"github.com/nikola43/ecoapigorm/awsmanager"
 	database "github.com/nikola43/ecoapigorm/database"
 	"github.com/nikola43/ecoapigorm/models"
 	companyModels "github.com/nikola43/ecoapigorm/models/company"
 	"github.com/nikola43/ecoapigorm/services"
 	"github.com/nikola43/ecoapigorm/utils"
 	"strconv"
+	"strings"
 )
 
 func GetCompanyById(context *fiber.Ctx) error {
@@ -25,7 +27,6 @@ func GetCompanyById(context *fiber.Ctx) error {
 
 	return context.JSON(company)
 }
-
 
 func CreateCompany(context *fiber.Ctx) error {
 	createCompanyRequest := new(companyModels.CreateCompanyRequest)
@@ -106,31 +107,28 @@ func CreateCompany(context *fiber.Ctx) error {
 
 	employeeToken, err := utils.GenerateEmployeeToken(
 		employee.Name,
-		company.ID,
+		createCompanyResponse.ID,
 		employee.Clinic.ID,
 		employee.ID,
 		employee.Email,
-		company.Name,
+		createCompanyResponse.Name,
 		employee.Clinic.Name,
 		employee.Role)
 
 	createCompanyResponse.Token = employeeToken
 
-	/*
-		// create bucket for company
-		bucketName := strings.ToLower(strings.ReplaceAll(createCompanyRequest.Name, " ", "_"))
-		err = awsmanager.AwsManager.CreateBucket(strings.ToLower(bucketName))
-		if err != nil {
-			return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-				"error": err.Error(),
-			})
-		}
-	*/
+	// create bucket for company
+	bucketName := strings.ToLower(strings.ReplaceAll(createCompanyRequest.Name, " ", "_"))
+	err = awsmanager.AwsManager.CreateBucket(strings.ToLower(bucketName))
+	if err != nil {
+		return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+			"error": err.Error(),
+		})
+	}
 
 	return context.JSON(createCompanyResponse)
 
 }
-
 
 func GetEmployeesByCompanyID(context *fiber.Ctx) error {
 	companyID, _ := strconv.ParseUint(context.Params("company_id"), 10, 64)
@@ -156,4 +154,3 @@ func GetClinicsByCompanyID(context *fiber.Ctx) error {
 		return context.JSON(list)
 	}
 }
-

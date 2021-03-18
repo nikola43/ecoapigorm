@@ -17,6 +17,7 @@ func CreateEmployeeFromPanel(createEmployeeRequest *modelsEmployees.CreateEmploy
 	// create newEmployee on DB
 	newEmployee := models.Employee{
 		ParentEmployeeID: createEmployeeRequest.ParentEmployeeID,
+		CompanyID:         createEmployeeRequest.CompanyID,
 		ClinicID:         createEmployeeRequest.ClinicID,
 		Name:             createEmployeeRequest.Name,
 		Email:            createEmployeeRequest.Email,
@@ -83,15 +84,14 @@ func Invite(employeeTokenClaims *models.EmployeeTokenClaims, employees []models.
 		if err != nil {
 			return err
 		}
-		fmt.Println("employeeTokenClaims.ClinicID")
-		fmt.Println(employeeTokenClaims.ClinicID)
 
 		invitation := &models.Invitation{
 			ParentEmployeeID: employeeTokenClaims.ID,
+			CompanyID:        employeeTokenClaims.CompanyID,
 			Token:            invitationToken,
 			FromEmail:        employeeTokenClaims.Name,
 			ToEmail:          employee.Email,
-			FromClinicID:     employeeTokenClaims.ClinicID,
+			FromClinicID:     employee.ClinicID,
 		}
 
 		sendEmailManager := utils.SendEmailManager{
@@ -102,6 +102,7 @@ func Invite(employeeTokenClaims *models.EmployeeTokenClaims, employees []models.
 		}
 
 		database.GormDB.Create(invitation)
+		fmt.Println(invitation)
 
 		if temp.ID > 0 {
 			sendEmailManager.SendMail("invite_to_clinic.html", employeeTokenClaims.Name+" te ha invitado a su clínica")

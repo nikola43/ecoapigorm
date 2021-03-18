@@ -7,6 +7,7 @@ import (
 type Invitation struct {
 	base.CustomGormModel
 	ParentEmployeeID uint   `json:"parent_employee_id"`
+	CompanyID        uint   `json:"company_id"`
 	FromClinicID     uint   `json:"clinic_id"`
 	FromEmail        string `gorm:"type:varchar(256) not null" json:"from_email"`
 	ToEmail          string `gorm:"type:varchar(256) not null" json:"to_email"`
