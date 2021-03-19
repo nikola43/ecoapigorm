@@ -118,7 +118,7 @@ func CreateCompany(context *fiber.Ctx) error {
 	createCompanyResponse.Token = employeeToken
 
 	// create bucket for company
-	bucketName := strings.ToLower(strings.ReplaceAll(createCompanyRequest.Name, " ", "_"))
+	bucketName := strings.ToLower(strings.ReplaceAll(createCompanyRequest.Name, " ", ""))
 	err = awsmanager.AwsManager.CreateBucket(strings.ToLower(bucketName))
 	if err != nil {
 		return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{

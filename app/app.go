@@ -61,6 +61,7 @@ func HandleRoutes(api fiber.Router) {
 	routes.PromoRoutes(api)
 	routes.StreamingRoutes(api)
 	routes.MultimediaRoutes(api)
+	routes.PaymentRoutes(api)
 }
 
 func InitializeHttpServer(port string) {

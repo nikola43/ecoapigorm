@@ -21,9 +21,7 @@ func UploadMultimedia(context *fiber.Ctx) error {
 		return context.SendStatus(fiber.StatusUnauthorized)
 	}
 
-
-
-	bucketName := strings.ToLower(strings.ReplaceAll(employeeTokenClaims.CompanyName, " ", "_"))
+	bucketName := strings.ToLower(strings.ReplaceAll(employeeTokenClaims.CompanyName, " ", ""))
 	if err != nil {
 		return err
 	}

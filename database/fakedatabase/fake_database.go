@@ -12,88 +12,101 @@ import (
 )
 
 func CreateFakeData() {
-
-	// EMPLOYEES ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	employee1 := models.Employee{Name: "Paulo", LastName: "Soares", Phone: "666666666", Email: "pauloxti@gmail.com", Password: utils.HashPassword([]byte("paulo")), Role: "admin"}
 	database.GormDB.Create(&employee1)
 
-	employee2 := models.Employee{Name: "Migue", LastName: "Barrera", Phone: "999999999", Email: "migue@gmail.com", Password: utils.HashPassword([]byte("migue")), Role: "employeee", ParentEmployeeID: employee1.ID}
-	database.GormDB.Create(&employee2)
 
-	employee3 := models.Employee{Name: "Pablo", LastName: "Gutierrez", Phone: "777777777", Email: "pablo@gmail.com", Password: utils.HashPassword([]byte("pablo")), Role: "admin"}
-	database.GormDB.Create(&employee3)
-
-	// COMPANIES ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	company1 := models.Company{Name: "Paulo Company", EmployeeID: employee1.ID}
 	database.GormDB.Create(&company1)
 	database.GormDB.Model(&employee1).Update("company_id", company1.ID)
-	database.GormDB.Model(&employee2).Update("company_id", company1.ID)
-	//database.GormDB.Model(&employee3).Update("company_id", company1.ID)
 
-	// CLINIC ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	clinic1 := models.Clinic{Name: "Paulo Clinic", EmployeeID: employee1.ID}
 	database.GormDB.Create(&clinic1)
-
-	clinic2 := models.Clinic{Name: "Migue Clinic", EmployeeID: employee2.ID}
-	database.GormDB.Create(&clinic2)
-
-	//clinic3 := models.Clinic{Name: "Pablo Clinic", EmployeeID: employee3.ID}
-	//database.GormDB.Create(&clinic3)
-
 	database.GormDB.Model(&employee1).Update("clinic_id", clinic1.ID)
-	database.GormDB.Model(&employee2).Update("clinic_id", clinic2.ID)
-	//database.GormDB.Model(&employee3).Update("clinic_id", clinic3.ID)
 
-	// CLIENTS ------------------------------------------------------------------------------------------------------------------------------------------------------------------
-	client1 := models.Client{ClinicID: clinic1.ID, Name: "Paulo", LastName: "Soares", Phone: "666 666 666", Email: "paulo@gmail.com", Password: utils.HashPassword([]byte("paulo"))}
-	database.GormDB.Create(&client1)
+	/*
+		// EMPLOYEES ------------------------------------------------------------------------------------------------------------------------------------------------------------------
+		employee1 := models.Employee{Name: "Paulo", LastName: "Soares", Phone: "666666666", Email: "pauloxti@gmail.com", Password: utils.HashPassword([]byte("paulo")), Role: "admin"}
+		database.GormDB.Create(&employee1)
 
-	client2 := models.Client{ClinicID: clinic1.ID, Name: "Migue", LastName: "Barrera", Phone: "999 999 999", Email: "migue@gmail.com", Password: utils.HashPassword([]byte("migue"))}
-	database.GormDB.Create(&client2)
+		employee2 := models.Employee{Name: "Migue", LastName: "Barrera", Phone: "999999999", Email: "migue@gmail.com", Password: utils.HashPassword([]byte("migue")), Role: "employeee", ParentEmployeeID: employee1.ID}
+		database.GormDB.Create(&employee2)
 
-	client3 := models.Client{ClinicID: clinic1.ID, Name: "Marta", LastName: "Martín", Phone: "999 999 999", Email: "marta@gmail.com", Password: utils.HashPassword([]byte("marta"))}
-	database.GormDB.Create(&client3)
+		employee3 := models.Employee{Name: "Pablo", LastName: "Gutierrez", Phone: "777777777", Email: "pablo@gmail.com", Password: utils.HashPassword([]byte("pablo")), Role: "admin"}
+		database.GormDB.Create(&employee3)
+ b
+		// COMPANIES ------------------------------------------------------------------------------------------------------------------------------------------------------------------
+		company1 := models.Company{Name: "Paulo Company", EmployeeID: employee1.ID}
+		database.GormDB.Create(&company1)
+		database.GormDB.Model(&employee1).Update("company_id", company1.ID)
+		database.GormDB.Model(&employee2).Update("company_id", company1.ID)
+		//database.GormDB.Model(&employee3).Update("company_id", company1.ID)
 
-	client4 := models.Client{ClinicID: clinic1.ID, Name: "Fernanda", LastName: "Portal", Phone: "999 999 999", Email: "fernanda@gmail.com", Password: utils.HashPassword([]byte("fernanda"))}
-	database.GormDB.Create(&client4)
+		// CLINIC ------------------------------------------------------------------------------------------------------------------------------------------------------------------
+		clinic1 := models.Clinic{Name: "Paulo Clinic", EmployeeID: employee1.ID}
+		database.GormDB.Create(&clinic1)
 
-	client5 := models.Client{ClinicID: clinic1.ID, Name: "Alejandra", LastName: "Fernández", Phone: "999 999 999", Email: "alejandra@gmail.com", Password: utils.HashPassword([]byte("alejandra"))}
-	database.GormDB.Create(&client5)
+		clinic2 := models.Clinic{Name: "Migue Clinic", EmployeeID: employee2.ID}
+		database.GormDB.Create(&clinic2)
 
-	client6 := models.Client{ClinicID: clinic1.ID, Name: "Claudia", LastName: "Sánchez", Phone: "999 999 999", Email: "claudia@gmail.com", Password: utils.HashPassword([]byte("claudia"))}
-	database.GormDB.Create(&client6)
+		//clinic3 := models.Clinic{Name: "Pablo Clinic", EmployeeID: employee3.ID}
+		//database.GormDB.Create(&clinic3)
 
-	client7 := models.Client{ClinicID: clinic1.ID, Name: "Sofía", LastName: "González", Phone: "999 999 999", Email: "sofia@gmail.com", Password: utils.HashPassword([]byte("sofia"))}
-	database.GormDB.Create(&client7)
+		database.GormDB.Model(&employee1).Update("clinic_id", clinic1.ID)
+		database.GormDB.Model(&employee2).Update("clinic_id", clinic2.ID)
+		//database.GormDB.Model(&employee3).Update("clinic_id", clinic3.ID)
 
-	client8 := models.Client{ClinicID: clinic1.ID, Name: "María", LastName: "Ruiz", Phone: "999 999 999", Email: "maria@gmail.com", Password: utils.HashPassword([]byte("maria"))}
-	database.GormDB.Create(&client8)
+		// CLIENTS ------------------------------------------------------------------------------------------------------------------------------------------------------------------
+		client1 := models.Client{ClinicID: clinic1.ID, Name: "Paulo", LastName: "Soares", Phone: "666 666 666", Email: "paulo@gmail.com", Password: utils.HashPassword([]byte("paulo"))}
+		database.GormDB.Create(&client1)
 
-	client9 := models.Client{ClinicID: clinic1.ID, Name: "Ana", LastName: "Diaz", Phone: "999 999 999", Email: "ana@gmail.com", Password: utils.HashPassword([]byte("ana"))}
-	database.GormDB.Create(&client9)
+		client2 := models.Client{ClinicID: clinic1.ID, Name: "Migue", LastName: "Barrera", Phone: "999 999 999", Email: "migue@gmail.com", Password: utils.HashPassword([]byte("migue"))}
+		database.GormDB.Create(&client2)
 
-	client10 := models.Client{ClinicID: clinic1.ID, Name: "Inma", LastName: "Romero", Phone: "999 999 999", Email: "inma@gmail.com", Password: utils.HashPassword([]byte("inma"))}
-	database.GormDB.Create(&client10)
+		client3 := models.Client{ClinicID: clinic1.ID, Name: "Marta", LastName: "Martín", Phone: "999 999 999", Email: "marta@gmail.com", Password: utils.HashPassword([]byte("marta"))}
+		database.GormDB.Create(&client3)
 
-	client11 := models.Client{ClinicID: clinic1.ID, Name: "Mónica", LastName: "Navarro", Phone: "999 999 999", Email: "monica@gmail.com", Password: utils.HashPassword([]byte("monica"))}
-	database.GormDB.Create(&client11)
+		client4 := models.Client{ClinicID: clinic1.ID, Name: "Fernanda", LastName: "Portal", Phone: "999 999 999", Email: "fernanda@gmail.com", Password: utils.HashPassword([]byte("fernanda"))}
+		database.GormDB.Create(&client4)
 
-	// CALCULATOR ------------------------------------------------------------------------------------------------------------------------------------------------------------------
-	for i := 1; i < 41; i++ {
-		calculatorDetail := models.CalculatorDetail{
-			Week:  uint(i),
-			Image: "https://s3.eu-central-1.wasabisys.com/stela/weeks/21SM.jpg",
-			Text:  "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book",
+		client5 := models.Client{ClinicID: clinic1.ID, Name: "Alejandra", LastName: "Fernández", Phone: "999 999 999", Email: "alejandra@gmail.com", Password: utils.HashPassword([]byte("alejandra"))}
+		database.GormDB.Create(&client5)
+
+		client6 := models.Client{ClinicID: clinic1.ID, Name: "Claudia", LastName: "Sánchez", Phone: "999 999 999", Email: "claudia@gmail.com", Password: utils.HashPassword([]byte("claudia"))}
+		database.GormDB.Create(&client6)
+
+		client7 := models.Client{ClinicID: clinic1.ID, Name: "Sofía", LastName: "González", Phone: "999 999 999", Email: "sofia@gmail.com", Password: utils.HashPassword([]byte("sofia"))}
+		database.GormDB.Create(&client7)
+
+		client8 := models.Client{ClinicID: clinic1.ID, Name: "María", LastName: "Ruiz", Phone: "999 999 999", Email: "maria@gmail.com", Password: utils.HashPassword([]byte("maria"))}
+		database.GormDB.Create(&client8)
+
+		client9 := models.Client{ClinicID: clinic1.ID, Name: "Ana", LastName: "Diaz", Phone: "999 999 999", Email: "ana@gmail.com", Password: utils.HashPassword([]byte("ana"))}
+		database.GormDB.Create(&client9)
+
+		client10 := models.Client{ClinicID: clinic1.ID, Name: "Inma", LastName: "Romero", Phone: "999 999 999", Email: "inma@gmail.com", Password: utils.HashPassword([]byte("inma"))}
+		database.GormDB.Create(&client10)
+
+		client11 := models.Client{ClinicID: clinic1.ID, Name: "Mónica", LastName: "Navarro", Phone: "999 999 999", Email: "monica@gmail.com", Password: utils.HashPassword([]byte("monica"))}
+		database.GormDB.Create(&client11)
+
+		// CALCULATOR ------------------------------------------------------------------------------------------------------------------------------------------------------------------
+		for i := 1; i < 41; i++ {
+			calculatorDetail := models.CalculatorDetail{
+				Week:  uint(i),
+				Image: "https://s3.eu-central-1.wasabisys.com/stela/weeks/21SM.jpg",
+				Text:  "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book",
+			}
+
+			database.GormDB.Create(&calculatorDetail)
 		}
 
-		database.GormDB.Create(&calculatorDetail)
-	}
+		CreateFakeByClient(client1.ID)
+		CreateFakeByClient(client2.ID)
 
-	CreateFakeByClient(client1.ID)
-	CreateFakeByClient(client2.ID)
-
-	CreateFakeByClinic(clinic2.ID)
-	CreateFakeByClinic(clinic1.ID)
+		CreateFakeByClinic(clinic2.ID)
+		CreateFakeByClinic(clinic1.ID)
+	*/
 }
 
 func CreateFakeByClinic(clinicId uint) {

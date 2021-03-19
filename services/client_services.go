@@ -105,12 +105,14 @@ func CreateClient(createClientRequest *modelsClients.CreateClientRequest) (*mode
 	// check if client has been created by clinic
 	if useClinicAvailableUsers {
 		database.GormDB.Model(&clinic).Update("available_credits", clinic.AvailableCredits-1)
+		database.GormDB.Model(&clinic).Update("used_credits", clinic.UsedCredits+1)
 	}
 
 	// check if client has been created by clinic
 	if useParentEmployeeClinicAvailableUsers {
 		database.GormDB.Model(&clinicOwnerParentEmployeeClinic).Update(
 			"available_credits", clinicOwnerParentEmployeeClinic.AvailableCredits-1)
+		database.GormDB.Model(&clinicOwnerParentEmployeeClinic).Update("used_credits", clinicOwnerParentEmployeeClinic.UsedCredits+1)
 	}
 
 	return &createClientResponse, result.Error
