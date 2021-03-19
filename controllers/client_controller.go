@@ -87,6 +87,7 @@ func GetHeartbeatByClientID(context *fiber.Ctx) error {
 	return context.Status(fiber.StatusOK).JSON(heartbeat)
 }
 
+// TODO BIFURCAR PARA REGISTRO DESDE MOVIL; HA DEJADO DE FUNCIONAR
 func CreateClient(context *fiber.Ctx) error {
 	createClientRequest := new(modelsClient.CreateClientRequest)
 	createClientResponse := new(modelsClient.CreateClientResponse)
