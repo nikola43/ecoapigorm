@@ -9,7 +9,7 @@ import (
 	"github.com/nikola43/ecoapigorm/utils"
 )
 
-func CreateClient(createClientRequest *modelsClients.CreateClientRequest) (*modelsClients.CreateClientResponse, error) {
+func CreateClient(createClientRequest *modelsClients.CreateClientFromAppRequest) (*modelsClients.CreateClientResponse, error) {
 	client := new(models.Client)
 
 	// check if client already exist

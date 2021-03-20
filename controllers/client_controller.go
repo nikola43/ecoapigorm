@@ -89,12 +89,12 @@ func GetHeartbeatByClientID(context *fiber.Ctx) error {
 
 // TODO BIFURCAR PARA REGISTRO DESDE MOVIL; HA DEJADO DE FUNCIONAR
 func CreateClient(context *fiber.Ctx) error {
-	createClientRequest := new(modelsClient.CreateClientRequest)
+	createClientFromAppRequest := new(modelsClient.CreateClientFromAppRequest)
 	createClientResponse := new(modelsClient.CreateClientResponse)
 	var err error
 
 	// parse request
-	if err = context.BodyParser(createClientRequest);
+	if err = context.BodyParser(createClientFromAppRequest);
 		err != nil {
 		return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 			"error": err.Error(),
@@ -103,7 +103,7 @@ func CreateClient(context *fiber.Ctx) error {
 
 	// validation ---------------------------------------------------------------------
 	v := validator.New()
-	err = v.Struct(createClientRequest)
+	err = v.Struct(createClientFromAppRequest)
 	if err != nil {
 		for _, e := range err.(validator.ValidationErrors) {
 			if e != nil {
@@ -115,16 +115,16 @@ func CreateClient(context *fiber.Ctx) error {
 	}
 
 	// create and response
-	if createClientResponse, err = services.CreateClient(createClientRequest);
+	if createClientResponse, err = services.CreateClient(createClientFromAppRequest);
 		err != nil {
 		return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 			"error": err.Error(),
 		})
 	} else {
-		welcomeEmail := utils.SendEmailManager{ToEmail: createClientRequest.Email,
-			ToName: createClientRequest.Name,
+		welcomeEmail := utils.SendEmailManager{ToEmail: createClientFromAppRequest.Email,
+			ToName: createClientFromAppRequest.Name,
 		}
-		welcomeEmail.SendMail("welcome.html", "Bienvenido "+createClientRequest.Name)
+		welcomeEmail.SendMail("welcome.html", "Bienvenido "+createClientFromAppRequest.Name)
 		return context.JSON(createClientResponse)
 	}
 }
