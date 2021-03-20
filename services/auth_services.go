@@ -31,6 +31,7 @@ func LoginClient(email, password string) (*models.LoginClientResponse, error) {
 		Name:     client.Name,
 		LastName: client.LastName,
 		Token:    token,
+		ClinicID: client.ClinicID,
 	}
 
 	return &clientLoginResponse, err

@@ -6,4 +6,5 @@ type LoginClientResponse struct {
 	Name     string `json:"name"`
 	LastName string `json:"lastname"`
 	Token    string `json:"token"`
+	ClinicID uint `json:"clinic_id"`
 }
