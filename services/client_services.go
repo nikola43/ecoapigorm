@@ -31,7 +31,7 @@ func CreateClient(createClientRequest *modelsClients.CreateClientRequest) (*mode
 		return nil, result.Error
 	}
 
-	token, err := utils.GenerateClientToken(client.Email, client.ID, client.ClinicID)
+	token, err := utils.GenerateClientToken(client.Email, client.ID, 0)
 	if err != nil {
 		return nil, err
 	}
