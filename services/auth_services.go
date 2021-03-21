@@ -29,6 +29,7 @@ func LoginClient(email, password string) (*models.LoginClientResponse, error) {
 		Id:       client.ID,
 		Email:    client.Email,
 		Name:     client.Name,
+		Phone:    client.Phone,
 		LastName: client.LastName,
 		Token:    token,
 		ClinicID: client.ClinicID,

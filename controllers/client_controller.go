@@ -87,7 +87,6 @@ func GetHeartbeatByClientID(context *fiber.Ctx) error {
 	return context.Status(fiber.StatusOK).JSON(heartbeat)
 }
 
-// TODO BIFURCAR PARA REGISTRO DESDE MOVIL; HA DEJADO DE FUNCIONAR
 func CreateClient(context *fiber.Ctx) error {
 	createClientFromAppRequest := new(modelsClient.CreateClientFromAppRequest)
 	createClientResponse := new(modelsClient.CreateClientResponse)
@@ -139,6 +138,25 @@ func ChangePassClient(context *fiber.Ctx) error {
 	}
 
 	err = services.ChangePassClientService(changePassClientRequest)
+
+	if err != nil {
+		return context.SendStatus(fiber.StatusNotFound)
+	}
+
+	return context.SendStatus(fiber.StatusOK)
+}
+
+func UpdateClient(context *fiber.Ctx) error {
+	clientID, _ := strconv.ParseUint(context.Params("client_id"), 10, 64)
+	updateClientRequest := new(modelsClient.UpdateClientRequest)
+	var err error
+
+	if err = context.BodyParser(updateClientRequest);
+		err != nil {
+		return context.SendStatus(fiber.StatusBadRequest)
+	}
+
+	err = services.UpdateClientService(uint(clientID), updateClientRequest)
 
 	if err != nil {
 		return context.SendStatus(fiber.StatusNotFound)

@@ -64,6 +64,27 @@ func ChangePassClientService(request *modelsClients.ChangePassClientRequest) err
 	return nil
 }
 
+func UpdateClientService(id uint ,request *modelsClients.UpdateClientRequest) error {
+	client := &models.Client{}
+
+	GormDBResult := database.GormDB.
+		Find(&client, id)
+
+	if GormDBResult.Error != nil {
+		return GormDBResult.Error
+	}
+
+	GormDBResult = database.GormDB.
+		Model(&client).
+		Updates(models.Client{Name: request.Name, LastName: request.LastName, Phone: request.Phone})
+
+	if GormDBResult.Error != nil {
+		return GormDBResult.Error
+	}
+
+	return nil
+}
+
 func PassRecoveryClientService(request *modelsClients.PassRecoveryRequest) error {
 	client := &models.Client{}
 
