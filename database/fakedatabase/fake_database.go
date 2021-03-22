@@ -24,6 +24,9 @@ func CreateFakeData() {
 	database.GormDB.Create(&clinic1)
 	database.GormDB.Model(&employee1).Update("clinic_id", clinic1.ID)
 
+	client2 := models.Client{ClinicID: clinic1.ID, Name: "Migue", LastName: "Barrera", Phone: "999 999 999", Email: "migue@gmail.com", Password: utils.HashPassword([]byte("migue"))}
+	database.GormDB.Create(&client2)
+
 	/*
 		// EMPLOYEES ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 		employee1 := models.Employee{Name: "Paulo", LastName: "Soares", Phone: "666666666", Email: "pauloxti@gmail.com", Password: utils.HashPassword([]byte("paulo")), Role: "admin"}

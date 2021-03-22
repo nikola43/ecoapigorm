@@ -9,13 +9,8 @@ import (
 	"github.com/nikola43/ecoapigorm/utils"
 )
 
-func CreateClient(createClientRequest *modelsClients.CreateClientRequest) (*modelsClients.CreateClientResponse, error) {
-	//TODO validate
+func CreateClient(createClientRequest *modelsClients.CreateClientFromAppRequest) (*modelsClients.CreateClientResponse, error) {
 	client := new(models.Client)
-	clinic := new(models.Clinic)
-	clinicOwnerParentEmployeeClinic := new(models.Clinic)
-	useParentEmployeeClinicAvailableUsers := false
-	useClinicAvailableUsers := false
 
 	// check if client already exist
 	utils.GetModelByField(client, "email", createClientRequest.Email)
@@ -23,59 +18,7 @@ func CreateClient(createClientRequest *modelsClients.CreateClientRequest) (*mode
 		return nil, errors.New("client already exist")
 	}
 
-	// find clinic
-	utils.GetModelByField(clinic, "id", createClientRequest.ClinicID)
-	if clinic.ID < 1 {
-		return nil, errors.New("clinic not found")
-	}
-
-	// check if clinic has sufficient credits
-	if clinic.AvailableCredits > 0 {
-		useClinicAvailableUsers = true
-	} else {
-		// get clinic owner
-		clinicOwnerEmployee := new(models.Employee)
-		utils.GetModelByField(clinicOwnerEmployee, "id", clinic.EmployeeID)
-		if clinicOwnerEmployee == nil {
-			return nil, errors.New("employee_id not found")
-		}
-
-		// check if has parent employee
-		if clinicOwnerEmployee.ParentEmployeeID > 0 {
-			// find parent employee
-			clinicOwnerParentEmployee := models.Employee{}
-			utils.GetModelByField(clinicOwnerParentEmployee, "id", clinicOwnerEmployee.ParentEmployeeID)
-			if clinicOwnerEmployee == nil {
-				return nil, errors.New("parent_employee_id not found")
-			}
-
-			// if find parent employee
-			if clinicOwnerParentEmployee.ID > 0 {
-				// get clinic owner employee clinic
-				database.GormDB.Model(models.Clinic{}).Select(
-					"clinics.id, clinics.extend_clients, clinics.available_clients").Joins(
-					"inner join employees on clinics.employee_id = employees.id").Where(
-					"employees.id = ?", clinicOwnerParentEmployee.ID).Scan(&clinicOwnerParentEmployeeClinic)
-
-				if clinicOwnerParentEmployeeClinic.ExtendCredits {
-					if clinicOwnerParentEmployeeClinic.AvailableCredits > 0 {
-						useParentEmployeeClinicAvailableUsers = true
-					} else {
-						return nil, errors.New("insufficient parent employee credits")
-					}
-				} else {
-					return nil, errors.New("parent employee not extends credits, insufficient credits")
-				}
-			} else {
-				return nil, errors.New("parent_employee_id not found, insufficient credits")
-			}
-		} else {
-			return nil, errors.New("insufficient credits")
-		}
-	}
-
 	client = &models.Client{
-		ClinicID: createClientRequest.ClinicID,
 		Email:    createClientRequest.Email,
 		Password: utils.HashPassword([]byte(createClientRequest.Password)),
 		Name:     createClientRequest.Name,
@@ -88,31 +31,18 @@ func CreateClient(createClientRequest *modelsClients.CreateClientRequest) (*mode
 		return nil, result.Error
 	}
 
-	token, err := utils.GenerateClientToken(client.Email, client.ID, client.ClinicID)
+	token, err := utils.GenerateClientToken(client.Email, client.ID, 0)
 	if err != nil {
 		return nil, err
 	}
 
 	createClientResponse := modelsClients.CreateClientResponse{
 		ID:       client.ID,
-		ClinicID: client.ClinicID,
 		Email:    client.Email,
 		Name:     client.Name,
 		LastName: client.LastName,
+		Phone:    client.Phone,
 		Token:    token,
-	}
-
-	// check if client has been created by clinic
-	if useClinicAvailableUsers {
-		database.GormDB.Model(&clinic).Update("available_credits", clinic.AvailableCredits-1)
-		database.GormDB.Model(&clinic).Update("used_credits", clinic.UsedCredits+1)
-	}
-
-	// check if client has been created by clinic
-	if useParentEmployeeClinicAvailableUsers {
-		database.GormDB.Model(&clinicOwnerParentEmployeeClinic).Update(
-			"available_credits", clinicOwnerParentEmployeeClinic.AvailableCredits-1)
-		database.GormDB.Model(&clinicOwnerParentEmployeeClinic).Update("used_credits", clinicOwnerParentEmployeeClinic.UsedCredits+1)
 	}
 
 	return &createClientResponse, result.Error
@@ -131,6 +61,27 @@ func ChangePassClientService(request *modelsClients.ChangePassClientRequest) err
 	newPassHashed := utils.HashPassword([]byte(request.NewPass))
 
 	database.GormDB.Model(&client).Update("password", newPassHashed)
+
+	return nil
+}
+
+func UpdateClientService(id uint ,request *modelsClients.UpdateClientRequest) error {
+	client := &models.Client{}
+
+	GormDBResult := database.GormDB.
+		Find(&client, id)
+
+	if GormDBResult.Error != nil {
+		return GormDBResult.Error
+	}
+
+	GormDBResult = database.GormDB.
+		Model(&client).
+		Updates(models.Client{Name: request.Name, LastName: request.LastName, Phone: request.Phone})
+
+	if GormDBResult.Error != nil {
+		return GormDBResult.Error
+	}
 
 	return nil
 }

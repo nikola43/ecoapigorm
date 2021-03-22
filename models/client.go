@@ -7,7 +7,7 @@ import (
 
 type Client struct {
 	base.CustomGormModel
-	ClinicID              uint                   `json:"clinic_id" xml:"clinic_id" form:"clinic_id"`
+	ClinicID              uint                   `gorm:"type:INTEGER NULL; DEFAULT:NULL" json:"clinic_id" xml:"clinic_id" form:"clinic_id"`
 	Email                 string                 `gorm:"index; unique; type:varchar(64) not null" json:"email"`
 	Password              string                 `gorm:"type:varchar(256) not null; size:256" json:"password" xml:"password" form:"password"`
 	Name                  string                 `gorm:"type:varchar(32) not null" json:"name" xml:"name" form:"name"`

@@ -9,7 +9,7 @@ import (
 
 func XApiKeyMiddleware(context *fiber.Ctx) error {
 	// todo investigar por que no llega X_API_KEY
-	/*
+/*
 	requestApiKey := context.Get("X_API_KEY")
 	serverApiKey := utils.GetEnvVariable("X_API_KEY")
 	fmt.Println("requestApiKey")
@@ -24,6 +24,7 @@ func XApiKeyMiddleware(context *fiber.Ctx) error {
 		})
 	}
 	*/
+
 
 	return context.Next()
 }

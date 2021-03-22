@@ -17,9 +17,6 @@ func ClientRoutes(router fiber.Router) {
 	// /api/v1/client/:client_id | READ
 	clientRouter.Get("/:client_id", controllers.GetClientById)
 
-	// /api/v1/client/:client_id | UPDATE
-	// clientRouter.Patch("/:client_id", controllers.CreateClient)
-
 	// /api/v1/client/:client_id | DELETE
 	// clientRouter.Delete("/:client_id", controllers.CreateClient)
 
@@ -34,4 +31,7 @@ func ClientRoutes(router fiber.Router) {
 
 	// /api/v1/client/:client_id
 	clientRouter.Delete("/:client_id", controllers.DeleteClientByID)
+
+	// /api/v1/client/:client_id | UPDATE
+	clientRouter.Patch("/:client_id", controllers.UpdateClient)
 }

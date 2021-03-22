@@ -88,12 +88,12 @@ func GetHeartbeatByClientID(context *fiber.Ctx) error {
 }
 
 func CreateClient(context *fiber.Ctx) error {
-	createClientRequest := new(modelsClient.CreateClientRequest)
+	createClientFromAppRequest := new(modelsClient.CreateClientFromAppRequest)
 	createClientResponse := new(modelsClient.CreateClientResponse)
 	var err error
 
 	// parse request
-	if err = context.BodyParser(createClientRequest);
+	if err = context.BodyParser(createClientFromAppRequest);
 		err != nil {
 		return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 			"error": err.Error(),
@@ -102,7 +102,7 @@ func CreateClient(context *fiber.Ctx) error {
 
 	// validation ---------------------------------------------------------------------
 	v := validator.New()
-	err = v.Struct(createClientRequest)
+	err = v.Struct(createClientFromAppRequest)
 	if err != nil {
 		for _, e := range err.(validator.ValidationErrors) {
 			if e != nil {
@@ -114,16 +114,16 @@ func CreateClient(context *fiber.Ctx) error {
 	}
 
 	// create and response
-	if createClientResponse, err = services.CreateClient(createClientRequest);
+	if createClientResponse, err = services.CreateClient(createClientFromAppRequest);
 		err != nil {
 		return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 			"error": err.Error(),
 		})
 	} else {
-		welcomeEmail := utils.SendEmailManager{ToEmail: createClientRequest.Email,
-			ToName: createClientRequest.Name,
+		welcomeEmail := utils.SendEmailManager{ToEmail: createClientFromAppRequest.Email,
+			ToName: createClientFromAppRequest.Name,
 		}
-		welcomeEmail.SendMail("welcome.html", "Bienvenido "+createClientRequest.Name)
+		welcomeEmail.SendMail("welcome.html", "Bienvenido "+createClientFromAppRequest.Name)
 		return context.JSON(createClientResponse)
 	}
 }
@@ -138,6 +138,25 @@ func ChangePassClient(context *fiber.Ctx) error {
 	}
 
 	err = services.ChangePassClientService(changePassClientRequest)
+
+	if err != nil {
+		return context.SendStatus(fiber.StatusNotFound)
+	}
+
+	return context.SendStatus(fiber.StatusOK)
+}
+
+func UpdateClient(context *fiber.Ctx) error {
+	clientID, _ := strconv.ParseUint(context.Params("client_id"), 10, 64)
+	updateClientRequest := new(modelsClient.UpdateClientRequest)
+	var err error
+
+	if err = context.BodyParser(updateClientRequest);
+		err != nil {
+		return context.SendStatus(fiber.StatusBadRequest)
+	}
+
+	err = services.UpdateClientService(uint(clientID), updateClientRequest)
 
 	if err != nil {
 		return context.SendStatus(fiber.StatusNotFound)

@@ -99,7 +99,6 @@ func GetClientsByClinicID(id uint) ([]clients.ListClientResponse, error) {
 }
 
 func CreateClientFromClinic(createClientRequest *clients.CreateClientRequest) (*clients.ListClientResponse, error) {
-	//TODO validate
 	client := models.Client{}
 	clinic := models.Clinic{}
 	clinicOwnerParentEmployeeClinic := models.Clinic{}
