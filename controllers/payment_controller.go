@@ -29,6 +29,21 @@ func CreatePayment(context *fiber.Ctx) error {
 	return context.Status(fiber.StatusOK).JSON(payment)
 
 }
+
+
+func GetPaymentBySessionID(context *fiber.Ctx) error {
+	sessionID := context.Params("session_id")
+	payment, err := services.GetPaymentBySessionID(sessionID)
+	if err != nil {
+		return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+
+	return context.Status(fiber.StatusOK).JSON(payment)
+}
+
 func ValidatePayment(context *fiber.Ctx) error {
 	sessionID := context.Params("session_id")
 	payment, err := services.ValidatePayment(sessionID)

@@ -35,6 +35,28 @@ func CreatePayment(createPaymentRequest *payments.CreatePaymentRequest) (*models
 	return payment, nil
 }
 
+func GetPaymentBySessionID(sessionID string) (*models.Payment, error) {
+	payment := new(models.Payment)
+	clinic := new(models.Clinic)
+
+	result := database.GormDB.Where("session_id = ?", sessionID).Find(&payment)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	result = database.GormDB.Where("id = ?", payment.ClinicID).Find(&clinic)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	if payment.ID < 1 {
+		return nil, errors.New("payment not found")
+	}
+
+	return payment, nil
+}
+
+
 func ValidatePayment(sessionID string) (*models.Payment, error) {
 	payment := new(models.Payment)
 	clinic := new(models.Clinic)
