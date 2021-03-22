@@ -41,6 +41,7 @@ func CreateClient(createClientRequest *modelsClients.CreateClientFromAppRequest)
 		Email:    client.Email,
 		Name:     client.Name,
 		LastName: client.LastName,
+		Phone:    client.Phone,
 		Token:    token,
 	}
 

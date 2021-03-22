@@ -7,4 +7,5 @@ type CreateClientResponse struct {
 	Name     string `json:"name"`
 	LastName string `json:"last_name"`
 	Token    string `json:"token"`
+	Phone    string `json:"phone"`
 }
