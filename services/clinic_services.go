@@ -32,8 +32,8 @@ func CreateClinic(employeeID uint, createClinicRequest *clinicModels.CreateClini
 	}
 
 	clinic := models.Clinic{
-		Name:       createClinicRequest.Name,
-		EmployeeID: employeeID,
+		Name:             createClinicRequest.Name,
+		EmployeeID:       employeeID,
 		AvailableCredits: uint(credits),
 	}
 	result := database.GormDB.Create(&clinic)
@@ -263,4 +263,34 @@ func UpdateClinic(clinic *models.Clinic) (*models.Clinic, error) {
 		return nil, result.Error
 	}
 	return clinic, nil
+}
+
+func LinkClient(clientID uint , clinicID uint) error {
+	client := &models.Client{}
+	clinic := &models.Clinic{}
+
+	// check if exist client
+	result := database.GormDB.Where("id = ?", clientID).First(&client)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	// check if exist clinic
+	result = database.GormDB.Where("id = ?", clinicID).First(&clinic)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	// check if client not is already linked by other clinic
+	if client.ClinicID > 0 {
+		return errors.New("client is already linked by other clinic")
+	}
+
+	//update clinic id
+	client.ClinicID = clinic.ID
+	result = database.GormDB.Save(&client)
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
 }

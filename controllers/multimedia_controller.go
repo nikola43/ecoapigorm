@@ -84,7 +84,9 @@ func DeleteImage(context *fiber.Ctx) error {
 	}
 	fmt.Println(id)
 
-	return context.SendStatus(fiber.StatusOK)
+	return context.Status(fiber.StatusOK).JSON(&fiber.Map{
+		"success": true,
+	})
 
 }
 
@@ -93,7 +95,9 @@ func DeleteVideo(context *fiber.Ctx) error {
 
 	fmt.Println(id)
 
-	return context.SendStatus(fiber.StatusBadRequest)
+	return context.Status(fiber.StatusOK).JSON(&fiber.Map{
+		"success": true,
+	})
 
 }
 func DeleteHolographic(context *fiber.Ctx) error {
@@ -101,7 +105,9 @@ func DeleteHolographic(context *fiber.Ctx) error {
 
 	fmt.Println(id)
 
-	return context.SendStatus(fiber.StatusBadRequest)
+	return context.Status(fiber.StatusOK).JSON(&fiber.Map{
+		"success": true,
+	})
 
 }
 
@@ -110,6 +116,8 @@ func DeleteHeartbeat(context *fiber.Ctx) error {
 
 	fmt.Println(id)
 
-	return context.SendStatus(fiber.StatusBadRequest)
+	return context.Status(fiber.StatusOK).JSON(&fiber.Map{
+		"success": true,
+	})
 
 }

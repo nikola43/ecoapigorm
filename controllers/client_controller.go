@@ -17,11 +17,27 @@ import (
 func GetClientById(context *fiber.Ctx) error {
 	clientID, _ := strconv.ParseUint(context.Params("client_id"), 10, 64)
 
-	if client, err := services.GetClientById(uint(clientID)); err != nil {
-		return context.SendStatus(fiber.StatusNotFound)
-	} else {
-		return context.Status(fiber.StatusOK).JSON(client)
+	client, err := services.GetClientById(uint(clientID))
+	if err != nil {
+		return context.Status(fiber.StatusNotFound).JSON(&fiber.Map{
+			"error": err.Error(),
+		})
 	}
+
+	return context.Status(fiber.StatusOK).JSON(client)
+
+}
+
+func GetClientByEmail(context *fiber.Ctx) error {
+	clientEmail := context.Params("client_email")
+
+	client, err := services.GetClientByEmail(clientEmail)
+	if err != nil {
+		return context.Status(fiber.StatusNotFound).JSON(&fiber.Map{
+			"error": err.Error(),
+		})
+	}
+	return context.Status(fiber.StatusOK).JSON(client)
 }
 
 func GetAllImagesByClientID(context *fiber.Ctx) error {

@@ -115,6 +115,24 @@ func PassRecoveryClientService(request *modelsClients.PassRecoveryRequest) error
 	return nil
 }
 
+func GetClientByEmail(clientEmail string) (*models.Client, error) {
+	client := &models.Client{}
+
+	GormDBResult := database.GormDB.
+		Where("email = ?", clientEmail).
+		Find(&client)
+
+	if GormDBResult.Error != nil {
+		return nil, GormDBResult.Error
+	}
+
+	if client.ID < 1 {
+		return nil, errors.New("not found")
+	}
+
+	return client, nil
+}
+
 func GetClientById(clientID uint) (*models.Client, error) {
 	client := &models.Client{}
 

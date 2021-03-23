@@ -56,7 +56,6 @@ func GetPaymentBySessionID(sessionID string) (*models.Payment, error) {
 	return payment, nil
 }
 
-
 func ValidatePayment(sessionID string) (*models.Payment, error) {
 	payment := new(models.Payment)
 	clinic := new(models.Clinic)
@@ -75,8 +74,11 @@ func ValidatePayment(sessionID string) (*models.Payment, error) {
 		return nil, errors.New("payment not found")
 	}
 
-	database.GormDB.Model(&payment).Update("is_paid", true)
-	database.GormDB.Model(&clinic).Update("available_credits", clinic.AvailableCredits+payment.Quantity)
+	if payment.IsPaid == false {
+		payment.IsPaid = true
+		database.GormDB.Model(&payment).Update("is_paid", true)
+		database.GormDB.Model(&clinic).Update("available_credits", clinic.AvailableCredits+payment.Quantity)
+	}
 
 	return payment, nil
 }
