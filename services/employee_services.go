@@ -105,9 +105,11 @@ func Invite(employeeTokenClaims *models.EmployeeTokenClaims, employees []models.
 		fmt.Println(invitation)
 
 		if temp.ID > 0 {
-			sendEmailManager.SendMail("invite_to_clinic.html", employeeTokenClaims.Name+" te ha invitado a su clínica")
+			text := employeeTokenClaims.Name+" de "+ employeeTokenClaims.ClinicName + " te ha invitado a su clínica";
+			sendEmailManager.SendMail("invite_to_clinic.html", text)
 		} else {
-			sendEmailManager.SendMail("invite_to_register.html", employeeTokenClaims.Name+" te ha invitado a registrarte")
+			text := employeeTokenClaims.Name+" de "+ employeeTokenClaims.ClinicName + " te ha invitado a registrarte";
+			sendEmailManager.SendMail("invite_to_register.html", text)
 		}
 	}
 
