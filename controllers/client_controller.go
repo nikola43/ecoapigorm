@@ -203,6 +203,7 @@ func PasswordRecovery(context *fiber.Ctx) error {
 	return context.SendStatus(fiber.StatusOK)
 }
 
+// TODO ¿este metodo es necesario?
 func DeleteClientByID(context *fiber.Ctx) error {
 	clientID, _ := strconv.ParseUint(context.Params("client_id"), 10, 64)
 
