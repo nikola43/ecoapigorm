@@ -6,6 +6,7 @@ import (
 )
 
 func CreatePromo(context *fiber.Ctx) error {
+	// TODO
 	return context.SendStatus(fiber.StatusBadRequest)
 
 }
