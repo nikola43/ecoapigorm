@@ -25,7 +25,7 @@ func LoginClient(email, password string) (*models.LoginClientResponse, error) {
 		return nil, err
 	}
 
-	clientLoginResponse := models.LoginClientResponse{
+	clientLoginResponse := &models.LoginClientResponse{
 		Id:       client.ID,
 		Email:    client.Email,
 		Name:     client.Name,
@@ -35,7 +35,7 @@ func LoginClient(email, password string) (*models.LoginClientResponse, error) {
 		ClinicID: client.ClinicID,
 	}
 
-	return &clientLoginResponse, err
+	return clientLoginResponse, err
 }
 
 func LoginEmployee(email, password string) (*models.LoginEmployeeResponse, error) {

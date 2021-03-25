@@ -33,6 +33,9 @@ func ClinicRoutes(router fiber.Router) {
 	// /api/v1/clinic/:clinic_id/:session_id/buy_credits
 	clinicRouter.Get("/:clinic_id/link/:client_id", controllers.LinkClient)
 
+	// /api/v1/clinic/refresh
+	clinicRouter.Get("/refresh", controllers.RefreshClient)
+
 	// /api/v1/clinic/:clinic_id/
 	clinicRouter.Delete("/:clinic_id", controllers.DeleteClinicByID)
 
