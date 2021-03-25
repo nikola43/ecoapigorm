@@ -12,8 +12,11 @@ func StreamingRoutes(router fiber.Router) {
 	// /api/v1/streaming/:code
 	streamingRouter.Get("/:code", controllers.GetStreamingByCodeController)
 
-	// /api/v1/streaming/create
+	// /api/v1/streaming
 	streamingRouter.Post("/", controllers.CreateStreaming)
+
+	// /api/v1/streaming
+	streamingRouter.Patch("/", controllers.UpdateStreaming)
 
 	// /api/v1/streaming
 	streamingRouter.Delete("/:streaming_id", controllers.DeleteStreamingByID)

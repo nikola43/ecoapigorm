@@ -18,7 +18,7 @@ func GetStreamingByCodeService(code string) (streaming.Streaming, error) {
 	if err := database.GormDB.Where("code = ?", code).
 		First(&streaming).Error;
 
-	err != nil {
+		err != nil {
 		return streaming, err
 	}
 
@@ -39,7 +39,6 @@ func CreateStreaming(createStreamingRequest *streamings.CreateStreamingRequest) 
 	streaming.Code = code
 
 	database.GormDB.Create(&streaming)
-
 
 	return streaming, nil
 }
@@ -72,4 +71,14 @@ func DeleteStreamingByID(streamingID uint) error {
 	}
 
 	return nil
+}
+
+func UpdateStreaming(streaming *streaming.Streaming) (*streaming.Streaming, error) {
+	utils.GetModelByField(streaming, "id", streaming.ID)
+	if streaming.ID < 1 {
+		return nil, errors.New("streaming not found")
+	}
+
+	database.GormDB.Model(&streaming).Update("url", streaming.Url)
+	return streaming, nil
 }

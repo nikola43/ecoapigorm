@@ -15,21 +15,19 @@ func GetStreamingByCodeController(context *fiber.Ctx) error {
 	var err error
 
 	if streaming, err = services.GetStreamingByCodeService(code);
-	err != nil {
+		err != nil {
 		return context.SendStatus(fiber.StatusNotFound)
 	}
 
 	return context.Status(fiber.StatusOK).JSON(streaming)
 }
 
-
 func CreateStreaming(context *fiber.Ctx) error {
 	createStreamingRequest := new(streamings.CreateStreamingRequest)
 	fmt.Println(createStreamingRequest)
 
-
 	// parse request
-	 err := context.BodyParser(createStreamingRequest)
+	err := context.BodyParser(createStreamingRequest)
 
 	if err != nil {
 		return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
@@ -47,8 +45,6 @@ func CreateStreaming(context *fiber.Ctx) error {
 	return context.Status(fiber.StatusOK).JSON(createStreamingResponse)
 }
 
-
-
 func DeleteStreamingByID(context *fiber.Ctx) error {
 	streamingID, _ := strconv.ParseUint(context.Params("streaming_id"), 10, 64)
 
@@ -62,4 +58,27 @@ func DeleteStreamingByID(context *fiber.Ctx) error {
 	return context.Status(fiber.StatusOK).JSON(&fiber.Map{
 		"success": true,
 	})
+}
+
+func UpdateStreaming(context *fiber.Ctx) error {
+	streaming := new(streaming.Streaming)
+
+	// parse request
+	err := context.BodyParser(streaming)
+	if err != nil {
+		return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	// todo validate
+	// validation ---------------------------------------------------------------------
+	streaming, err = services.UpdateStreaming(streaming)
+	if err != nil {
+		return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+			"error": err.Error(),
+		})
+	}
+	return context.Status(fiber.StatusOK).JSON(streaming)
+
 }
