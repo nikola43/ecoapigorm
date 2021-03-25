@@ -74,7 +74,7 @@ func CreateClinic(context *fiber.Ctx) error {
 
 	}
 	if clinic.ID > 0 {
-		return context.Status(fiber.StatusConflict).JSON(&fiber.Map{
+		return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 			"error": errors.New("clinic already exist"),
 		})
 	}
@@ -229,5 +229,19 @@ func LinkClient(context *fiber.Ctx) error {
 	return context.Status(fiber.StatusOK).JSON(&fiber.Map{
 		"success": true,
 	})
+}
 
+func DeleteClinicByID(context *fiber.Ctx) error {
+	clinicID, _ := strconv.ParseUint(context.Params("clinic_id"), 10, 64)
+
+	err := services.DeleteClinicByID(uint(clinicID))
+	if err != nil {
+		return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return context.Status(fiber.StatusOK).JSON(&fiber.Map{
+		"success": true,
+	})
 }

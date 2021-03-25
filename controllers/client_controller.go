@@ -150,35 +150,43 @@ func ChangePassClient(context *fiber.Ctx) error {
 
 	if err = context.BodyParser(changePassClientRequest);
 		err != nil {
-		return context.SendStatus(fiber.StatusBadRequest)
+		return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+			"error": err.Error(),
+		})
 	}
 
 	err = services.ChangePassClientService(changePassClientRequest)
 
 	if err != nil {
-		return context.SendStatus(fiber.StatusNotFound)
+		return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+			"error": err.Error(),
+		})
 	}
 
-	return context.SendStatus(fiber.StatusOK)
+	return context.Status(fiber.StatusOK).JSON(&fiber.Map{
+		"success": true,
+	})
 }
 
 func UpdateClient(context *fiber.Ctx) error {
 	clientID, _ := strconv.ParseUint(context.Params("client_id"), 10, 64)
 	updateClientRequest := new(modelsClient.UpdateClientRequest)
-	var err error
 
-	if err = context.BodyParser(updateClientRequest);
-		err != nil {
-		return context.SendStatus(fiber.StatusBadRequest)
-	}
-
-	err = services.UpdateClientService(uint(clientID), updateClientRequest)
-
+	err := context.BodyParser(updateClientRequest)
 	if err != nil {
-		return context.SendStatus(fiber.StatusNotFound)
+		return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+			"error": err.Error(),
+		})
 	}
 
-	return context.SendStatus(fiber.StatusOK)
+	client, err := services.UpdateClientService(uint(clientID), updateClientRequest)
+	if err != nil {
+		return context.Status(fiber.StatusNotFound).JSON(&fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return context.Status(fiber.StatusOK).JSON(client)
 }
 
 func PassRecoveryClient(context *fiber.Ctx) error {

@@ -65,14 +65,14 @@ func ChangePassClientService(request *modelsClients.ChangePassClientRequest) err
 	return nil
 }
 
-func UpdateClientService(id uint ,request *modelsClients.UpdateClientRequest) error {
+func UpdateClientService(id uint ,request *modelsClients.UpdateClientRequest) (*models.Client, error) {
 	client := &models.Client{}
 
 	GormDBResult := database.GormDB.
 		Find(&client, id)
 
 	if GormDBResult.Error != nil {
-		return GormDBResult.Error
+		return nil, GormDBResult.Error
 	}
 
 	GormDBResult = database.GormDB.
@@ -80,10 +80,10 @@ func UpdateClientService(id uint ,request *modelsClients.UpdateClientRequest) er
 		Updates(models.Client{Name: request.Name, LastName: request.LastName, Phone: request.Phone})
 
 	if GormDBResult.Error != nil {
-		return GormDBResult.Error
+		return nil, GormDBResult.Error
 	}
 
-	return nil
+	return client, nil
 }
 
 func PassRecoveryClientService(request *modelsClients.PassRecoveryRequest) error {

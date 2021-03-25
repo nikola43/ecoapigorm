@@ -265,7 +265,7 @@ func UpdateClinic(clinic *models.Clinic) (*models.Clinic, error) {
 	return clinic, nil
 }
 
-func LinkClient(clientID uint , clinicID uint) error {
+func LinkClient(clientID uint, clinicID uint) error {
 	client := &models.Client{}
 	clinic := &models.Clinic{}
 
@@ -292,5 +292,44 @@ func LinkClient(clientID uint , clinicID uint) error {
 	if result.Error != nil {
 		return result.Error
 	}
+	return nil
+}
+
+func DeleteClinicByID(clinicID uint) error {
+	deleteClinic := new(models.Clinic)
+	clinicClients := make([]models.Client, 0)
+	clinicEmployees := make([]models.Employee, 0)
+
+	// todo check clinic is who make action
+	// check if employee exist
+	utils.GetModelByField(deleteClinic, "id", clinicID)
+	if deleteClinic.ID < 1 {
+		return errors.New("clinic not found")
+	}
+
+	err := database.GormDB.Where("clinic_id = ?", clinicID).Find(&clinicClients)
+	if err.Error != nil {
+		return err.Error
+	}
+
+	if len(clinicClients) > 0 {
+		return errors.New("clinic has clients")
+	}
+
+	err = database.GormDB.Where("clinic_id = ?", clinicID).Find(&clinicEmployees)
+	if err.Error != nil {
+		return err.Error
+	}
+
+	if len(clinicEmployees) > 0 {
+		return errors.New("clinic has employees")
+	}
+
+	// delete clinic
+	result := database.GormDB.Delete(deleteClinic)
+	if result.Error != nil {
+		return result.Error
+	}
+
 	return nil
 }
