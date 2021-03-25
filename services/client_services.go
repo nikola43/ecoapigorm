@@ -143,6 +143,11 @@ func GetClientById(clientID uint) (*models.Client, error) {
 	if GormDBResult.Error != nil {
 		return nil, GormDBResult.Error
 	}
+
+	if client.ID < 1 {
+		return nil, errors.New("client not found")
+	}
+
 	return client, nil
 }
 
@@ -199,11 +204,11 @@ func DeleteClientByID(clientID uint) error {
 	database.GormDB.Model(&deleteClient).Update("clinic_id", nil)
 
 	/*
-	// delete employee
-	result := database.GormDB.Delete(deleteClient)
-	if result.Error != nil {
-		return result.Error
-	}
+		// delete employee
+		result := database.GormDB.Delete(deleteClient)
+		if result.Error != nil {
+			return result.Error
+		}
 	*/
 
 	// todo remove content
