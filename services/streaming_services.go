@@ -73,12 +73,14 @@ func DeleteStreamingByID(streamingID uint) error {
 	return nil
 }
 
-func UpdateStreaming(streaming *streaming.Streaming) (*streaming.Streaming, error) {
-	utils.GetModelByField(streaming, "id", streaming.ID)
+func UpdateStreaming(updateStreaming *streaming.Streaming) (*streaming.Streaming, error) {
+	streaming := new(streaming.Streaming)
+
+	utils.GetModelByField(streaming, "id", updateStreaming.ID)
 	if streaming.ID < 1 {
 		return nil, errors.New("streaming not found")
 	}
 
-	database.GormDB.Model(&streaming).Update("url", streaming.Url)
+	database.GormDB.Model(&streaming).Update("url", updateStreaming.Url)
 	return streaming, nil
 }
