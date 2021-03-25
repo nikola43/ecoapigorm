@@ -14,6 +14,9 @@ func ClientRoutes(router fiber.Router) {
 	// /api/v1/client | CREATE
 	clientRouter.Post("/", controllers.CreateClient)
 
+
+
+
 	// /api/v1/client/:client_id | READ
 	clientRouter.Get("/:client_id", controllers.GetClientById)
 
@@ -28,6 +31,10 @@ func ClientRoutes(router fiber.Router) {
 
 	// use jwt
 	clientRouter.Use(jwtware.New(jwtware.Config{SigningKey: []byte(utils.GetEnvVariable("JWT_CLIENT_KEY"))}))
+
+
+	// /api/v1/clinic/refresh
+	clientRouter.Get("/:client_id/refresh", controllers.RefreshClient)
 
 	// /api/v1/client/change_password
 	clientRouter.Post("/change_password", controllers.ChangePassClient)

@@ -334,28 +334,3 @@ func DeleteClinicByID(clinicID uint) error {
 	return nil
 }
 
-func RefreshClient(clientID uint) (*models.LoginClientResponse, error) {
-	client := new(models.Client)
-
-	utils.GetModelByField(client, "id", clientID)
-	if client.ID < 1 {
-		return nil, errors.New("client not found")
-	}
-
-	token, err := utils.GenerateClientToken(client.Email, client.ID, client.ClinicID);
-	if err != nil {
-		return nil, err
-	}
-
-	clientLoginResponse := &models.LoginClientResponse{
-		Id:       client.ID,
-		Email:    client.Email,
-		Name:     client.Name,
-		Phone:    client.Phone,
-		LastName: client.LastName,
-		Token:    token,
-		ClinicID: client.ClinicID,
-	}
-
-	return clientLoginResponse, nil
-}

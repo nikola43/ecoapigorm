@@ -20,17 +20,15 @@ func CreateFakeData() {
 	database.GormDB.Create(&company1)
 	database.GormDB.Model(&employee1).Update("company_id", company1.ID)
 
-	/*
-		clinic1 := models.Clinic{Name: "Paulo Clinic", EmployeeID: employee1.ID}
-		database.GormDB.Create(&clinic1)
-		database.GormDB.Model(&employee1).Update("clinic_id", clinic1.ID)
+	clinic1 := models.Clinic{Name: "Paulo Clinic", EmployeeID: employee1.ID}
+	database.GormDB.Create(&clinic1)
+	database.GormDB.Model(&employee1).Update("clinic_id", clinic1.ID)
 
-		client1 := models.Client{Name: "Paulo", LastName: "Cliente", Phone: "999 999 999", Email: "pauloxti@gmail.com", Password: utils.HashPassword([]byte("paulo"))}
-		database.GormDB.Create(&client1)
+	client1 := models.Client{Name: "Paulo", LastName: "Cliente", Phone: "999 999 999", Email: "pauloxti@gmail.com", Password: utils.HashPassword([]byte("paulo"))}
+	database.GormDB.Create(&client1)
 
-		client2 := models.Client{ClinicID: clinic1.ID, Name: "Migue", LastName: "Barrera", Phone: "999 999 999", Email: "migue@gmail.com", Password: utils.HashPassword([]byte("migue"))}
-		database.GormDB.Create(&client2)
-	*/
+	client2 := models.Client{ClinicID: clinic1.ID, Name: "Migue", LastName: "Barrera", Phone: "999 999 999", Email: "migue@gmail.com", Password: utils.HashPassword([]byte("migue"))}
+	database.GormDB.Create(&client2)
 
 	/*
 		// EMPLOYEES ------------------------------------------------------------------------------------------------------------------------------------------------------------------

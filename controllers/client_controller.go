@@ -226,3 +226,17 @@ func DeleteClientByID(context *fiber.Ctx) error {
 		"success": true,
 	})
 }
+
+func RefreshClient(context *fiber.Ctx) error {
+	clientID, _ := strconv.ParseUint(context.Params("client_id"), 10, 64)
+
+
+	client, err := services.RefreshClient(uint(clientID))
+	if err != nil {
+		return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return context.Status(fiber.StatusOK).JSON(client)
+}

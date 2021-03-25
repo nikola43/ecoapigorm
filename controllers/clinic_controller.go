@@ -246,20 +246,3 @@ func DeleteClinicByID(context *fiber.Ctx) error {
 	})
 }
 
-func RefreshClient(context *fiber.Ctx) error {
-	clientClaims, err := utils.GetClientTokenClaims(context)
-	if err != nil {
-		return context.Status(fiber.StatusUnauthorized).JSON(&fiber.Map{
-			"error": err.Error(),
-		})
-	}
-
-	client, err := services.RefreshClient(clientClaims.ID)
-	if err != nil {
-		return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-			"error": err.Error(),
-		})
-	}
-
-	return context.Status(fiber.StatusOK).JSON(client)
-}
