@@ -2,11 +2,28 @@ package controllers
 
 import (
 	"github.com/gofiber/fiber/v2"
+	"github.com/nikola43/ecoapigorm/models/promos"
 	"github.com/nikola43/ecoapigorm/services"
 )
 
 func CreatePromo(context *fiber.Ctx) error {
-	return context.SendStatus(fiber.StatusBadRequest)
+	createPromoRequest := new(promos.CreatePromoRequest)
+	err := context.BodyParser(&createPromoRequest)
+	if err != nil {
+		return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	response, err := services.CreatePromoService(*createPromoRequest)
+
+	if err != nil {
+		return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return context.Status(fiber.StatusOK).JSON(response)
 
 }
 func GetPromosController(context *fiber.Ctx) error {
