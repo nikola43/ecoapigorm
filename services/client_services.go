@@ -65,7 +65,7 @@ func ChangePassClientService(request *modelsClients.ChangePassClientRequest) err
 	return nil
 }
 
-func UpdateClientService(id uint ,request *modelsClients.UpdateClientRequest) (*models.Client, error) {
+func UpdateClientService(id uint, request *modelsClients.UpdateClientRequest) (*models.Client, error) {
 	client := &models.Client{}
 
 	GormDBResult := database.GormDB.
@@ -196,11 +196,15 @@ func DeleteClientByID(clientID uint) error {
 		return errors.New("client not found")
 	}
 
+	database.GormDB.Model(&deleteClient).Update("clinic_id", nil)
+
+	/*
 	// delete employee
 	result := database.GormDB.Delete(deleteClient)
 	if result.Error != nil {
 		return result.Error
 	}
+	*/
 
 	// todo remove content
 
