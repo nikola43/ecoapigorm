@@ -7,7 +7,7 @@ import (
 	"github.com/nikola43/ecoapigorm/utils"
 )
 
-func PromoRoutes (router fiber.Router) {
+func PromoRoutes(router fiber.Router) {
 	promoRouter := router.Group("/promo")
 
 	promoRouter.Use(jwtware.New(jwtware.Config{SigningKey: []byte(utils.GetEnvVariable("JWT_CLIENT_KEY"))}))
@@ -17,4 +17,7 @@ func PromoRoutes (router fiber.Router) {
 
 	// /api/v1/promo/client
 	promoRouter.Get("/client", controllers.GetPromosController)
+
+	// /api/v1/promo/:promo_id
+	promoRouter.Delete("/:promo_id", controllers.DeletePromoByID)
 }
