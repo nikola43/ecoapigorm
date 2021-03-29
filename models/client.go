@@ -3,6 +3,7 @@ package models
 import (
 	"github.com/nikola43/ecoapigorm/models/base"
 	"github.com/nikola43/ecoapigorm/models/streaming"
+	"time"
 )
 
 type Client struct {
@@ -14,7 +15,7 @@ type Client struct {
 	Phone                 string                 `gorm:"type:varchar(32) not null" json:"phone" xml:"phone" form:"phone"`
 	LastName              string                 `gorm:"type:varchar(32)" json:"last_name" xml:"last_name" form:"last_name"`
 	IsFirstLogin          bool                   `json:"is_first_login"`
-	Calculator            Calculator             `json:"calculator" xml:"calculator" form:"calculator"`
+	PregnancyDate         time.Time              `json:"pregnancy_date" xml:"pregnancy_date"`
 	Videos                []Video                `json:"videos" xml:"videos" form:"videos"`
 	Holographs            []Holographic          `json:"holographics" xml:"holographics" form:"holographics"`
 	Images                []Image                `json:"images" xml:"images" form:"images"`

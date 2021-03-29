@@ -130,7 +130,7 @@ func CreateClient(context *fiber.Ctx) error {
 	}
 
 	// create and response
-	if createClientResponse, err = services.CreateClient(createClientFromAppRequest);
+	if createClientResponse, err = services.CreateClientFromApp(createClientFromAppRequest);
 		err != nil {
 		return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 			"error": err.Error(),

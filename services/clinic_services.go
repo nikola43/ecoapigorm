@@ -80,12 +80,6 @@ func GetClientsByClinicID(id uint) ([]clients.ListClientResponse, error) {
 	//videosSize := 0
 	//heartbeatSize := 0
 
-
-
-
-
-
-
 	database.GormDB.Model(models.Client{}).Select(
 		"distinct clients.id, "+
 			"clinics.id as clinic_id, "+
@@ -203,6 +197,7 @@ func CreateClientFromClinic(createClientRequest *clients.CreateClientRequest) (*
 		Password: utils.HashPassword([]byte("mimatrona")),
 		Name:     createClientRequest.Name,
 		LastName: createClientRequest.LastName,
+		PregnancyDate: createClientRequest.PregnancyDate,
 		Phone:    createClientRequest.Phone,
 	}
 	result := database.GormDB.Create(&client)
@@ -218,8 +213,8 @@ func CreateClientFromClinic(createClientRequest *clients.CreateClientRequest) (*
 		Name:      client.Name,
 		LastName:  client.LastName,
 		Phone:     client.Phone,
-		Week:      createClientRequest.Week,
-		CreatedAt: fmt.Sprintf(time.Now().Format("2006-01-02 15:04:05")),
+		PregnancyDate:      createClientRequest.PregnancyDate,
+		CreatedAt: fmt.Sprintf(time.Now().Format("2006-01-02 15:04:05")), //TODO
 	}
 
 	// check if client has been created by clinic
