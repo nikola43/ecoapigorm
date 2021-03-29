@@ -20,8 +20,6 @@ func GetModelByField(dest interface{}, fieldName string, fieldValue interface{})
 		model = dest.(*models.Clinic)
 	case *models.Employee:
 		model = dest.(*models.Employee)
-	case *models.Calculator:
-		model = dest.(*models.Calculator)
 	case *streaming.Streaming:
 		model = dest.(*streaming.Streaming)
 	case *promos.Promo:
