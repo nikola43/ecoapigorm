@@ -19,11 +19,11 @@ func CreateClientFromApp(createClientRequest *modelsClients.CreateClientFromAppR
 	}
 
 	client = &models.Client{
-		Email:    createClientRequest.Email,
-		Password: utils.HashPassword([]byte(createClientRequest.Password)),
-		Name:     createClientRequest.Name,
-		LastName: createClientRequest.LastName,
-		Phone:    createClientRequest.Phone,
+		Email:         createClientRequest.Email,
+		Password:      utils.HashPassword([]byte(createClientRequest.Password)),
+		Name:          createClientRequest.Name,
+		LastName:      createClientRequest.LastName,
+		Phone:         createClientRequest.Phone,
 		PregnancyDate: createClientRequest.PregnancyDate,
 	}
 	result := database.GormDB.Create(&client)
@@ -38,13 +38,13 @@ func CreateClientFromApp(createClientRequest *modelsClients.CreateClientFromAppR
 	}
 
 	createClientResponse := modelsClients.CreateClientResponse{
-		ID:       client.ID,
-		Email:    client.Email,
-		Name:     client.Name,
-		LastName: client.LastName,
-		Phone:    client.Phone,
+		ID:            client.ID,
+		Email:         client.Email,
+		Name:          client.Name,
+		LastName:      client.LastName,
+		Phone:         client.Phone,
 		PregnancyDate: client.PregnancyDate,
-		Token:    token,
+		Token:         token,
 	}
 
 	return &createClientResponse, result.Error
@@ -67,7 +67,7 @@ func ChangePassClientService(request *modelsClients.ChangePassClientRequest) err
 	return nil
 }
 
-func UpdateClientService(id uint, request *modelsClients.UpdateClientRequest) (*models.Client, error) {
+func UpdateClientService(id uint, updateClientRequest *modelsClients.UpdateClientRequest) (*models.Client, error) {
 	client := &models.Client{}
 
 	GormDBResult := database.GormDB.
@@ -79,7 +79,10 @@ func UpdateClientService(id uint, request *modelsClients.UpdateClientRequest) (*
 
 	GormDBResult = database.GormDB.
 		Model(&client).
-		Updates(models.Client{Name: request.Name, LastName: request.LastName, Phone: request.Phone})
+		Updates(models.Client{Name: updateClientRequest.Name,
+			LastName:      updateClientRequest.LastName,
+			Phone:         updateClientRequest.Phone,
+			PregnancyDate: updateClientRequest.PregnancyDate})
 
 	if GormDBResult.Error != nil {
 		return nil, GormDBResult.Error
