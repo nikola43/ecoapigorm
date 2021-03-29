@@ -47,3 +47,4 @@ func Migrate() {
 	GormDB.AutoMigrate(&models.Payment{})
 	GormDB.AutoMigrate(&models.Invitation{})
 }
+
