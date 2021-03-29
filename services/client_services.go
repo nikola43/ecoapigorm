@@ -242,6 +242,7 @@ func RefreshClient(clientID uint) (*models.LoginClientResponse, error) {
 		LastName: client.LastName,
 		Token:    token,
 		ClinicID: client.ClinicID,
+		PregnancyDate: client.PregnancyDate,
 	}
 
 	return clientLoginResponse, nil

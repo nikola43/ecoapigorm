@@ -14,9 +14,6 @@ func ClientRoutes(router fiber.Router) {
 	// /api/v1/client | CREATE
 	clientRouter.Post("/", controllers.CreateClient)
 
-
-
-
 	// /api/v1/client/:client_id | READ
 	clientRouter.Get("/:client_id", controllers.GetClientById)
 

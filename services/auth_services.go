@@ -33,6 +33,7 @@ func LoginClient(email, password string) (*models.LoginClientResponse, error) {
 		LastName: client.LastName,
 		Token:    token,
 		ClinicID: client.ClinicID,
+		PregnancyDate: client.PregnancyDate,
 	}
 
 	return clientLoginResponse, err
