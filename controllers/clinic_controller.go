@@ -246,3 +246,14 @@ func DeleteClinicByID(context *fiber.Ctx) error {
 	})
 }
 
+func GetPromosByWeekAndClinicID(context *fiber.Ctx) error {
+	clinicID, _ := strconv.ParseUint(context.Params("clinic_id"), 10, 64)
+	week, _ := strconv.ParseUint(context.Params("week"), 10, 64)
+
+	promosList, err := services.GetPromosByWeekAndClinicID(uint(week), uint(clinicID))
+	if err != nil {
+		return context.SendStatus(fiber.StatusBadRequest)
+	}
+
+	return context.Status(fiber.StatusOK).JSON(promosList)
+}

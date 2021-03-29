@@ -36,6 +36,9 @@ func ClinicRoutes(router fiber.Router) {
 	// /api/v1/clinic/:clinic_id/
 	clinicRouter.Delete("/:clinic_id", controllers.DeleteClinicByID)
 
+	// /api/v1/clinic/:clinic_id/promos/:week
+	clinicRouter.Get("/:clinic_id/promos/:week", controllers.GetPromosByWeekAndClinicID)
+
 	// check Employee.Role == 'admin'
 	clinicRouter.Use(middleware.AdminEmployeeMiddleware)
 

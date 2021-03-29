@@ -51,3 +51,4 @@ func DeletePromoByID(context *fiber.Ctx) error {
 		"success": true,
 	})
 }
+

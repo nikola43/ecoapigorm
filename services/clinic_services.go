@@ -12,6 +12,7 @@ import (
 	"github.com/nikola43/ecoapigorm/models/streaming"
 	"github.com/nikola43/ecoapigorm/utils"
 	_ "github.com/nikola43/ecoapigorm/utils"
+	"gorm.io/gorm"
 	"time"
 )
 
@@ -334,3 +335,25 @@ func DeleteClinicByID(clinicID uint) error {
 	return nil
 }
 
+func GetPromosByWeekAndClinicID(week, clinicID uint) ([]promos.Promo, error) {
+	var list = make([]promos.Promo, 0)
+	var result *gorm.DB
+
+	if week >= 1 && week <= 22 {
+		result = database.GormDB.Where("clinic_id = ? AND week BETWEEN 1 AND 22", clinicID, week).Find(&list)
+	} else if week >= 23 && week <= 25 {
+		result = database.GormDB.Where("clinic_id = ? AND week BETWEEN 23 AND 25", clinicID, week).Find(&list)
+	} else if week >= 26 && week <= 32 {
+		result = database.GormDB.Where("clinic_id = ? AND week BETWEEN 26 AND 32", clinicID, week).Find(&list)
+	} else if week >= 33 && week <= 40 {
+		result = database.GormDB.Where("clinic_id = ? AND week BETWEEN 33 AND 40", clinicID, week).Find(&list)
+	} else if week == 41 {
+		result = database.GormDB.Where("clinic_id = ?", clinicID, week).Find(&list)
+	}
+
+	if result != nil && result.Error != nil {
+		return nil, result.Error
+	}
+
+	return list, nil
+}
