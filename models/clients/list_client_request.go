@@ -10,4 +10,5 @@ type ListClientResponse struct {
 	Phone      string `json:"phone" xml:"phone" form:"phone"`
 	Week       uint   `json:"week" xml:"week" form:"week"`
 	CreatedAt  string `json:"created_at" xml:"created_at" form:"created_at"`
+	UsedSize   uint   `json:"used_size" xml:"used_size" form:"used_size"`
 }

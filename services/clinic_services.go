@@ -76,6 +76,15 @@ func GetClinicByID(id uint) (*models.Clinic, error) {
 
 func GetClientsByClinicID(id uint) ([]clients.ListClientResponse, error) {
 	list := make([]clients.ListClientResponse, 0)
+	var totalSize uint = 0
+	//videosSize := 0
+	//heartbeatSize := 0
+
+
+
+
+
+
 
 	database.GormDB.Model(models.Client{}).Select(
 		"distinct clients.id, "+
@@ -96,6 +105,28 @@ func GetClientsByClinicID(id uint) ([]clients.ListClientResponse, error) {
 			"on clients.id = calculators.client_id").
 
 		Where("clinics.id = ?", id).Scan(&list)
+
+	for index, client := range list {
+		var size uint = 0
+		totalSize = 0
+
+		// get images size
+		database.GormDB.Table("images").Where("client_id = ?", client.ID).Select("IF(size IS NULL, 0, SUM(size)) as size").Scan(&size)
+		totalSize += size
+
+		//get videos size
+		size = 0
+		database.GormDB.Table("videos").Where("client_id = ?", client.ID).Select("IF(size IS NULL, 0, SUM(size)) as size").Scan(&size)
+		totalSize += size
+
+		//get heartbeat size
+		size = 0
+		database.GormDB.Table("heartbeats").Where("client_id = ?", client.ID).Select("IF(size IS NULL, 0, SUM(size)) as size").Scan(&size)
+		totalSize += size
+
+		list[index].UsedSize = totalSize
+	}
+
 	return list, nil
 }
 
