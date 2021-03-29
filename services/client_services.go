@@ -9,7 +9,7 @@ import (
 	"github.com/nikola43/ecoapigorm/utils"
 )
 
-func CreateClient(createClientRequest *modelsClients.CreateClientFromAppRequest) (*modelsClients.CreateClientResponse, error) {
+func CreateClientFromApp(createClientRequest *modelsClients.CreateClientFromAppRequest) (*modelsClients.CreateClientResponse, error) {
 	client := new(models.Client)
 
 	// check if client already exist
@@ -24,6 +24,7 @@ func CreateClient(createClientRequest *modelsClients.CreateClientFromAppRequest)
 		Name:     createClientRequest.Name,
 		LastName: createClientRequest.LastName,
 		Phone:    createClientRequest.Phone,
+		PregnancyDate: createClientRequest.PregnancyDate,
 	}
 	result := database.GormDB.Create(&client)
 
@@ -42,6 +43,7 @@ func CreateClient(createClientRequest *modelsClients.CreateClientFromAppRequest)
 		Name:     client.Name,
 		LastName: client.LastName,
 		Phone:    client.Phone,
+		PregnancyDate: client.PregnancyDate,
 		Token:    token,
 	}
 
