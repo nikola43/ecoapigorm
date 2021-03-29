@@ -45,7 +45,7 @@ func (i SendEmailManager) SendMail(htmlTemplate string, subject string) {
 	m.SetBody("text/html", result)
 	//m.Attach("template.html")// attach whatever you want
 
-	d := gomail.NewDialer("ssl0.ovh.net", 465, "babyandme@stelast.com", "+S,/HD=mZKA%2Xf")
+	d := gomail.NewDialer("ssl0.ovh.net", 465, "mimatrona@stelast.com", "T<NaRMT7}skS4jnQ")
 
 	if err := d.DialAndSend(m); err != nil {
 		fmt.Println(err)
