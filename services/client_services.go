@@ -199,7 +199,7 @@ func GetAllStreamingByClientID(clientID string) ([]streaming.Streaming, error) {
 	return list, nil
 }
 
-func DeleteClientByID(clientID uint) error {
+func UnassignClientByID(clientID uint) error {
 	deleteClient := new(models.Client)
 
 	// todo check clinic is who make action

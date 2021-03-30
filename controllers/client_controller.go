@@ -211,11 +211,10 @@ func PasswordRecovery(context *fiber.Ctx) error {
 	return context.SendStatus(fiber.StatusOK)
 }
 
-// TODO ¿este metodo es necesario?
-func DeleteClientByID(context *fiber.Ctx) error {
+func UnassignClientByID(context *fiber.Ctx) error {
 	clientID, _ := strconv.ParseUint(context.Params("client_id"), 10, 64)
 
-	err := services.DeleteClientByID(uint(clientID))
+	err := services.UnassignClientByID(uint(clientID))
 	if err != nil {
 		return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 			"error": err.Error(),

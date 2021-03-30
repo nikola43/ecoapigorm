@@ -11,7 +11,6 @@ import (
 
 func CreateEmployeeFromPanel(createEmployeeRequest *modelsEmployees.CreateEmployeeRequest) (*modelsEmployees.CreateEmployeeResponse, error) {
 
-	// todo if has clinic id, check if clinic exist
 
 	// todo cambiar role por constantes
 	// create newEmployee on DB

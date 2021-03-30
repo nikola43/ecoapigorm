@@ -34,7 +34,6 @@ func GenerateClientToken(email string, client_id uint, clinic_id uint) (string, 
 	return tokenString, err
 }
 
-// todo validar claims por separado
 func GetClientTokenClaims(context *fiber.Ctx) (*models.ClientTokenClaims, error) {
 	user := context.Locals("user").(*jwt.Token)
 	if claims, ok := user.Claims.(jwt.MapClaims); ok && user.Valid {
