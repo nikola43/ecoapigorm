@@ -1,6 +1,8 @@
 package clients
 
-import "time"
+import (
+	"github.com/nikola43/ecoapigorm/models/base"
+)
 
 type CreateClientResponse struct {
 	ID       uint   `json:"id"`
@@ -8,7 +10,7 @@ type CreateClientResponse struct {
 	Email    string `json:"email"`
 	Name     string `json:"name"`
 	LastName string `json:"last_name"`
-	PregnancyDate    time.Time  `json:"pregnancy_date" xml:"pregnancy_date"`
+	PregnancyDate   base.CustomNullTime  `json:"pregnancy_date" xml:"pregnancy_date"`
 	Token    string `json:"token"`
 	Phone    string `json:"phone"`
 }
