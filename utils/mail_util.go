@@ -21,7 +21,7 @@ type SendEmailManager struct {
 }
 
 func (i SendEmailManager) SendMail(htmlTemplate string, subject string) {
-	senderEmail := "babyandme@stelast.com"
+	senderEmail := "mimatrona@stelast.com"
 	// senderEmail := GetEnvVariable("FROM_EMAIL")
 	// fromEmailPassword := GetEnvVariable("FROM_EMAIL")
 
