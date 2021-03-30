@@ -7,7 +7,6 @@ import (
 	modelsClients "github.com/nikola43/ecoapigorm/models/clients"
 	"github.com/nikola43/ecoapigorm/models/streaming"
 	"github.com/nikola43/ecoapigorm/utils"
-	"time"
 )
 
 func CreateClientFromApp(createClientRequest *modelsClients.CreateClientFromAppRequest) (*modelsClients.CreateClientResponse, error) {
@@ -78,19 +77,15 @@ func UpdateClientService(id uint, updateClientRequest *modelsClients.UpdateClien
 		return nil, GormDBResult.Error
 	}
 
+	// database.GormDB.Model(&client).Update("pregnancy_date", nil)
 
-	_, err := time.Parse("2006-01-02 15:04", updateClientRequest.PregnancyDate.String())
-	if err != nil {
-		database.GormDB.Model(&client).Update("pregnancy_date", nil)
-	} else {
-		database.GormDB.Model(&client).Update("pregnancy_date", updateClientRequest.PregnancyDate)
-	}
+	database.GormDB.Model(&client).Update("pregnancy_date", updateClientRequest.PregnancyDate)
 
 	GormDBResult = database.GormDB.
 		Model(&client).
 		Updates(models.Client{Name: updateClientRequest.Name,
-			LastName:      updateClientRequest.LastName,
-			Phone:         updateClientRequest.Phone})
+			LastName: updateClientRequest.LastName,
+			Phone:    updateClientRequest.Phone})
 
 	if GormDBResult.Error != nil {
 		return nil, GormDBResult.Error
@@ -243,13 +238,13 @@ func RefreshClient(clientID uint) (*models.LoginClientResponse, error) {
 	}
 
 	clientLoginResponse := &models.LoginClientResponse{
-		Id:       client.ID,
-		Email:    client.Email,
-		Name:     client.Name,
-		Phone:    client.Phone,
-		LastName: client.LastName,
-		Token:    token,
-		ClinicID: client.ClinicID,
+		Id:            client.ID,
+		Email:         client.Email,
+		Name:          client.Name,
+		Phone:         client.Phone,
+		LastName:      client.LastName,
+		Token:         token,
+		ClinicID:      client.ClinicID,
 		PregnancyDate: client.PregnancyDate,
 	}
 

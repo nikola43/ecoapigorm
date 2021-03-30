@@ -1,8 +1,6 @@
 package clients
 
-import (
-	"github.com/nikola43/ecoapigorm/models/base"
-)
+import "github.com/nikola43/ecoapigorm/models/base"
 
 type ListClientResponse struct {
 	ID         uint   `json:"id"  xml:"id" form:"id"`
@@ -11,8 +9,8 @@ type ListClientResponse struct {
 	Email      string `json:"email" xml:"email" form:"email"`
 	Name       string `json:"name"  xml:"name" form:"name"`
 	LastName   string `json:"last_name" xml:"last_name" form:"last_name"`
-	PregnancyDate base.CustomNullTime `json:"pregnancy_date" xml:"pregnancy_date"`
 	Phone      string `json:"phone" xml:"phone" form:"phone"`
 	CreatedAt  string `json:"created_at" xml:"created_at" form:"created_at"`
+	PregnancyDate base.CustomNullTime `json:"pregnancy_date" xml:"pregnancy_date"`
 	UsedSize   uint   `json:"used_size" xml:"used_size" form:"used_size"`
 }

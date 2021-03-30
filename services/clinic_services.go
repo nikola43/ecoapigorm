@@ -89,7 +89,8 @@ func GetClientsByClinicID(id uint) ([]clients.ListClientResponse, error) {
 			"clients.last_name, "+
 			"clients.phone, "+
 			"calculators.week, "+
-			"clients.created_at").
+			"clients.created_at, "+
+			"clients.pregnancy_date").
 
 		Joins(
 			"left join clinics "+
@@ -192,13 +193,13 @@ func CreateClientFromClinic(createClientRequest *clients.CreateClientRequest) (*
 	}
 
 	client = models.Client{
-		ClinicID: createClientRequest.ClinicID,
-		Email:    createClientRequest.Email,
-		Password: utils.HashPassword([]byte("mimatrona")),
-		Name:     createClientRequest.Name,
-		LastName: createClientRequest.LastName,
+		ClinicID:      createClientRequest.ClinicID,
+		Email:         createClientRequest.Email,
+		Password:      utils.HashPassword([]byte("mimatrona")),
+		Name:          createClientRequest.Name,
+		LastName:      createClientRequest.LastName,
 		PregnancyDate: createClientRequest.PregnancyDate,
-		Phone:    createClientRequest.Phone,
+		Phone:         createClientRequest.Phone,
 	}
 	result := database.GormDB.Create(&client)
 
@@ -207,14 +208,14 @@ func CreateClientFromClinic(createClientRequest *clients.CreateClientRequest) (*
 	}
 
 	listClientResponse := &clients.ListClientResponse{
-		ID:        client.ID,
-		ClinicID:  client.ClinicID,
-		Email:     client.Email,
-		Name:      client.Name,
-		LastName:  client.LastName,
-		Phone:     client.Phone,
-		PregnancyDate:      createClientRequest.PregnancyDate,
-		CreatedAt: fmt.Sprintf(time.Now().Format("2006-01-02 15:04:05")), //TODO
+		ID:            client.ID,
+		ClinicID:      client.ClinicID,
+		Email:         client.Email,
+		Name:          client.Name,
+		LastName:      client.LastName,
+		Phone:         client.Phone,
+		PregnancyDate: createClientRequest.PregnancyDate,
+		CreatedAt:     fmt.Sprintf(time.Now().Format("2006-01-02 15:04:05")), //TODO
 	}
 
 	// check if client has been created by clinic
