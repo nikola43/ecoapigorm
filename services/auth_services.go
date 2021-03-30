@@ -67,6 +67,13 @@ func LoginEmployee(email, password string) (*models.LoginEmployeeResponse, error
 	fmt.Println("clinicID")
 	fmt.Println(clinic.ID)
 
+
+	if clinic.ID < 1 {
+		database.GormDB.Where("id = ?", employee.ClinicID).Find(&clinic)
+	}
+
+
+
 	token, err = utils.GenerateEmployeeToken(
 		employee.Name,
 		company.ID,
