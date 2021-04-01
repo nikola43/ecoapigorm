@@ -3,7 +3,7 @@ package controllers
 import (
 	"fmt"
 	"github.com/gofiber/fiber/v2"
-	"github.com/nikola43/ecoapigorm/awsmanager"
+	"github.com/nikola43/ecoapigorm/wasabis3manager"
 	"github.com/nikola43/ecoapigorm/services"
 	"github.com/nikola43/ecoapigorm/utils"
 	"log"
@@ -52,7 +52,7 @@ func DownloadAllMultimediaContentByClientID(context *fiber.Ctx) error {
 		fmt.Println(image.Url)
 		filename := strings.Split(image.Url, "/")[len(strings.Split(image.Url, "/"))-1]
 		fmt.Println(filename)
-		err = awsmanager.AwsManager.DownloadObject(filename, "tempFiles/"+context.Params("client_id")+"/images/"+filename)
+		err = wasabis3manager.WasabiS3Client.DownloadObject(filename, "tempFiles/"+context.Params("client_id")+"/images/"+filename)
 		if err != nil {
 			fmt.Println(err)
 		}

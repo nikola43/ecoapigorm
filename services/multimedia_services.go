@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/gofiber/fiber/v2"
-	"github.com/nikola43/ecoapigorm/awsmanager"
+	"github.com/nikola43/ecoapigorm/wasabis3manager"
 	database "github.com/nikola43/ecoapigorm/database"
 	"github.com/nikola43/ecoapigorm/models"
 	"github.com/nikola43/ecoapigorm/utils"
@@ -31,7 +31,7 @@ func UploadMultimedia(context *fiber.Ctx, bucketName string, clientID uint, uplo
 	if fileType == "image" {
 		// image
 
-		url, size, storeInAmazonError := awsmanager.AwsManager.UploadObject(bucketName, "tempFiles/"+uploadedFile.Filename, clientID, fileType)
+		url, size, storeInAmazonError := wasabis3manager.WasabiS3Client.UploadObject(bucketName, "tempFiles/"+uploadedFile.Filename, clientID, fileType)
 		if storeInAmazonError != nil {
 			fmt.Println(storeInAmazonError.Error())
 		}
@@ -41,7 +41,7 @@ func UploadMultimedia(context *fiber.Ctx, bucketName string, clientID uint, uplo
 		return err
 	} else if fileType == "video" || fileType == "holographic" {
 		// upload video
-		videoUrl, videoSize, storeInAmazonError := awsmanager.AwsManager.UploadObject(bucketName,"tempFiles/"+uploadedFile.Filename, clientID, fileType)
+		videoUrl, videoSize, storeInAmazonError := wasabis3manager.WasabiS3Client.UploadObject(bucketName,"tempFiles/"+uploadedFile.Filename, clientID, fileType)
 		if storeInAmazonError != nil {
 			return err
 		}
@@ -53,7 +53,7 @@ func UploadMultimedia(context *fiber.Ctx, bucketName string, clientID uint, uplo
 		}
 
 		// thumb video
-		thumbUrl, thumbSize, storeThumbInAmazonError := awsmanager.AwsManager.UploadObject(bucketName,thumbnailPath, clientID, fileType)
+		thumbUrl, thumbSize, storeThumbInAmazonError := wasabis3manager.WasabiS3Client.UploadObject(bucketName,thumbnailPath, clientID, fileType)
 		if storeThumbInAmazonError != nil {
 			return storeThumbInAmazonError
 		}
@@ -87,7 +87,7 @@ func UploadMultimedia(context *fiber.Ctx, bucketName string, clientID uint, uplo
 		return err
 	} else if fileType == "heartbeat" {
 		// holo
-		url, size, storeInAmazonError := awsmanager.AwsManager.UploadObject(bucketName,"tempFiles/"+uploadedFile.Filename, clientID, fileType)
+		url, size, storeInAmazonError := wasabis3manager.WasabiS3Client.UploadObject(bucketName,"tempFiles/"+uploadedFile.Filename, clientID, fileType)
 		if storeInAmazonError != nil {
 			fmt.Println(storeInAmazonError.Error())
 		}

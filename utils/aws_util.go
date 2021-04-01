@@ -20,14 +20,13 @@ const (
 	maxRetries  = 3
 )
 
-type AwsClient struct {
+type WasabiS3Client struct {
 	s3Client  *s3.S3
 	s3Session *session.Session
-	s3BucketName  string
 	s3BucketRegion  string
 }
 
-func (awsClient *AwsClient) DownloadObject(filekey string, filepath string) error {
+func (awsClient *WasabiS3Client) DownloadObject(filekey string, filepath string) error {
 	file, err := os.Create(filepath)
 	if err != nil {
 		fmt.Println(err)
@@ -46,7 +45,7 @@ func (awsClient *AwsClient) DownloadObject(filekey string, filepath string) erro
 	fmt.Println(bytes)
 	return nil
 }
-func (awsClient *AwsClient) UploadObject(bucketName,filepath string, clientID uint, tipo string) (string, int64, error) {
+func (awsClient *WasabiS3Client) UploadObject(bucketName,filepath string, clientID uint, tipo string) (string, int64, error) {
 
 	file, err := os.Open("./" + filepath)
 	if err != nil {
@@ -112,7 +111,7 @@ func (awsClient *AwsClient) UploadObject(bucketName,filepath string, clientID ui
 	return *url, size, nil
 }
 
-func (awsClient *AwsClient) CreateBucket(bucketName string) error {
+func (awsClient *WasabiS3Client) CreateBucket(bucketName string) error {
 	result, err := awsClient.s3Client.CreateBucket(&s3.CreateBucketInput{
 		Bucket:      aws.String(bucketName),
 		ACL:         aws.String("public-read"),
@@ -121,7 +120,7 @@ func (awsClient *AwsClient) CreateBucket(bucketName string) error {
 	return err
 }
 
-func (awsClient *AwsClient) DeleteObject(bucket string, key *string) error {
+func (awsClient *WasabiS3Client) DeleteObject(bucket string, key *string) error {
 	request := &s3.DeleteObjectInput{
 		Bucket: &bucket,
 		Key:    key,
@@ -190,8 +189,8 @@ func CompleteMultipartUpload(s3Client *s3.S3, resp *s3.CreateMultipartUploadOutp
 	return s3Client.CompleteMultipartUpload(completeInput)
 }
 
-func New(accessKey, secretKey, endpoint, bucketName,bucketRegion string) *AwsClient {
-	awsManager := &AwsClient{}
+func New(accessKey, secretKey, endpoint,bucketRegion string) *WasabiS3Client {
+	awsManager := &WasabiS3Client{}
 
 	s3Config := &aws.Config{
 		Credentials:      credentials.NewStaticCredentials(accessKey, secretKey, ""),
@@ -203,7 +202,6 @@ func New(accessKey, secretKey, endpoint, bucketName,bucketRegion string) *AwsCli
 	awsManager.s3Client = s3.New(s3Session)
 
 	awsManager.s3Session = s3Session
-	awsManager.s3BucketName = bucketName
 	awsManager.s3BucketRegion = bucketRegion
 
 	return awsManager

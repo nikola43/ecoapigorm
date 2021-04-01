@@ -178,6 +178,7 @@ func GetFileType(file string, uploadMode uint) string {
 	extension := filepath.Ext(file)
 
 	if extension == ".jpg" ||
+		extension == ".jpeg" ||
 		extension == ".png" {
 		fileType = "image"
 	} else if extension == ".mp4" ||

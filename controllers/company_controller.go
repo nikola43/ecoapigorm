@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
-	"github.com/nikola43/ecoapigorm/awsmanager"
+	"github.com/nikola43/ecoapigorm/wasabis3manager"
 	database "github.com/nikola43/ecoapigorm/database"
 	"github.com/nikola43/ecoapigorm/models"
 	companyModels "github.com/nikola43/ecoapigorm/models/company"
@@ -119,7 +119,7 @@ func CreateCompany(context *fiber.Ctx) error {
 
 	// create bucket for company
 	bucketName := strings.ToLower(strings.ReplaceAll(createCompanyRequest.Name, " ", ""))
-	err = awsmanager.AwsManager.CreateBucket(strings.ToLower(bucketName))
+	err = wasabis3manager.WasabiS3Client.CreateBucket(strings.ToLower(bucketName))
 	if err != nil {
 		return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 			"error": err.Error(),

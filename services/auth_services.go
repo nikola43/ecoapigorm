@@ -54,6 +54,9 @@ func LoginEmployee(email, password string) (*models.LoginEmployeeResponse, error
 	if !match {
 		return nil, errors.New("not found")
 	}
+	fmt.Println(employee)
+
+
 
 	database.GormDB.Model(&clinic).
 		Joins("left join employees on clinics.employee_id = employees.id").
@@ -71,8 +74,6 @@ func LoginEmployee(email, password string) (*models.LoginEmployeeResponse, error
 	if clinic.ID < 1 {
 		database.GormDB.Where("id = ?", employee.ClinicID).Find(&clinic)
 	}
-
-
 
 	token, err = utils.GenerateEmployeeToken(
 		employee.Name,
