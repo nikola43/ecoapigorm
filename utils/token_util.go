@@ -171,3 +171,20 @@ func GenerateInvitationToken() (string, error) {
 	}
 	return tokenString, err
 }
+
+func GeneratePasswordRecoveryToken(recoveryType string, id uint) (string, error) {
+	// Create token
+	token := jwt.New(jwt.SigningMethodHS256)
+
+	// Set claims
+	claims := token.Claims.(jwt.MapClaims)
+	claims["type"] = recoveryType
+	claims["id"] = id
+	claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
+
+	tokenString, err := token.SignedString([]byte(GetEnvVariable("INVITE_TOKEN")))
+	if err != nil {
+		return "", err
+	}
+	return tokenString, err
+}

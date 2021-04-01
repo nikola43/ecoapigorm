@@ -28,7 +28,7 @@ func (a *App) Initialize(port string) {
 		utils.GetEnvVariable("MYSQL_PASSWORD"),
 		utils.GetEnvVariable("MYSQL_DATABASE"))
 
-	database.Migrate()
+	// database.Migrate()
 	// fakedatabase.CreateFakeData()
 
 	fmt.Println(utils.GetEnvVariable("AWS_ACCESS_KEY"))

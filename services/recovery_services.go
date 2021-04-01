@@ -18,21 +18,28 @@ func PassRecoveryClientService(request *recovery.PassRecoveryRequest) error {
 		return GormDBResult.Error
 	}
 
-	apiTokenString, err := utils.GenerateClientToken(client.Email, client.ClinicID, client.ID)
+	apiTokenString, err := utils.GeneratePasswordRecoveryToken("client", client.ID)
 	if err != nil {
 		return err
 	}
 
-	recovery := recovery.UserRecovery{
-		UserId:          client.ID,
-		Token:           apiTokenString,
-		Type:            "client",
+	userRecovery := recovery.UserRecovery{
+		UserId: client.ID,
+		Token:  apiTokenString,
+		Type:   "client",
 	}
-	result := database.GormDB.Create(&recovery)
+	result := database.GormDB.Create(&userRecovery)
 	if result.Error != nil {
 		return result.Error
 	}
-	SendMailRecovery(client.Email, recovery.Token)
+
+	sendEmailManager := utils.SendEmailManager{
+		ToEmail:               client.Email,
+		ToName:                client.Name,
+		RecoveryPasswordToken: apiTokenString,
+	}
+
+	sendEmailManager.SendMail("recovery_password.html", "Recuperar contraseña")
 
 	return nil
 }
@@ -48,21 +55,27 @@ func PassRecoveryEmployeeService(request *recovery.PassRecoveryRequest) error {
 		return GormDBResult.Error
 	}
 
-	apiTokenString, err := utils.GenerateClientToken(employee.Email, employee.ClinicID, employee.ID)
+	apiTokenString, err := utils.GeneratePasswordRecoveryToken("employee", employee.ID)
 	if err != nil {
 		return err
 	}
 
-	recovery := recovery.UserRecovery{
-		UserId:          employee.ID,
-		Token:           apiTokenString,
-		Type:            "employee",
+	userRecovery := recovery.UserRecovery{
+		UserId: employee.ID,
+		Token:  apiTokenString,
+		Type:   "employee",
 	}
-	result := database.GormDB.Create(&recovery)
+	result := database.GormDB.Create(&userRecovery)
 	if result.Error != nil {
 		return result.Error
 	}
-	SendMailRecovery(employee.Email, recovery.Token)
+	sendEmailManager := utils.SendEmailManager{
+		ToEmail:               employee.Email,
+		ToName:                employee.Name,
+		RecoveryPasswordToken: apiTokenString,
+	}
+
+	sendEmailManager.SendMail("recovery_password.html", "Recuperar contraseña")
 
 	return nil
 }
