@@ -6,6 +6,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	database "github.com/nikola43/ecoapigorm/database"
 	"github.com/nikola43/ecoapigorm/models"
+	modelsClient "github.com/nikola43/ecoapigorm/models/clients"
 	modelsEmployees "github.com/nikola43/ecoapigorm/models/employee"
 	"github.com/nikola43/ecoapigorm/services"
 	"github.com/nikola43/ecoapigorm/utils"
@@ -191,5 +192,29 @@ func ValidateInvitation(context *fiber.Ctx) error {
 		"employee_email":     invitation.ToEmail,
 		"token":              invitationToken,
 		"parent_employee_id": invitation.ParentEmployeeID,
+	})
+}
+
+func ChangePassEmployee(context *fiber.Ctx) error {
+	changePassClientRequest := new(modelsClient.ChangePassClientRequest)
+	var err error
+
+	if err = context.BodyParser(changePassClientRequest);
+		err != nil {
+		return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	err = services.ChangePassClientService(changePassClientRequest)
+
+	if err != nil {
+		return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return context.Status(fiber.StatusOK).JSON(&fiber.Map{
+		"success": true,
 	})
 }

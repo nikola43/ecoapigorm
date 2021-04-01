@@ -22,7 +22,10 @@ func PassRecoveryClient(context *fiber.Ctx) error {
 		return context.SendStatus(fiber.StatusNotFound)
 	}
 
-	return context.SendStatus(fiber.StatusOK)
+
+	return context.Status(fiber.StatusOK).JSON(&fiber.Map{
+		"success": true,
+	})
 }
 
 func PassRecoveryEmployee(context *fiber.Ctx) error {
@@ -40,7 +43,10 @@ func PassRecoveryEmployee(context *fiber.Ctx) error {
 		return context.SendStatus(fiber.StatusNotFound)
 	}
 
-	return context.SendStatus(fiber.StatusOK)
+
+	return context.Status(fiber.StatusOK).JSON(&fiber.Map{
+		"success": true,
+	})
 }
 
 func ValidateRecovery(context *fiber.Ctx) error {
@@ -56,7 +62,5 @@ func ValidateRecovery(context *fiber.Ctx) error {
 		})
 	}
 
-	return context.Status(fiber.StatusOK).JSON(&fiber.Map{
-		"success": true,
-	})
+	return context.Status(fiber.StatusOK).JSON(userRecovery)
 }

@@ -21,6 +21,9 @@ func EmployeeRoutes(router fiber.Router) {
 	// /api/v1/employee/validate_recovery
 	employeeRouter.Post("/validate_recovery", controllers.ValidateRecovery)
 
+	// /api/v1/client/change_password
+	employeeRouter.Post("/change_password", controllers.ChangePassEmployee)
+
 	// /api/v1/employee/validate_invitation/:invitation_token
 	employeeRouter.Get("/validate_invitation/:invitation_token", controllers.ValidateInvitation)
 

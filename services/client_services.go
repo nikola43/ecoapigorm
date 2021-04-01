@@ -54,13 +54,13 @@ func ChangePassClientService(request *modelsClients.ChangePassClientRequest) err
 	client := &models.Client{}
 
 	GormDBResult := database.GormDB.
-		Find(&client, request.ClientId)
+		Find(&client, request.ClientID)
 
 	if GormDBResult.Error != nil {
 		return GormDBResult.Error
 	}
 
-	newPassHashed := utils.HashPassword([]byte(request.NewPass))
+	newPassHashed := utils.HashPassword([]byte(request.Password))
 
 	database.GormDB.Model(&client).Update("password", newPassHashed)
 

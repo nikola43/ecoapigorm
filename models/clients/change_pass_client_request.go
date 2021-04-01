@@ -1,6 +1,7 @@
 package clients
 
 type ChangePassClientRequest struct {
-	ClientId int `json:"clientid"`
-	NewPass string `json:"newpass"`
+	ClientID int    `json:"client_id"`
+	Token    string `json:"token"`
+	Password string `json:"password"`
 }
