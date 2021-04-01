@@ -94,34 +94,7 @@ func UpdateClientService(id uint, updateClientRequest *modelsClients.UpdateClien
 	return client, nil
 }
 
-func PassRecoveryClientService(request *modelsClients.PassRecoveryRequest) error {
-	client := &models.Client{}
 
-	GormDBResult := database.GormDB.
-		Where("email = ?", request.Email).
-		Find(&client)
-
-	if GormDBResult.Error != nil {
-		return GormDBResult.Error
-	}
-
-	apiTokenString, err := utils.GenerateClientToken(client.Email, client.ClinicID, client.ID)
-	if err != nil {
-		return err
-	}
-
-	recovery := models.Recovery{
-		ClientID: client.ID,
-		Token:    apiTokenString,
-	}
-	result := database.GormDB.Create(&recovery)
-	if result.Error != nil {
-		return result.Error
-	}
-	SendMailRecovery(client.Email, recovery.Token)
-
-	return nil
-}
 
 func GetClientByEmail(clientEmail string) (*models.Client, error) {
 	client := &models.Client{}

@@ -189,28 +189,6 @@ func UpdateClient(context *fiber.Ctx) error {
 	return context.Status(fiber.StatusOK).JSON(client)
 }
 
-func PassRecoveryClient(context *fiber.Ctx) error {
-	passRecoveryClientRequest := new(modelsClient.PassRecoveryRequest)
-	var err error
-
-	if err = context.BodyParser(passRecoveryClientRequest);
-		err != nil {
-		return context.SendStatus(fiber.StatusBadRequest)
-	}
-
-	err = services.PassRecoveryClientService(passRecoveryClientRequest)
-
-	if err != nil {
-		return context.SendStatus(fiber.StatusNotFound)
-	}
-
-	return context.SendStatus(fiber.StatusOK)
-}
-
-func PasswordRecovery(context *fiber.Ctx) error {
-	return context.SendStatus(fiber.StatusOK)
-}
-
 func UnassignClientByID(context *fiber.Ctx) error {
 	clientID, _ := strconv.ParseUint(context.Params("client_id"), 10, 64)
 
