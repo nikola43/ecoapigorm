@@ -27,7 +27,7 @@ func ClientRoutes(router fiber.Router) {
 	clientRouter.Post("/recovery", controllers.PassRecoveryClient)
 
 	// /api/v1/client/validate_recovery
-	clientRouter.Post("/validate_recovery", controllers.ValidateRecovery)
+	clientRouter.Get("/validate_recovery/:recovery_token", controllers.ValidateRecovery)
 
 	// use jwt
 	clientRouter.Use(jwtware.New(jwtware.Config{SigningKey: []byte(utils.GetEnvVariable("JWT_CLIENT_KEY"))}))

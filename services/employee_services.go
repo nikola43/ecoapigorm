@@ -11,12 +11,11 @@ import (
 
 func CreateEmployeeFromPanel(createEmployeeRequest *modelsEmployees.CreateEmployeeRequest) (*modelsEmployees.CreateEmployeeResponse, error) {
 
-
 	// todo cambiar role por constantes
 	// create newEmployee on DB
 	newEmployee := models.Employee{
 		ParentEmployeeID: createEmployeeRequest.ParentEmployeeID,
-		CompanyID:         createEmployeeRequest.CompanyID,
+		CompanyID:        createEmployeeRequest.CompanyID,
 		ClinicID:         createEmployeeRequest.ClinicID,
 		Name:             createEmployeeRequest.Name,
 		Email:            createEmployeeRequest.Email,
@@ -104,10 +103,10 @@ func Invite(employeeTokenClaims *models.EmployeeTokenClaims, employees []models.
 		fmt.Println(invitation)
 
 		if temp.ID > 0 {
-			text := employeeTokenClaims.Name+" de "+ employeeTokenClaims.ClinicName + " te ha invitado a su clínica";
+			text := employeeTokenClaims.Name + " de " + employeeTokenClaims.ClinicName + " te ha invitado a su clínica"
 			sendEmailManager.SendMail("invite_to_clinic.html", text)
 		} else {
-			text := employeeTokenClaims.Name+" de "+ employeeTokenClaims.ClinicName + " te ha invitado a registrarte";
+			text := employeeTokenClaims.Name + " de " + employeeTokenClaims.ClinicName + " te ha invitado a registrarte"
 			sendEmailManager.SendMail("invite_to_register.html", text)
 		}
 	}
@@ -150,6 +149,22 @@ func DeleteEmployeeByEmployeeID(parentEmployeeID, deletedEmployeeID uint) error 
 }
 
 func ValidateInvitation(parentEmployeeID, deletedEmployeeID uint) error {
+
+	return nil
+}
+
+func ChangePassEmployeeService(changePasswordEmployeeRequest *modelsEmployees.ChangePasswordEmployeeRequest) error {
+	employee := &models.Employee{}
+
+	GormDBResult := database.GormDB.First(&employee, changePasswordEmployeeRequest.ID)
+
+	if GormDBResult.Error != nil {
+		return GormDBResult.Error
+	}
+
+	newPassHashed := utils.HashPassword([]byte(changePasswordEmployeeRequest.Password))
+
+	database.GormDB.Model(&employee).Update("password", newPassHashed)
 
 	return nil
 }

@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"github.com/gofiber/fiber/v2"
 	recovery "github.com/nikola43/ecoapigorm/models/recovery"
 	"github.com/nikola43/ecoapigorm/services"
@@ -51,6 +52,8 @@ func PassRecoveryEmployee(context *fiber.Ctx) error {
 
 func ValidateRecovery(context *fiber.Ctx) error {
 	recoveryToken := context.Params("recovery_token")
+	fmt.Println("recoveryToken")
+	fmt.Println(recoveryToken)
 
 	userRecovery := new(recovery.UserRecovery)
 	utils.GetModelByField(userRecovery, "token", recoveryToken)

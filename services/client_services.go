@@ -54,7 +54,7 @@ func ChangePassClientService(request *modelsClients.ChangePassClientRequest) err
 	client := &models.Client{}
 
 	GormDBResult := database.GormDB.
-		Find(&client, request.ClientID)
+		First(&client, request.ID)
 
 	if GormDBResult.Error != nil {
 		return GormDBResult.Error
@@ -93,8 +93,6 @@ func UpdateClientService(id uint, updateClientRequest *modelsClients.UpdateClien
 
 	return client, nil
 }
-
-
 
 func GetClientByEmail(clientEmail string) (*models.Client, error) {
 	client := &models.Client{}
