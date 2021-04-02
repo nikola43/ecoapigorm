@@ -112,7 +112,7 @@ func GetClientByEmail(clientEmail string) (*models.Client, error) {
 	return client, nil
 }
 
-func GetClientById(clientID uint) (*modelsClients.ListClientResponse, error) {
+func GetClientById(clinicID, clientID uint) (*modelsClients.ListClientResponse, error) {
 	client := &models.Client{}
 
 	GormDBResult := database.GormDB.
@@ -126,7 +126,6 @@ func GetClientById(clientID uint) (*modelsClients.ListClientResponse, error) {
 	if client.ID < 1 {
 		return nil, errors.New("client not found")
 	}
-
 
 	var size uint = 0
 	var totalSize uint = 0
@@ -145,18 +144,21 @@ func GetClientById(clientID uint) (*modelsClients.ListClientResponse, error) {
 	database.GormDB.Table("heartbeats").Where("client_id = ?", client.ID).Select("IF(size IS NULL, 0, SUM(size)) as size").Scan(&size)
 	totalSize += size
 
-	clientResponse := &modelsClients.ListClientResponse{
-		ID:            client.ID,
-		ClinicID:      client.ID,
-		Email:         client.Email,
-		Name:          client.Name,
-		LastName:      client.LastName,
-		Phone:         client.Phone,
-		CreatedAt:     client.CreatedAt,
-		PregnancyDate: client.PregnancyDate,
-		UsedSize:      totalSize,
-	}
+	clinicClient := new(models.ClinicClient)
+	GormDBResult = database.GormDB.Where("client_id = ? AND clinic_id = ?", client.ID, clinicID).Find(&clinicClient)
 
+	clientResponse := &modelsClients.ListClientResponse{
+		ID:             client.ID,
+		ClinicID:       client.ID,
+		Email:          client.Email,
+		Name:           client.Name,
+		LastName:       client.LastName,
+		Phone:          client.Phone,
+		CreatedAt:      client.CreatedAt,
+		PregnancyDate:  client.PregnancyDate,
+		UsedSize:       totalSize,
+		DiskQuoteLevel: clinicClient.DiskQuoteLevel,
+	}
 
 	return clientResponse, nil
 }
@@ -184,7 +186,7 @@ func GetAllHolographicsByClientID(clientID string) ([]models.Holographic, error)
 	var list = make([]models.Holographic, 0)
 
 	if err := database.GormDB.Where("client_id = ?", clientID).Find(&list).Error;
-	err != nil {
+		err != nil {
 		return nil, err
 	}
 
@@ -243,7 +245,7 @@ func RefreshClient(clientID uint) (*models.LoginClientResponse, error) {
 		return nil, errors.New("client not found")
 	}
 
-	token, err := utils.GenerateClientToken(client.Email, client.ID,1/* client.ClinicID*/)
+	token, err := utils.GenerateClientToken(client.Email, client.ID, 1 /* client.ClinicID*/)
 	if err != nil {
 		return nil, err
 	}
@@ -255,9 +257,25 @@ func RefreshClient(clientID uint) (*models.LoginClientResponse, error) {
 		Phone:         client.Phone,
 		LastName:      client.LastName,
 		Token:         token,
-		ClinicID:      1,//client.ClinicID,
+		ClinicID:      1, //client.ClinicID,
 		PregnancyDate: client.PregnancyDate,
 	}
 
 	return clientLoginResponse, nil
+}
+
+func IncrementDiskQuoteLevel(clinicID uint, listClientResponse *modelsClients.ListClientResponse) error {
+	client := &models.Client{}
+	clinicClient := new(models.ClinicClient)
+
+	GormDBResult := database.GormDB.First(&client, listClientResponse.ID)
+	GormDBResult = database.GormDB.Where("client_id = ? AND clinic_id = ?", client.ID, clinicID).Find(&clinicClient)
+
+	if GormDBResult.Error != nil {
+		return GormDBResult.Error
+	}
+
+	database.GormDB.Model(&clinicClient).Update("disk_quote_level", clinicClient.DiskQuoteLevel+1)
+
+	return nil
 }

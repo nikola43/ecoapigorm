@@ -16,8 +16,14 @@ import (
 
 func GetClientById(context *fiber.Ctx) error {
 	clientID, _ := strconv.ParseUint(context.Params("client_id"), 10, 64)
+	employeeTokenClaims, err := utils.GetEmployeeTokenClaims(context)
+	if err != nil {
+		return context.Status(fiber.StatusUnauthorized).JSON(&fiber.Map{
+			"error": err.Error(),
+		})
+	}
 
-	client, err := services.GetClientById(uint(clientID))
+	client, err := services.GetClientById(employeeTokenClaims.ClinicID, uint(clientID))
 	if err != nil {
 		return context.Status(fiber.StatusNotFound).JSON(&fiber.Map{
 			"error": err.Error(),
@@ -142,6 +148,40 @@ func CreateClient(context *fiber.Ctx) error {
 		welcomeEmail.SendMail("welcome.html", "Bienvenido "+createClientFromAppRequest.Name)
 		return context.JSON(createClientResponse)
 	}
+}
+
+func IncrementDiskQuoteLevel(context *fiber.Ctx) error {
+	listClientResponse := new(modelsClient.ListClientResponse)
+
+
+
+
+	if err := context.BodyParser(listClientResponse);
+		err != nil {
+		return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	employeeTokenClaims, err := utils.GetEmployeeTokenClaims(context)
+	if err != nil {
+		return context.Status(fiber.StatusUnauthorized).JSON(&fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+
+	err = services.IncrementDiskQuoteLevel(employeeTokenClaims.ClinicID, listClientResponse)
+
+	if err != nil {
+		return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return context.Status(fiber.StatusOK).JSON(&fiber.Map{
+		"success": true,
+	})
 }
 
 func ChangePassClient(context *fiber.Ctx) error {

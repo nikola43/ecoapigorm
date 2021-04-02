@@ -13,7 +13,6 @@ type Client struct {
 	Name                  string                 `gorm:"type:varchar(32) not null" json:"name" xml:"name" form:"name"`
 	Phone                 string                 `gorm:"type:varchar(32) not null" json:"phone" xml:"phone" form:"phone"`
 	LastName              string                 `gorm:"type:varchar(32)" json:"last_name" xml:"last_name" form:"last_name"`
-	//DiskQuoteLevel        uint                   `gorm:"type:INTEGER not null; DEFAULT:1" json:"disk_quote_level"`
 	PregnancyDate         base.CustomNullTime    `json:"pregnancy_date" xml:"pregnancy_date"`
 	Videos                []Video                `json:"videos" xml:"videos" form:"videos"`
 	Holographs            []Holographic          `json:"holographics" xml:"holographics" form:"holographics"`
