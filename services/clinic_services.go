@@ -67,40 +67,31 @@ func GetClinicByID(id uint) (*models.Clinic, error) {
 
 func GetClientsByClinicID(id uint) ([]clients.ListClientResponse, error) {
 	list := make([]clients.ListClientResponse, 0)
-	listCLinicClients := make([]models.ClinicClient, 0)
+	listClinicClients := make([]models.ClinicClient, 0)
 	clinic := models.Clinic{}
 	clientsList := make([]models.Client, 0)
-	var totalSize uint = 0
-	//videosSize := 0
-	//heartbeatSize := 0
 
-	database.GormDB.First(&clinic, id)
-	database.GormDB.Where("clinic_id = ?", id).Find(&listCLinicClients)
+	database.GormDB.Find(&clinic, id)
+
+	if clinic.ID < 1 {
+		return nil, errors.New("clinic_id not found")
+	}
+
+	database.GormDB.Where("clinic_id = ?", id).Find(&listClinicClients)
+
+	if len(listClinicClients) == 0 {
+		return list, nil
+	}
 
 	clientIds := make([]uint,0)
-	linq.From(listCLinicClients).SelectT(func(u models.ClinicClient) uint { return u.ClientID }).ToSlice(&clientIds)
+	linq.From(listClinicClients).
+		SelectT(func(clinicClientRelation models.ClinicClient) uint { return clinicClientRelation.ClientID }).
+		ToSlice(&clientIds)
 
-	database.GormDB.Find(&clientsList,&clientIds)
+	database.GormDB.Find(&clientsList, &clientIds)
 
 	for _,client := range clientsList {
-
-		var size uint = 0
-		totalSize = 0
-
-		// get images size
-		database.GormDB.Table("images").Where("client_id = ?", client.ID).Select("IF(size IS NULL, 0, SUM(size)) as size").Scan(&size)
-		totalSize += size
-
-		//get videos size
-		size = 0
-		database.GormDB.Table("videos").Where("client_id = ?", client.ID).Select("IF(size IS NULL, 0, SUM(size)) as size").Scan(&size)
-		totalSize += size
-
-		//get heartbeat size
-		size = 0
-		database.GormDB.Table("heartbeats").Where("client_id = ?", client.ID).Select("IF(size IS NULL, 0, SUM(size)) as size").Scan(&size)
-		totalSize += size
-
+		totalSize := CalculateTotalSizeByClient(client)
 		list = append(
 			list,
 			clients.ListClientResponse{
@@ -117,49 +108,37 @@ func GetClientsByClinicID(id uint) ([]clients.ListClientResponse, error) {
 		)
 	}
 
-/*	database.GormDB.Model(models.Client{}).Select(
-		"distinct clients.id, "+
-			"clinics.id as clinic_id, "+
-			"clinics.name as clinic_name, "+
-			"clients.email, "+
-			"clients.name, "+
-			"clients.last_name, "+
-			"clients.phone, "+
-			"calculators.week, "+
-			"clients.created_at, "+
-			"clients.pregnancy_date").
-
-		Joins(
-			"left join clinics "+
-				"on clinics.id = clients.clinic_id").
-
-		Joins("left join calculators "+
-			"on clients.id = calculators.client_id").
-
-		Where("clinics.id = ?", id).Scan(&list)
-
-	for index, client := range list {
-		var size uint = 0
-		totalSize = 0
-
-		// get images size
-		database.GormDB.Table("images").Where("client_id = ?", client.ID).Select("IF(size IS NULL, 0, SUM(size)) as size").Scan(&size)
-		totalSize += size
-
-		//get videos size
-		size = 0
-		database.GormDB.Table("videos").Where("client_id = ?", client.ID).Select("IF(size IS NULL, 0, SUM(size)) as size").Scan(&size)
-		totalSize += size
-
-		//get heartbeat size
-		size = 0
-		database.GormDB.Table("heartbeats").Where("client_id = ?", client.ID).Select("IF(size IS NULL, 0, SUM(size)) as size").Scan(&size)
-		totalSize += size
-
-		list[index].UsedSize = totalSize
-	}*/
-
 	return list, nil
+}
+
+func CalculateTotalSizeByClient(client models.Client) uint {
+	var size uint = 0
+	totalSize := uint(0)
+
+	// get images size
+	database.GormDB.Table("images").
+		Where("client_id = ?", client.ID).
+		Select("IF(size IS NULL, 0, SUM(size)) as size").
+		Scan(&size)
+	totalSize += size
+
+	//get videos size
+	size = 0
+	database.GormDB.Table("videos").
+		Where("client_id = ?", client.ID).
+		Select("IF(size IS NULL, 0, SUM(size)) as size").
+		Scan(&size)
+	totalSize += size
+
+	//get heartbeat size
+	size = 0
+	database.GormDB.Table("heartbeats").
+		Where("client_id = ?", client.ID).
+		Select("IF(size IS NULL, 0, SUM(size)) as size").
+		Scan(&size)
+	totalSize += size
+
+	return totalSize
 }
 
 func CreateClientFromClinic(createClientRequest *clients.CreateClientRequest) (*clients.ListClientResponse, error) {
