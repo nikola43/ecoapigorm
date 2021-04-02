@@ -77,8 +77,8 @@ func GetClientsByClinicID(id uint) ([]clients.ListClientResponse, error) {
 	database.GormDB.First(&clinic, id)
 	database.GormDB.Where("clinic_id = ?", id).Find(&listCLinicClients)
 
-	var clientIds []uint
-	linq.From(listCLinicClients).SelectT(func(u models.ClinicClient) uint { return u.ClientID }).ToSlice(clientIds)
+	clientIds := make([]uint,0)
+	linq.From(listCLinicClients).SelectT(func(u models.ClinicClient) uint { return u.ClientID }).ToSlice(&clientIds)
 
 	database.GormDB.Find(&clientsList,&clientIds)
 
