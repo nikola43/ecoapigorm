@@ -112,7 +112,7 @@ func GetClientByEmail(clientEmail string) (*models.Client, error) {
 	return client, nil
 }
 
-func GetClientById(clientID uint) (*models.Client, error) {
+func GetClientById(clientID uint) (*modelsClients.ListClientResponse, error) {
 	client := &models.Client{}
 
 	GormDBResult := database.GormDB.
@@ -127,7 +127,38 @@ func GetClientById(clientID uint) (*models.Client, error) {
 		return nil, errors.New("client not found")
 	}
 
-	return client, nil
+
+	var size uint = 0
+	var totalSize uint = 0
+
+	// get images size
+	database.GormDB.Table("images").Where("client_id = ?", client.ID).Select("IF(size IS NULL, 0, SUM(size)) as size").Scan(&size)
+	totalSize += size
+
+	//get videos size
+	size = 0
+	database.GormDB.Table("videos").Where("client_id = ?", client.ID).Select("IF(size IS NULL, 0, SUM(size)) as size").Scan(&size)
+	totalSize += size
+
+	//get heartbeat size
+	size = 0
+	database.GormDB.Table("heartbeats").Where("client_id = ?", client.ID).Select("IF(size IS NULL, 0, SUM(size)) as size").Scan(&size)
+	totalSize += size
+
+	clientResponse := &modelsClients.ListClientResponse{
+		ID:            client.ID,
+		ClinicID:      client.ID,
+		Email:         client.Email,
+		Name:          client.Name,
+		LastName:      client.LastName,
+		Phone:         client.Phone,
+		CreatedAt:     client.CreatedAt,
+		PregnancyDate: client.PregnancyDate,
+		UsedSize:      totalSize,
+	}
+
+
+	return clientResponse, nil
 }
 
 func GetAllImagesByClientID(clientID uint) ([]models.Image, error) {

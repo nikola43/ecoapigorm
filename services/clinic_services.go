@@ -106,7 +106,6 @@ func GetClientsByClinicID(id uint) ([]clients.ListClientResponse, error) {
 			clients.ListClientResponse{
 				ID:            client.ID,
 				ClinicID:      clinic.ID,
-				ClinicName:    clinic.Name,
 				Email:         client.Email,
 				Name:          client.Name,
 				LastName:      client.LastName,
