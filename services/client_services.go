@@ -125,10 +125,12 @@ func GetClientById(clinicID, clientID uint) (*modelsClients.ListClientResponse, 
 		return nil, errors.New("client not found")
 	}
 
-	totalSize := utils.CalculateTotalSizeByClient(*client)
+	totalSize := utils.CalculateTotalSizeByClient(*client, clinicID)
 
 	clinicClient := new(models.ClinicClient)
-	GormDBResult = database.GormDB.Where("client_id = ? AND clinic_id = ?", client.ID, clinicID).Find(&clinicClient)
+	GormDBResult = database.GormDB.
+		Where("client_id = ? AND clinic_id = ?", client.ID, clinicID).
+		Find(&clinicClient)
 
 	clientResponse := &modelsClients.ListClientResponse{
 		ID:             client.ID,

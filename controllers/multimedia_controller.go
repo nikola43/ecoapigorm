@@ -22,7 +22,14 @@ func UploadMultimedia(context *fiber.Ctx) error {
 
 	bucketName := strings.ToLower(strings.ReplaceAll(employeeTokenClaims.CompanyName, " ", ""))
 
-	err = services.UploadMultimedia(context, bucketName, employeeTokenClaims.ClinicName, uint(clientID), uploadedFile, uint(uploadMode))
+	err = services.UploadMultimedia(
+		context,
+		bucketName,
+		employeeTokenClaims.ClinicName,
+		uint(clientID),
+		uploadedFile,
+		uint(uploadMode),
+		employeeTokenClaims.ClinicID)
 	if err != nil {
 		return err
 	}

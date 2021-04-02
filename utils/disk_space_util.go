@@ -5,7 +5,7 @@ import (
 	"github.com/nikola43/ecoapigorm/models"
 )
 
-func CalculateTotalSizeByClient(client models.Client) uint {
+func CalculateTotalSizeByClient(client models.Client, clinicId uint) uint {
 	var size uint = 0
 	totalSize := uint(0)
 
