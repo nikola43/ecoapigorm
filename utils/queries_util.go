@@ -6,7 +6,7 @@ import (
 	"github.com/nikola43/ecoapigorm/models"
 	"github.com/nikola43/ecoapigorm/models/promos"
 	"github.com/nikola43/ecoapigorm/models/recovery"
-	"github.com/nikola43/ecoapigorm/models/streaming"
+	streamingModels "github.com/nikola43/ecoapigorm/models/streamings"
 )
 
 
@@ -21,8 +21,8 @@ func GetModelByField(dest interface{}, fieldName string, fieldValue interface{})
 		model = dest.(*models.Clinic)
 	case *models.Employee:
 		model = dest.(*models.Employee)
-	case *streaming.Streaming:
-		model = dest.(*streaming.Streaming)
+	case *streamingModels.Streaming:
+		model = dest.(*streamingModels.Streaming)
 	case *promos.Promo:
 		model = dest.(*promos.Promo)
 	case *models.Image:

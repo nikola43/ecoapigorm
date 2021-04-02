@@ -11,6 +11,6 @@ type LoginClientResponse struct {
 	LastName string `json:"lastname"`
 	Phone    string `json:"phone"`
 	Token    string `json:"token"`
-	ClinicID uint `json:"clinic_id"`
+	Clinics []*Clinic `json:"clinics"`
 	PregnancyDate base.CustomNullTime `json:"pregnancy_date" xml:"pregnancy_date"`
 }

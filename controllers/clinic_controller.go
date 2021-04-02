@@ -10,7 +10,7 @@ import (
 	"github.com/nikola43/ecoapigorm/models/clients"
 	clinicModels "github.com/nikola43/ecoapigorm/models/clinic"
 	"github.com/nikola43/ecoapigorm/models/promos"
-	"github.com/nikola43/ecoapigorm/models/streaming"
+	streamingModels "github.com/nikola43/ecoapigorm/models/streamings"
 	"github.com/nikola43/ecoapigorm/services"
 	"github.com/nikola43/ecoapigorm/utils"
 	"strconv"
@@ -158,7 +158,7 @@ func CreateClientFromClinic(context *fiber.Ctx) error {
 
 func GetAllStreamingByClinicID(context *fiber.Ctx) error {
 	id := context.Params("clinic_id")
-	streamings := make([]streaming.Streaming, 0)
+	streamings := make([]streamingModels.Streaming, 0)
 	var err error
 
 	if streamings, err = services.GetAllStreamingByClinicID(id); err != nil {

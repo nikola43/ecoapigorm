@@ -3,7 +3,6 @@ package controllers
 import (
 	"fmt"
 	"github.com/gofiber/fiber/v2"
-	"github.com/nikola43/ecoapigorm/models/streaming"
 	streamings "github.com/nikola43/ecoapigorm/models/streamings"
 	"github.com/nikola43/ecoapigorm/services"
 	"strconv"
@@ -11,7 +10,7 @@ import (
 
 func GetStreamingByCodeController(context *fiber.Ctx) error {
 	code := context.Params("code")
-	var streaming = streaming.Streaming{}
+	var streaming = streamings.Streaming{}
 	var err error
 
 	if streaming, err = services.GetStreamingByCodeService(code);
@@ -61,7 +60,7 @@ func DeleteStreamingByID(context *fiber.Ctx) error {
 }
 
 func UpdateStreaming(context *fiber.Ctx) error {
-	streaming := new(streaming.Streaming)
+	streaming := new(streamings.Streaming)
 
 	// parse request
 	err := context.BodyParser(streaming)

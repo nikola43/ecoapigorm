@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	database "github.com/nikola43/ecoapigorm/database"
-	"github.com/nikola43/ecoapigorm/models/streaming"
 	streamings "github.com/nikola43/ecoapigorm/models/streamings"
 	"github.com/nikola43/ecoapigorm/utils"
 	"math/rand"
@@ -12,8 +11,8 @@ import (
 	"time"
 )
 
-func GetStreamingByCodeService(code string) (streaming.Streaming, error) {
-	var streaming = streaming.Streaming{}
+func GetStreamingByCodeService(code string) (streamings.Streaming, error) {
+	var streaming = streamings.Streaming{}
 
 	if err := database.GormDB.Where("code = ?", code).
 		First(&streaming).Error;
@@ -25,8 +24,8 @@ func GetStreamingByCodeService(code string) (streaming.Streaming, error) {
 	return streaming, nil
 }
 
-func CreateStreaming(createStreamingRequest *streamings.CreateStreamingRequest) (*streaming.Streaming, error) {
-	streaming := &streaming.Streaming{}
+func CreateStreaming(createStreamingRequest *streamings.CreateStreamingRequest) (*streamings.Streaming, error) {
+	streaming := &streamings.Streaming{}
 	code := ""
 	fmt.Println(createStreamingRequest)
 	for ok := true; ok; ok = streaming.ID > 0 {
@@ -55,7 +54,7 @@ func GenerateRandomCode(length int) string {
 }
 
 func DeleteStreamingByID(streamingID uint) error {
-	deleteStreaming := new(streaming.Streaming)
+	deleteStreaming := new(streamings.Streaming)
 
 	// todo check clinic is who make action
 	// check if employee exist
@@ -73,8 +72,8 @@ func DeleteStreamingByID(streamingID uint) error {
 	return nil
 }
 
-func UpdateStreaming(updateStreaming *streaming.Streaming) (*streaming.Streaming, error) {
-	streaming := new(streaming.Streaming)
+func UpdateStreaming(updateStreaming *streamings.Streaming) (*streamings.Streaming, error) {
+	streaming := new(streamings.Streaming)
 
 	utils.GetModelByField(streaming, "id", updateStreaming.ID)
 	if streaming.ID < 1 {

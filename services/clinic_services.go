@@ -10,7 +10,7 @@ import (
 	clinicModels "github.com/nikola43/ecoapigorm/models/clinic"
 	_ "github.com/nikola43/ecoapigorm/models/employee"
 	"github.com/nikola43/ecoapigorm/models/promos"
-	"github.com/nikola43/ecoapigorm/models/streaming"
+	streamingModels "github.com/nikola43/ecoapigorm/models/streamings"
 	"github.com/nikola43/ecoapigorm/utils"
 	_ "github.com/nikola43/ecoapigorm/utils"
 	"gorm.io/gorm"
@@ -91,7 +91,7 @@ func GetClientsByClinicID(id uint) ([]clients.ListClientResponse, error) {
 	database.GormDB.Find(&clientsList, &clientIds)
 
 	for i,client := range clientsList {
-		totalSize := CalculateTotalSizeByClient(client)
+		totalSize := utils.CalculateTotalSizeByClient(client)
 		list = append(
 			list,
 			clients.ListClientResponse{
@@ -110,36 +110,6 @@ func GetClientsByClinicID(id uint) ([]clients.ListClientResponse, error) {
 	}
 
 	return list, nil
-}
-
-func CalculateTotalSizeByClient(client models.Client) uint {
-	var size uint = 0
-	totalSize := uint(0)
-
-	// get images size
-	database.GormDB.Table("images").
-		Where("client_id = ?", client.ID).
-		Select("IF(size IS NULL, 0, SUM(size)) as size").
-		Scan(&size)
-	totalSize += size
-
-	//get videos size
-	size = 0
-	database.GormDB.Table("videos").
-		Where("client_id = ?", client.ID).
-		Select("IF(size IS NULL, 0, SUM(size)) as size").
-		Scan(&size)
-	totalSize += size
-
-	//get heartbeat size
-	size = 0
-	database.GormDB.Table("heartbeats").
-		Where("client_id = ?", client.ID).
-		Select("IF(size IS NULL, 0, SUM(size)) as size").
-		Scan(&size)
-	totalSize += size
-
-	return totalSize
 }
 
 func CreateClientFromClinic(createClientRequest *clients.CreateClientRequest) (*clients.ListClientResponse, error) {
@@ -265,8 +235,8 @@ func GetAllPromosByClinicID(clinicID string) ([]promos.Promo, error) {
 	return promos, nil
 }
 
-func GetAllStreamingByClinicID(clinicID string) ([]streaming.Streaming, error) {
-	var list = make([]streaming.Streaming, 0)
+func GetAllStreamingByClinicID(clinicID string) ([]streamingModels.Streaming, error) {
+	var list = make([]streamingModels.Streaming, 0)
 	var clients = make([]models.Client, 0)
 	var clientsIds = make([]uint, 0)
 

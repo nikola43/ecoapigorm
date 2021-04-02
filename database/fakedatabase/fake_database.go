@@ -5,7 +5,7 @@ import (
 	"github.com/nikola43/ecoapigorm/models"
 	"github.com/nikola43/ecoapigorm/models/kicks"
 	"github.com/nikola43/ecoapigorm/models/promos"
-	"github.com/nikola43/ecoapigorm/models/streaming"
+	streamingModels "github.com/nikola43/ecoapigorm/models/streamings"
 	"github.com/nikola43/ecoapigorm/utils"
 	"math/rand"
 	"time"
@@ -203,7 +203,7 @@ func CreateFakeByClient(clientId uint) {
 
 	//STREAMING
 	for i := 1; i < 100; i++ {
-		streaming := streaming.Streaming{
+		streaming := streamingModels.Streaming{
 			ClientID: clientId,
 			Url:      "https://www.youtube.com/watch?v=5qap5aO4i9A",
 			Code:     "12345",

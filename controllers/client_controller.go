@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	streamingModels "github.com/nikola43/ecoapigorm/models/streamings"
 	"github.com/nikola43/ecoapigorm/utils"
 	//"fmt"
 	"github.com/go-playground/validator/v10"
@@ -8,7 +9,6 @@ import (
 
 	"github.com/nikola43/ecoapigorm/models"
 	modelsClient "github.com/nikola43/ecoapigorm/models/clients"
-	"github.com/nikola43/ecoapigorm/models/streaming"
 	"github.com/nikola43/ecoapigorm/services"
 	"strconv"
 	//"strings"
@@ -60,7 +60,7 @@ func GetAllImagesByClientID(context *fiber.Ctx) error {
 
 func GetAllStreamingByClientID(context *fiber.Ctx) error {
 	clientID := context.Params("client_id")
-	videos := make([]streaming.Streaming, 0)
+	videos := make([]streamingModels.Streaming, 0)
 	var err error
 
 	if videos, err = services.GetAllStreamingByClientID(clientID); err != nil {
@@ -171,7 +171,7 @@ func IncrementDiskQuoteLevel(context *fiber.Ctx) error {
 	}
 
 
-	err = services.IncrementDiskQuoteLevel(employeeTokenClaims.ClinicID, listClientResponse)
+	err = services.IncrementDiskQuoteLevel(employeeTokenClaims.ClinicID, listClientResponse.ID)
 
 	if err != nil {
 		return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{

@@ -2,7 +2,7 @@ package models
 
 import (
 	"github.com/nikola43/ecoapigorm/models/base"
-	"github.com/nikola43/ecoapigorm/models/streaming"
+	streamingModels "github.com/nikola43/ecoapigorm/models/streamings"
 )
 
 type Client struct {
@@ -18,7 +18,7 @@ type Client struct {
 	Holographs            []Holographic          `json:"holographics" xml:"holographics" form:"holographics"`
 	Images                []Image                `json:"images" xml:"images" form:"images"`
 	Heartbeat             []Heartbeat            `json:"heartbeat" xml:"heartbeat" form:"heartbeat"`
-	Streaming             []streaming.Streaming  `json:"streamings" xml:"streamings" form:"streamings"`
-	Clinics          []*Clinic       `gorm:"many2many:clinic_clients;" json:"clinics"`
+	Streaming             []streamingModels.Streaming `json:"streamings" xml:"streamings" form:"streamings"`
+	Clinics          []*Clinic                   `gorm:"many2many:clinic_clients;" json:"clinics"`
 	PushNotificationDatas []PushNotificationData `json:"push_notification_datas" xml:"push_notification_datas" form:"push_notification_datas"`
 }
