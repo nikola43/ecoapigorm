@@ -21,9 +21,9 @@ const (
 )
 
 type WasabiS3Client struct {
-	s3Client  *s3.S3
-	s3Session *session.Session
-	s3BucketRegion  string
+	s3Client       *s3.S3
+	s3Session      *session.Session
+	s3BucketRegion string
 }
 
 func (awsClient *WasabiS3Client) DownloadObject(filekey string, filepath string) error {
@@ -45,7 +45,7 @@ func (awsClient *WasabiS3Client) DownloadObject(filekey string, filepath string)
 	fmt.Println(bytes)
 	return nil
 }
-func (awsClient *WasabiS3Client) UploadObject(bucketName,filepath string, clientID uint, tipo string) (string, int64, error) {
+func (awsClient *WasabiS3Client) UploadObject(bucketName, clinicName, filepath string, clientID uint, tipo string) (string, int64, error) {
 
 	file, err := os.Open("./" + filepath)
 	if err != nil {
@@ -63,7 +63,7 @@ func (awsClient *WasabiS3Client) UploadObject(bucketName,filepath string, client
 	fmt.Println("file.Name()")
 	fmt.Println(file.Name())
 
-	path := "/" + strconv.FormatInt(int64(clientID), 10) + "/" + tipo + "/" + strings.Split(file.Name(), "/")[2]
+	path := "/" + clinicName + "/" + strconv.FormatInt(int64(clientID), 10) + "/" + tipo + "/" + strings.Split(file.Name(), "/")[4]
 	input := &s3.CreateMultipartUploadInput{
 		Bucket:      aws.String(bucketName),
 		Key:         aws.String(path),
@@ -113,8 +113,8 @@ func (awsClient *WasabiS3Client) UploadObject(bucketName,filepath string, client
 
 func (awsClient *WasabiS3Client) CreateBucket(bucketName string) error {
 	result, err := awsClient.s3Client.CreateBucket(&s3.CreateBucketInput{
-		Bucket:      aws.String(bucketName),
-		ACL:         aws.String("public-read"),
+		Bucket: aws.String(bucketName),
+		ACL:    aws.String("public-read"),
 	})
 	fmt.Println(result)
 	return err
@@ -125,11 +125,13 @@ func (awsClient *WasabiS3Client) DeleteObject(bucket string, key *string) error 
 		Bucket: &bucket,
 		Key:    key,
 	}
+	fmt.Println(request)
 
-	_, err := awsClient.s3Client.DeleteObject(request)
+	r, err := awsClient.s3Client.DeleteObject(request)
 	if err != nil {
 		return err
 	}
+	fmt.Println(r)
 	return nil
 }
 
@@ -189,7 +191,7 @@ func CompleteMultipartUpload(s3Client *s3.S3, resp *s3.CreateMultipartUploadOutp
 	return s3Client.CompleteMultipartUpload(completeInput)
 }
 
-func New(accessKey, secretKey, endpoint,bucketRegion string) *WasabiS3Client {
+func New(accessKey, secretKey, endpoint, bucketRegion string) *WasabiS3Client {
 	awsManager := &WasabiS3Client{}
 
 	s3Config := &aws.Config{

@@ -39,6 +39,9 @@ func ClinicRoutes(router fiber.Router) {
 	// /api/v1/clinic/:clinic_id/promos/:week
 	clinicRouter.Get("/:clinic_id/promos/:week", controllers.GetPromosByWeekAndClinicID)
 
+	// /api/v1/clinic/:clinic_id/employees
+	clinicRouter.Get("/:clinic_id/employees", controllers.GetEmployeesByClinicID)
+
 	// check Employee.Role == 'admin'
 	clinicRouter.Use(middleware.AdminEmployeeMiddleware)
 
@@ -51,7 +54,6 @@ func ClinicRoutes(router fiber.Router) {
 	// /api/v1/clinic
 	clinicRouter.Patch("/", controllers.UpdateClinicByID)
 
-	// /api/v1/clinic/:clinic_id/employees
-	clinicRouter.Get("/:clinic_id/employees", controllers.GetEmployeesByClinicID)
+
 
 }

@@ -3,10 +3,9 @@ package controllers
 import (
 	"fmt"
 	"github.com/gofiber/fiber/v2"
-	"github.com/nikola43/ecoapigorm/wasabis3manager"
 	"github.com/nikola43/ecoapigorm/services"
 	"github.com/nikola43/ecoapigorm/utils"
-	"log"
+	"github.com/nikola43/ecoapigorm/wasabis3manager"
 	"os"
 	"strconv"
 	"strings"
@@ -22,18 +21,10 @@ func UploadMultimedia(context *fiber.Ctx) error {
 	}
 
 	bucketName := strings.ToLower(strings.ReplaceAll(employeeTokenClaims.CompanyName, " ", ""))
+
+	err = services.UploadMultimedia(context, bucketName, employeeTokenClaims.ClinicName, uint(clientID), uploadedFile, uint(uploadMode))
 	if err != nil {
 		return err
-	}
-
-	err = services.UploadMultimedia(context, bucketName, uint(clientID), uploadedFile, uint(uploadMode))
-	if err != nil {
-		return err
-	}
-
-	e := os.Remove("./tempFiles/" + uploadedFile.Filename)
-	if e != nil {
-		log.Fatal(e)
 	}
 
 	return context.Status(fiber.StatusOK).JSON(&fiber.Map{
@@ -73,10 +64,16 @@ func DownloadAllMultimediaContentByClientID(context *fiber.Ctx) error {
 	return context.SendStatus(fiber.StatusOK)
 }
 
-func DeleteImage(context *fiber.Ctx) error {
+func DeleteHeartbeat(context *fiber.Ctx) error {
 	id, _ := strconv.ParseUint(context.Params("id"), 10, 64)
+	employeeTokenClaims, err := utils.GetEmployeeTokenClaims(context)
+	if err != nil {
+		return context.SendStatus(fiber.StatusUnauthorized)
+	}
 
-	err := services.DeleteImage(uint(id))
+	bucketName := strings.ToLower(strings.ReplaceAll(employeeTokenClaims.CompanyName, " ", ""))
+
+	err = services.DeleteHeartbeat(bucketName, uint(id))
 	if err != nil {
 		return context.Status(fiber.StatusNotFound).JSON(&fiber.Map{
 			"error": err.Error(),
@@ -87,19 +84,52 @@ func DeleteImage(context *fiber.Ctx) error {
 	return context.Status(fiber.StatusOK).JSON(&fiber.Map{
 		"success": true,
 	})
-
 }
 
-func DeleteVideo(context *fiber.Ctx) error {
-	id, _ := strconv.ParseUint(context.Params("video_id"), 10, 64)
+func DeleteImage(context *fiber.Ctx) error {
+	id, _ := strconv.ParseUint(context.Params("id"), 10, 64)
+	employeeTokenClaims, err := utils.GetEmployeeTokenClaims(context)
+	if err != nil {
+		return context.SendStatus(fiber.StatusUnauthorized)
+	}
 
+	bucketName := strings.ToLower(strings.ReplaceAll(employeeTokenClaims.CompanyName, " ", ""))
+
+	err = services.DeleteImage(bucketName, uint(id))
+	if err != nil {
+		return context.Status(fiber.StatusNotFound).JSON(&fiber.Map{
+			"error": err.Error(),
+		})
+	}
 	fmt.Println(id)
 
 	return context.Status(fiber.StatusOK).JSON(&fiber.Map{
 		"success": true,
 	})
-
 }
+
+func DeleteVideo(context *fiber.Ctx) error {
+	id, _ := strconv.ParseUint(context.Params("id"), 10, 64)
+	employeeTokenClaims, err := utils.GetEmployeeTokenClaims(context)
+	if err != nil {
+		return context.SendStatus(fiber.StatusUnauthorized)
+	}
+
+	bucketName := strings.ToLower(strings.ReplaceAll(employeeTokenClaims.CompanyName, " ", ""))
+
+	err = services.DeleteVideo(bucketName, uint(id))
+	if err != nil {
+		return context.Status(fiber.StatusNotFound).JSON(&fiber.Map{
+			"error": err.Error(),
+		})
+	}
+	fmt.Println(id)
+
+	return context.Status(fiber.StatusOK).JSON(&fiber.Map{
+		"success": true,
+	})
+}
+
 func DeleteHolographic(context *fiber.Ctx) error {
 	id, _ := strconv.ParseUint(context.Params("holopraphic_id"), 10, 64)
 
@@ -108,16 +138,4 @@ func DeleteHolographic(context *fiber.Ctx) error {
 	return context.Status(fiber.StatusOK).JSON(&fiber.Map{
 		"success": true,
 	})
-
-}
-
-func DeleteHeartbeat(context *fiber.Ctx) error {
-	id, _ := strconv.ParseUint(context.Params("heartbeat_id"), 10, 64)
-
-	fmt.Println(id)
-
-	return context.Status(fiber.StatusOK).JSON(&fiber.Map{
-		"success": true,
-	})
-
 }

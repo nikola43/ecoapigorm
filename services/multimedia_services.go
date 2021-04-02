@@ -11,64 +11,90 @@ import (
 	"log"
 	"mime/multipart"
 	"os"
+	"regexp"
+	"strconv"
+	"strings"
 )
 
-func UploadMultimedia(context *fiber.Ctx, bucketName string, clientID uint, uploadedFile *multipart.FileHeader, uploadMode uint) error {
+func UploadMultimedia(context *fiber.Ctx, bucketName string, clinicName string, clientID uint, uploadedFile *multipart.FileHeader, uploadMode uint) error {
 	//fmt.Println(context)
 	//fmt.Println(clientID)
 	//fmt.Println(uploadedFile)
 
 	// Save file to root directory:
-	err := context.SaveFile(uploadedFile, fmt.Sprintf("./tempFiles/%s", uploadedFile.Filename))
+	reg, err := regexp.Compile("[^a-zA-Z0-9-.]+")
+	if err != nil {
+		log.Fatal(err)
+	}
+	cleanFilename := reg.ReplaceAllString(uploadedFile.Filename, "")
+	clinicName = reg.ReplaceAllString(clinicName, "")
+	clinicName = strings.ToLower(strings.ReplaceAll(clinicName, " ", ""))
+	var clientIDString = strconv.FormatUint(uint64(clientID), 10)
+	os.MkdirAll(fmt.Sprintf("./tempFiles/%s/%s", clinicName, clientIDString), os.ModePerm)
+
+	err = context.SaveFile(uploadedFile, fmt.Sprintf("./tempFiles/%s/%s/%s", clinicName, clientIDString, cleanFilename))
 	if err != nil {
 		return err
 	}
 
-	fileType := utils.GetFileType(uploadedFile.Filename, uploadMode)
+	fileType := utils.GetFileType(cleanFilename, uploadMode)
 	fmt.Println("fileType")
 	fmt.Println(fileType)
 
 	if fileType == "image" {
 		// image
 
-		url, size, storeInAmazonError := wasabis3manager.WasabiS3Client.UploadObject(bucketName, "tempFiles/"+uploadedFile.Filename, clientID, fileType)
+		url, size, storeInAmazonError := wasabis3manager.WasabiS3Client.UploadObject(bucketName, clinicName, "tempFiles/"+clinicName+"/"+clientIDString+"/"+cleanFilename, clientID, fileType)
 		if storeInAmazonError != nil {
 			fmt.Println(storeInAmazonError.Error())
 		}
-		image := models.Image{ClientID: clientID, Url: url, Size: uint(size)}
+		image := models.Image{Filename: cleanFilename, ClientID: clientID, Url: url, Size: uint(size)}
 		database.GormDB.Create(&image)
+
+		e := os.Remove("./tempFiles/" + clinicName + "/" + clientIDString + "/" + cleanFilename)
+		if e != nil {
+			log.Fatal(e)
+		}
 
 		return err
 	} else if fileType == "video" || fileType == "holographic" {
 		// upload video
-		videoUrl, videoSize, storeInAmazonError := wasabis3manager.WasabiS3Client.UploadObject(bucketName,"tempFiles/"+uploadedFile.Filename, clientID, fileType)
+		videoUrl, videoSize, storeInAmazonError := wasabis3manager.WasabiS3Client.UploadObject(bucketName, clinicName, "tempFiles/"+clinicName+"/"+clientIDString+"/"+cleanFilename, clientID, fileType)
 		if storeInAmazonError != nil {
 			return err
 		}
 
+		ThumbnailCleanFilename := "tempFiles/" + clinicName + "/" + clientIDString + "/" + cleanFilename + "_thumbnail.jpg"
+		ThumbnailCleanFilename = strings.ToLower(strings.ReplaceAll(ThumbnailCleanFilename, " ", ""))
+
 		// create thumb
-		thumbnailPath, extractThumbnailFromVideoError := utils.ExtractThumbnailFromVideo("tempFiles/"+uploadedFile.Filename)
+		thumbnailPath, extractThumbnailFromVideoError := utils.ExtractThumbnailFromVideo("tempFiles/" + clinicName + "/" + clientIDString + "/" + cleanFilename)
 		if extractThumbnailFromVideoError != nil {
 			return extractThumbnailFromVideoError
 		}
 
 		// thumb video
-		thumbUrl, thumbSize, storeThumbInAmazonError := wasabis3manager.WasabiS3Client.UploadObject(bucketName,thumbnailPath, clientID, fileType)
+		thumbUrl, thumbSize, storeThumbInAmazonError := wasabis3manager.WasabiS3Client.UploadObject(bucketName, clinicName, thumbnailPath, clientID, fileType)
 		if storeThumbInAmazonError != nil {
 			return storeThumbInAmazonError
 		}
 
 		if fileType == "video" {
-			video := models.Video{ClientID: clientID, Url: videoUrl, ThumbnailUrl: thumbUrl, Size: uint(videoSize + thumbSize)}
+			video := models.Video{Filename: cleanFilename, ClientID: clientID, Url: videoUrl, ThumbnailUrl: thumbUrl, Size: uint(videoSize + thumbSize)}
 			database.GormDB.Create(&video)
 		}
 
 		if fileType == "holographic" {
-			video := models.Holographic{ClientID: clientID, Url: videoUrl, ThumbnailUrl: thumbUrl, Size: uint(videoSize + thumbSize)}
+			video := models.Holographic{Filename: cleanFilename, ClientID: clientID, Url: videoUrl, ThumbnailUrl: thumbUrl, Size: uint(videoSize + thumbSize)}
 			database.GormDB.Create(&video)
 		}
 
-		e := os.Remove(thumbnailPath)
+		e := os.Remove("./tempFiles/" + clinicName + "/" + clientIDString + "/" + cleanFilename)
+		if e != nil {
+			log.Fatal(e)
+		}
+
+		e = os.Remove(thumbnailPath)
 		if e != nil {
 			log.Fatal(e)
 		}
@@ -77,7 +103,7 @@ func UploadMultimedia(context *fiber.Ctx, bucketName string, clientID uint, uplo
 	} else if fileType == "holo" {
 		// holo
 		/*
-			url, size, storeInAmazonError := utils.UploadObject("tempFiles/"+uploadedFile.Filename, clientID, fileType)
+			url, size, storeInAmazonError := utils.UploadObject("tempFiles/"+cleanFilename, clientID, fileType)
 			if storeInAmazonError != nil {
 				fmt.Println(storeInAmazonError.Error())
 			}
@@ -87,19 +113,24 @@ func UploadMultimedia(context *fiber.Ctx, bucketName string, clientID uint, uplo
 		return err
 	} else if fileType == "heartbeat" {
 		// holo
-		url, size, storeInAmazonError := wasabis3manager.WasabiS3Client.UploadObject(bucketName,"tempFiles/"+uploadedFile.Filename, clientID, fileType)
+		url, size, storeInAmazonError := wasabis3manager.WasabiS3Client.UploadObject(bucketName, clinicName, "tempFiles/"+clinicName+"/"+clientIDString+"/"+cleanFilename, clientID, fileType)
 		if storeInAmazonError != nil {
 			fmt.Println(storeInAmazonError.Error())
 		}
-		video := models.Heartbeat{ClientID: clientID, Url: url, Size: uint(size)}
+		video := models.Heartbeat{Filename: cleanFilename, ClientID: clientID, Url: url, Size: uint(size)}
 		database.GormDB.Create(&video)
+		e := os.Remove("./tempFiles/" + clinicName + "/" + clientIDString + "/" + cleanFilename)
+		if e != nil {
+			log.Fatal(e)
+		}
+
 		return err
 	} else {
 		return errors.New("invalid file")
 	}
 }
 
-func DeleteImage(imageID uint) error {
+func DeleteImage(bucketName string, imageID uint) error {
 	image := &models.Image{}
 
 	result := database.GormDB.First(&image, imageID)
@@ -107,10 +138,77 @@ func DeleteImage(imageID uint) error {
 		return result.Error
 	}
 
+	url := strings.Split(image.Url, "/")
+	key := url[4] + "/" + url[5] + "/" + url[6]
+
 	// delete from S3
+	err := wasabis3manager.WasabiS3Client.DeleteObject(bucketName, &key)
+	if err != nil {
+		return err
+	}
 
 	// delete from DB
 	result = database.GormDB.Unscoped().Delete(image)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
+}
+
+func DeleteVideo(bucketName string, imageID uint) error {
+	video := &models.Video{}
+
+	result := database.GormDB.First(&video, imageID)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	videoUrl := strings.Split(video.Url, "/")
+	thumbnailUrl := strings.Split(video.ThumbnailUrl, "/")
+	videoKey := videoUrl[4] + "/" + videoUrl[5] + "/" + videoUrl[6]
+	thumbnailKey := thumbnailUrl[4] + "/" + thumbnailUrl[5] + "/" + thumbnailUrl[6]
+
+	// delete video
+	err := wasabis3manager.WasabiS3Client.DeleteObject(bucketName, &videoKey)
+	if err != nil {
+		return err
+	}
+
+	// delete thumbnail
+	err = wasabis3manager.WasabiS3Client.DeleteObject(bucketName, &thumbnailKey)
+	if err != nil {
+		return err
+	}
+
+	// delete from DB
+	result = database.GormDB.Unscoped().Delete(video)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
+}
+
+func DeleteHeartbeat(bucketName string, imageID uint) error {
+	heartbeat := &models.Heartbeat{}
+
+	result := database.GormDB.First(&heartbeat, imageID)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	url := strings.Split(heartbeat.Url, "/")
+	key := url[4] + "/" + url[5] + "/" + url[6]
+
+	// delete from S3
+	err := wasabis3manager.WasabiS3Client.DeleteObject(bucketName, &key)
+	if err != nil {
+		return err
+	}
+
+	// delete from DB
+	result = database.GormDB.Unscoped().Delete(heartbeat)
 	if result.Error != nil {
 		return result.Error
 	}

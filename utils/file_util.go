@@ -12,9 +12,9 @@ import (
 	"time"
 )
 
-const FFMPEG_PATH = "/usr/bin/ffmpeg"
+//const FFMPEG_PATH = "/usr/bin/ffmpeg"
 
-//const FFMPEG_PATH = "/home/ecodadys/bin/ffmpeg"
+const FFMPEG_PATH = "/usr/local/bin/ffmpeg"
 
 /**
 Check if file exist and its size
