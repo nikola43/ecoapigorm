@@ -90,7 +90,7 @@ func GetClientsByClinicID(id uint) ([]clients.ListClientResponse, error) {
 
 	database.GormDB.Find(&clientsList, &clientIds)
 
-	for _,client := range clientsList {
+	for i,client := range clientsList {
 		totalSize := CalculateTotalSizeByClient(client)
 		list = append(
 			list,
@@ -104,7 +104,7 @@ func GetClientsByClinicID(id uint) ([]clients.ListClientResponse, error) {
 				CreatedAt:      client.CreatedAt,
 				PregnancyDate:  client.PregnancyDate,
 				UsedSize:       totalSize,
-				DiskQuoteLevel: listCLinicClients[i].DiskQuoteLevel,
+				DiskQuoteLevel: listClinicClients[i].DiskQuoteLevel,
 			},
 		)
 	}
