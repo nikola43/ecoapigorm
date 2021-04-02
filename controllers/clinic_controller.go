@@ -80,7 +80,7 @@ func CreateClinic(context *fiber.Ctx) error {
 	}
 
 	// create and response
-	if createClinicResponse, err = services.CreateClinic(employeeTokenClaims.ID, createClinicRequest);
+	if createClinicResponse, err = services.CreateClinic(employeeTokenClaims.CompanyID, createClinicRequest);
 		err != nil {
 		return context.Status(fiber.StatusNotFound).JSON(&fiber.Map{
 			"error": err.Error(),

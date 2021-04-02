@@ -21,7 +21,7 @@ func LoginClient(email, password string) (*models.LoginClientResponse, error) {
 		return nil, errors.New("not found")
 	}
 
-	if token, err = utils.GenerateClientToken(client.Email, client.ID, client.ClinicID); err != nil {
+	if token, err = utils.GenerateClientToken(client.Email, client.ID, 1/*client.ClinicID*/); err != nil {
 		return nil, err
 	}
 
@@ -32,7 +32,8 @@ func LoginClient(email, password string) (*models.LoginClientResponse, error) {
 		Phone:    client.Phone,
 		LastName: client.LastName,
 		Token:    token,
-		ClinicID: client.ClinicID,
+		//ClinicID: client.ClinicID,
+		ClinicID: 1,
 		PregnancyDate: client.PregnancyDate,
 	}
 
@@ -56,23 +57,18 @@ func LoginEmployee(email, password string) (*models.LoginEmployeeResponse, error
 	}
 	fmt.Println(employee)
 
-
-
-	database.GormDB.Model(&clinic).
-		Joins("left join employees on clinics.employee_id = employees.id").
-		Where("employees.id = ?", employee.ID).
-		Find(&clinic)
-
-	database.GormDB.Model(&company).
-		Where("id = ?", employee.CompanyID).
-		Find(&company)
+	database.GormDB.First(&company,employee.CompanyID)
 
 	fmt.Println("clinicID")
 	fmt.Println(clinic.ID)
 
-
-	if clinic.ID < 1 {
-		database.GormDB.Where("id = ?", employee.ClinicID).Find(&clinic)
+	//Si es admin le metemos todas las clinicas de la company
+	if employee.Role == "admin" {
+		database.GormDB.
+			Where("company_id = ?", employee.CompanyID).
+			First(&clinic) //TODO enviar todas en lugar de una
+	}else {
+		database.GormDB.First(&clinic, employee.ClinicID)
 	}
 
 	token, err = utils.GenerateEmployeeToken(

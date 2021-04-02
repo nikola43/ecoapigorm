@@ -3,6 +3,7 @@ module github.com/nikola43/ecoapigorm
 go 1.14
 
 require (
+	github.com/ahmetb/go-linq/v3 v3.2.0
 	github.com/aws/aws-sdk-go v1.37.21
 	github.com/form3tech-oss/jwt-go v3.2.2+incompatible
 	github.com/go-playground/validator/v10 v10.4.1

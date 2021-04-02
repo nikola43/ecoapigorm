@@ -3,6 +3,7 @@ package services
 import (
 	"errors"
 	"fmt"
+	linq "github.com/ahmetb/go-linq/v3"
 	database "github.com/nikola43/ecoapigorm/database"
 	models "github.com/nikola43/ecoapigorm/models"
 	"github.com/nikola43/ecoapigorm/models/clients"
@@ -13,15 +14,14 @@ import (
 	"github.com/nikola43/ecoapigorm/utils"
 	_ "github.com/nikola43/ecoapigorm/utils"
 	"gorm.io/gorm"
-	"time"
 )
 
-func CreateClinic(employeeID uint, createClinicRequest *clinicModels.CreateClinicRequest) (*clinicModels.CreateClinicResponse, error) {
+func CreateClinic(companyID uint, createClinicRequest *clinicModels.CreateClinicRequest) (*clinicModels.CreateClinicResponse, error) {
 	// give 30 credits first time
 	var clinics = make([]*models.Clinic, 0)
 	credits := 0
 
-	GormDBResult := database.GormDB.Where("employee_id = ?", employeeID).Find(&clinics)
+	GormDBResult := database.GormDB.Where("company_id = ?", companyID).Find(&clinics)
 	if GormDBResult.Error != nil {
 
 	}
@@ -34,7 +34,8 @@ func CreateClinic(employeeID uint, createClinicRequest *clinicModels.CreateClini
 
 	clinic := models.Clinic{
 		Name:             createClinicRequest.Name,
-		EmployeeID:       employeeID,
+		//EmployeeID:       employeeID,
+		CompanyID: companyID,
 		AvailableCredits: uint(credits),
 	}
 	result := database.GormDB.Create(&clinic)
@@ -46,22 +47,12 @@ func CreateClinic(employeeID uint, createClinicRequest *clinicModels.CreateClini
 	createEmployeeResponse := &clinicModels.CreateClinicResponse{
 		ID:               clinic.ID,
 		Name:             clinic.Name,
-		EmployeeID:       clinic.EmployeeID,
+		//EmployeeID:       clinic.EmployeeID,
+		CompanyID: companyID,
 		AvailableCredits: uint(credits),
 	}
 
 	return createEmployeeResponse, result.Error
-}
-
-func GetClinicas() ([]models.Clinic, error) {
-	var list []models.Clinic
-
-	GormDBResult := database.GormDB.Find(list)
-	if GormDBResult.Error != nil {
-		return nil, GormDBResult.Error
-	}
-
-	return list, nil
 }
 
 func GetClinicByID(id uint) (*models.Clinic, error) {
@@ -76,11 +67,58 @@ func GetClinicByID(id uint) (*models.Clinic, error) {
 
 func GetClientsByClinicID(id uint) ([]clients.ListClientResponse, error) {
 	list := make([]clients.ListClientResponse, 0)
+	listCLinicClients := make([]models.ClinicClient, 0)
+	clinic := models.Clinic{}
+	clientsList := make([]models.Client, 0)
 	var totalSize uint = 0
 	//videosSize := 0
 	//heartbeatSize := 0
 
-	database.GormDB.Model(models.Client{}).Select(
+	database.GormDB.First(&clinic, id)
+	database.GormDB.Where("clinic_id = ?", id).Find(&listCLinicClients)
+
+	var clientIds []uint
+	linq.From(listCLinicClients).SelectT(func(u models.ClinicClient) uint { return u.ClientID }).ToSlice(clientIds)
+
+	database.GormDB.Find(&clientsList,&clientIds)
+
+	for _,client := range clientsList {
+
+		var size uint = 0
+		totalSize = 0
+
+		// get images size
+		database.GormDB.Table("images").Where("client_id = ?", client.ID).Select("IF(size IS NULL, 0, SUM(size)) as size").Scan(&size)
+		totalSize += size
+
+		//get videos size
+		size = 0
+		database.GormDB.Table("videos").Where("client_id = ?", client.ID).Select("IF(size IS NULL, 0, SUM(size)) as size").Scan(&size)
+		totalSize += size
+
+		//get heartbeat size
+		size = 0
+		database.GormDB.Table("heartbeats").Where("client_id = ?", client.ID).Select("IF(size IS NULL, 0, SUM(size)) as size").Scan(&size)
+		totalSize += size
+
+		list = append(
+			list,
+			clients.ListClientResponse{
+				ID:            client.ID,
+				ClinicID:      clinic.ID,
+				ClinicName:    clinic.Name,
+				Email:         client.Email,
+				Name:          client.Name,
+				LastName:      client.LastName,
+				Phone:         client.Phone,
+				CreatedAt:     client.CreatedAt,
+				PregnancyDate: client.PregnancyDate,
+				UsedSize:      totalSize,
+			},
+		)
+	}
+
+/*	database.GormDB.Model(models.Client{}).Select(
 		"distinct clients.id, "+
 			"clinics.id as clinic_id, "+
 			"clinics.name as clinic_name, "+
@@ -120,7 +158,7 @@ func GetClientsByClinicID(id uint) ([]clients.ListClientResponse, error) {
 		totalSize += size
 
 		list[index].UsedSize = totalSize
-	}
+	}*/
 
 	return list, nil
 }
@@ -128,8 +166,8 @@ func GetClientsByClinicID(id uint) ([]clients.ListClientResponse, error) {
 func CreateClientFromClinic(createClientRequest *clients.CreateClientRequest) (*clients.ListClientResponse, error) {
 	client := models.Client{}
 	clinic := models.Clinic{}
-	clinicOwnerParentEmployeeClinic := models.Clinic{}
-	useParentEmployeeClinicAvailableUsers := false
+	//clinicOwnerParentEmployeeClinic := clinicModels.Clinic{}
+	//useParentEmployeeClinicAvailableUsers := false
 	useClinicAvailableUsers := false
 
 	// check if client already exist
@@ -153,7 +191,7 @@ func CreateClientFromClinic(createClientRequest *clients.CreateClientRequest) (*
 	if clinic.AvailableCredits > 0 {
 		useClinicAvailableUsers = true
 	} else {
-		// get clinic owner
+/*		// get clinic owner
 		clinicOwnerEmployee := models.Employee{}
 		if err := database.GormDB.First(&clinicOwnerEmployee, clinic.EmployeeID).Error; err != nil {
 			return nil, errors.New("employee_id not found")
@@ -170,7 +208,7 @@ func CreateClientFromClinic(createClientRequest *clients.CreateClientRequest) (*
 			// if find parent employee
 			if clinicOwnerParentEmployee.ID > 0 {
 				// get clinic owner employee clinic
-				database.GormDB.Model(models.Clinic{}).Select(
+				database.GormDB.Model(clinicModels.Clinic{}).Select(
 					"clinics.id, clinics.extend_clients, clinics.available_clients").Joins(
 					"inner join employees on clinics.employee_id = employees.id").Where(
 					"employees.id = ?", clinicOwnerParentEmployee.ID).Scan(&clinicOwnerParentEmployeeClinic)
@@ -189,11 +227,10 @@ func CreateClientFromClinic(createClientRequest *clients.CreateClientRequest) (*
 			}
 		} else {
 			return nil, errors.New("insufficient credits")
-		}
+		}*/
 	}
 
 	client = models.Client{
-		ClinicID:      createClientRequest.ClinicID,
 		Email:         createClientRequest.Email,
 		Password:      utils.HashPassword([]byte("mimatrona")),
 		Name:          createClientRequest.Name,
@@ -203,19 +240,25 @@ func CreateClientFromClinic(createClientRequest *clients.CreateClientRequest) (*
 	}
 	result := database.GormDB.Create(&client)
 
+	clinicClient := &models.ClinicClient{
+		ClinicID:  clinic.ID,
+		ClientID:  client.ID,
+	}
+	result = database.GormDB.Create(&clinicClient)
+
 	if result.Error != nil {
 		return nil, result.Error
 	}
 
 	listClientResponse := &clients.ListClientResponse{
 		ID:            client.ID,
-		ClinicID:      client.ClinicID,
+		ClinicID:      clinic.ID,
 		Email:         client.Email,
 		Name:          client.Name,
 		LastName:      client.LastName,
 		Phone:         client.Phone,
 		PregnancyDate: createClientRequest.PregnancyDate,
-		CreatedAt:     fmt.Sprintf(time.Now().Format("2006-01-02 15:04:05")), //TODO
+		CreatedAt:     client.CreatedAt,
 	}
 
 	// check if client has been created by clinic
@@ -224,10 +267,10 @@ func CreateClientFromClinic(createClientRequest *clients.CreateClientRequest) (*
 	}
 
 	// check if client has been created by clinic
-	if useParentEmployeeClinicAvailableUsers {
+/*	if useParentEmployeeClinicAvailableUsers {
 		database.GormDB.Model(&clinicOwnerParentEmployeeClinic).Update(
 			"available_credits", clinicOwnerParentEmployeeClinic.AvailableCredits-1)
-	}
+	}*/
 
 	return listClientResponse, result.Error
 }
@@ -310,13 +353,20 @@ func LinkClient(clientID uint, clinicID uint) error {
 	}
 
 	// check if client not is already linked by other clinic
-	if client.ClinicID > 0 {
+	//todo
+/*	if client.ClinicID > 0 {
 		return errors.New("client is already linked by other clinic")
-	}
+	}*/
 
-	//update clinic id
-	client.ClinicID = clinic.ID
-	result = database.GormDB.Save(&client)
+	clinicClient := &models.ClinicClient{
+		ClinicID:  clinic.ID,
+		ClientID:  client.ID,
+	}
+	result = database.GormDB.Create(&clinicClient)
+
+	/*//update clinic id
+	//client.ClinicID = clinic.ID
+	result = database.GormDB.Save(&client)*/
 	if result.Error != nil {
 		return result.Error
 	}

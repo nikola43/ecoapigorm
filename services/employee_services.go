@@ -133,6 +133,7 @@ func DeleteEmployeeByEmployeeID(parentEmployeeID, deletedEmployeeID uint) error 
 		database.GormDB.Model(&deleteEmployeeClinic).Update("employee_id", parentEmployeeID)
 	}
 
+
 	// check if employee who make action has deleted employee parent
 	if deleteEmployee.ParentEmployeeID != parentEmployeeID {
 		// update clinic employee id with parent employee id
@@ -144,11 +145,6 @@ func DeleteEmployeeByEmployeeID(parentEmployeeID, deletedEmployeeID uint) error 
 	if result.Error != nil {
 		return result.Error
 	}
-
-	return nil
-}
-
-func ValidateInvitation(parentEmployeeID, deletedEmployeeID uint) error {
 
 	return nil
 }

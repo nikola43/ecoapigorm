@@ -192,7 +192,14 @@ func UpdateClient(context *fiber.Ctx) error {
 func UnassignClientByID(context *fiber.Ctx) error {
 	clientID, _ := strconv.ParseUint(context.Params("client_id"), 10, 64)
 
-	err := services.UnassignClientByID(uint(clientID))
+	employeeTokenClaims, err := utils.GetEmployeeTokenClaims(context)
+	if err != nil {
+		return context.Status(fiber.StatusUnauthorized).JSON(&fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	err = services.UnassignClientByID(uint(clientID),uint(employeeTokenClaims.ClinicID))
 	if err != nil {
 		return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 			"error": err.Error(),

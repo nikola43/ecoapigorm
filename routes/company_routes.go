@@ -12,6 +12,8 @@ func CompanyRoutes (router fiber.Router) {
 	// /api/v1/company
 	clinicRouter := router.Group("/company")
 
+	clinicRouter.Get("/", controllers.GetCompanies)
+
 	// use jwt
 	clinicRouter.Use(jwtware.New(jwtware.Config{SigningKey: []byte(utils.GetEnvVariable("JWT_CLIENT_KEY"))}))
 

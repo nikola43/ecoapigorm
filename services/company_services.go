@@ -11,7 +11,7 @@ import (
 func CreateCompany(employeeID uint, createEmployeeRequest *companyModels.CreateCompanyRequest) (*companyModels.CreateCompanyResponse, error) {
 	company := models.Company{
 		Name:       createEmployeeRequest.Name,
-		EmployeeID: employeeID,
+		//EmployeeID: employeeID,
 	}
 
 	if err := database.GormDB.Create(&company).Error; err != nil {
@@ -21,7 +21,7 @@ func CreateCompany(employeeID uint, createEmployeeRequest *companyModels.CreateC
 	createCompanyResponse := &companyModels.CreateCompanyResponse{
 		ID:         company.ID,
 		Name:       company.Name,
-		EmployeeID: company.EmployeeID,
+		//EmployeeID: company.EmployeeID,
 		CreatedAt:  company.CreatedAt.String(),
 	}
 
@@ -68,20 +68,20 @@ func GetEmployeesByCompanyID(id uint) ([]models.Employee, error) {
 }
 
 func GetClinicsByCompanyID(company_id uint) ([]models.Clinic, error) {
-	employees := make([]models.Employee, 0)
-	employeesIds := make([]uint, 0)
+	/*employees := make([]models.Employee, 0)
+	employeesIds := make([]uint, 0)*/
 	clinics := make([]models.Clinic, 0)
 
-	if err := database.GormDB.Where("company_id = ?", company_id).Find(&employees).Error; err != nil {
+	/*if err := database.GormDB.Where("company_id = ?", company_id).Find(&employees).Error; err != nil {
 		return nil, err
 	}
 
 	for _, employee := range employees {
 		employeesIds = append(employeesIds, employee.ID)
-	}
+	}*/
 
 	//if err := database.GormDB.Where("employee_id IN (?)", employeesIds).Find(&clinics).Error;
-	if err := database.GormDB.Where("employee_id IN (?)", employeesIds).Preload("Clients").Preload("Employees").Find(&clinics).Error
+	if err := database.GormDB.Where("company_id = ?", company_id).Preload("Clients").Preload("Employees").Find(&clinics).Error
 		err != nil {
 		return nil, err
 	}

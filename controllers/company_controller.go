@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
-	"github.com/nikola43/ecoapigorm/wasabis3manager"
 	database "github.com/nikola43/ecoapigorm/database"
 	"github.com/nikola43/ecoapigorm/models"
 	companyModels "github.com/nikola43/ecoapigorm/models/company"
 	"github.com/nikola43/ecoapigorm/services"
 	"github.com/nikola43/ecoapigorm/utils"
+	"github.com/nikola43/ecoapigorm/wasabis3manager"
 	"strconv"
 	"strings"
 )
@@ -26,6 +26,19 @@ func GetCompanyById(context *fiber.Ctx) error {
 	}
 
 	return context.JSON(company)
+}
+
+func GetCompanies(context *fiber.Ctx) error {
+	var err error
+	companyList := make([]models.Company, 0)
+
+	if companyList, err = services.GetCompanies(); err != nil {
+		return context.Status(fiber.StatusNotFound).JSON(&fiber.Map{
+			"error": "Company not found",
+		})
+	}
+
+	return context.JSON(companyList)
 }
 
 func CreateCompany(context *fiber.Ctx) error {

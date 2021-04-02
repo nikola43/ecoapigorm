@@ -152,7 +152,8 @@ func GetAllVideosByClientID(clientID uint) ([]models.Video, error) {
 func GetAllHolographicsByClientID(clientID string) ([]models.Holographic, error) {
 	var list = make([]models.Holographic, 0)
 
-	if err := database.GormDB.Where("client_id = ?", clientID).Find(&list).Error; err != nil {
+	if err := database.GormDB.Where("client_id = ?", clientID).Find(&list).Error;
+	err != nil {
 		return nil, err
 	}
 
@@ -170,17 +171,25 @@ func GetAllStreamingByClientID(clientID string) ([]streaming.Streaming, error) {
 	return list, nil
 }
 
-func UnassignClientByID(clientID uint) error {
-	deleteClient := new(models.Client)
+func UnassignClientByID(clientID uint, clinicId uint) error {
+	deleteClinicClient := new(models.ClinicClient)
 
-	// todo check clinic is who make action
+	/*// todo check clinic is who make action
 	// check if employee exist
 	utils.GetModelByField(deleteClient, "id", clientID)
 	if deleteClient.ID < 1 {
 		return errors.New("client not found")
+	}*/
+
+	GormDBResult := database.GormDB.
+		Where("clinic_id = ? AND client_id = ?", clinicId, clientID).
+		Find(&deleteClinicClient)
+
+	if GormDBResult.Error != nil {
+		return GormDBResult.Error
 	}
 
-	database.GormDB.Model(&deleteClient).Update("clinic_id", nil)
+	database.GormDB.Unscoped().Delete(deleteClinicClient)
 
 	/*
 		// delete employee
@@ -203,7 +212,7 @@ func RefreshClient(clientID uint) (*models.LoginClientResponse, error) {
 		return nil, errors.New("client not found")
 	}
 
-	token, err := utils.GenerateClientToken(client.Email, client.ID, client.ClinicID)
+	token, err := utils.GenerateClientToken(client.Email, client.ID,1/* client.ClinicID*/)
 	if err != nil {
 		return nil, err
 	}
@@ -215,7 +224,7 @@ func RefreshClient(clientID uint) (*models.LoginClientResponse, error) {
 		Phone:         client.Phone,
 		LastName:      client.LastName,
 		Token:         token,
-		ClinicID:      client.ClinicID,
+		ClinicID:      1,//client.ClinicID,
 		PregnancyDate: client.PregnancyDate,
 	}
 

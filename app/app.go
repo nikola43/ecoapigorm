@@ -6,6 +6,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	database "github.com/nikola43/ecoapigorm/database"
+	"github.com/nikola43/ecoapigorm/database/fakedatabase"
 	middlewares "github.com/nikola43/ecoapigorm/middleware"
 	"github.com/nikola43/ecoapigorm/routes"
 	"github.com/nikola43/ecoapigorm/utils"
@@ -28,8 +29,8 @@ func (a *App) Initialize(port string) {
 		utils.GetEnvVariable("MYSQL_PASSWORD"),
 		utils.GetEnvVariable("MYSQL_DATABASE"))
 
-	// database.Migrate()
-	// fakedatabase.CreateFakeData()
+	database.Migrate()
+	fakedatabase.CreateFakeData()
 
 	fmt.Println(utils.GetEnvVariable("AWS_ACCESS_KEY"))
 	fmt.Println(utils.GetEnvVariable("AWS_SECRET_KEY"))
