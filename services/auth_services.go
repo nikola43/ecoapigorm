@@ -13,7 +13,11 @@ func LoginClient(email, password string) (*models.LoginClientResponse, error) {
 	var err error
 	token := ""
 
-	if err = database.GormDB.Where("email = ?", email).Find(&client).Error; err != nil {
+	err = database.GormDB.
+		Where("email = ?", email).
+		Preload("Clinics").
+		Find(&client).Error
+	if err != nil {
 		return nil, err
 	}
 
@@ -32,8 +36,7 @@ func LoginClient(email, password string) (*models.LoginClientResponse, error) {
 		Phone:    client.Phone,
 		LastName: client.LastName,
 		Token:    token,
-		//ClinicID: client.ClinicID,
-		ClinicID: 1,
+		Clinics: client.Clinics,
 		PregnancyDate: client.PregnancyDate,
 	}
 

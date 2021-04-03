@@ -67,22 +67,16 @@ func GetEmployeesByCompanyID(id uint) ([]models.Employee, error) {
 	return list, nil
 }
 
-func GetClinicsByCompanyID(company_id uint) ([]models.Clinic, error) {
-	/*employees := make([]models.Employee, 0)
-	employeesIds := make([]uint, 0)*/
+func GetClinicsByCompanyID(companyId uint) ([]models.Clinic, error) {
 	clinics := make([]models.Clinic, 0)
 
-	/*if err := database.GormDB.Where("company_id = ?", company_id).Find(&employees).Error; err != nil {
-		return nil, err
-	}
+	 err := database.GormDB.
+		Where("company_id = ?", companyId).
+		Preload("Clients").
+		Preload("Employees").
+		Find(&clinics).Error
 
-	for _, employee := range employees {
-		employeesIds = append(employeesIds, employee.ID)
-	}*/
-
-	//if err := database.GormDB.Where("employee_id IN (?)", employeesIds).Find(&clinics).Error;
-	if err := database.GormDB.Where("company_id = ?", company_id).Preload("Clients").Preload("Employees").Find(&clinics).Error
-		err != nil {
+	if	err != nil {
 		return nil, err
 	}
 

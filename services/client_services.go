@@ -5,7 +5,7 @@ import (
 	database "github.com/nikola43/ecoapigorm/database"
 	"github.com/nikola43/ecoapigorm/models"
 	modelsClients "github.com/nikola43/ecoapigorm/models/clients"
-	"github.com/nikola43/ecoapigorm/models/streaming"
+	streamingModels "github.com/nikola43/ecoapigorm/models/streamings"
 	"github.com/nikola43/ecoapigorm/utils"
 )
 
@@ -77,8 +77,6 @@ func UpdateClientService(id uint, updateClientRequest *modelsClients.UpdateClien
 		return nil, GormDBResult.Error
 	}
 
-	// database.GormDB.Model(&client).Update("pregnancy_date", nil)
-
 	database.GormDB.Model(&client).Update("pregnancy_date", updateClientRequest.PregnancyDate)
 
 	GormDBResult = database.GormDB.
@@ -127,25 +125,12 @@ func GetClientById(clinicID, clientID uint) (*modelsClients.ListClientResponse, 
 		return nil, errors.New("client not found")
 	}
 
-	var size uint = 0
-	var totalSize uint = 0
-
-	// get images size
-	database.GormDB.Table("images").Where("client_id = ?", client.ID).Select("IF(size IS NULL, 0, SUM(size)) as size").Scan(&size)
-	totalSize += size
-
-	//get videos size
-	size = 0
-	database.GormDB.Table("videos").Where("client_id = ?", client.ID).Select("IF(size IS NULL, 0, SUM(size)) as size").Scan(&size)
-	totalSize += size
-
-	//get heartbeat size
-	size = 0
-	database.GormDB.Table("heartbeats").Where("client_id = ?", client.ID).Select("IF(size IS NULL, 0, SUM(size)) as size").Scan(&size)
-	totalSize += size
+	totalSize := utils.CalculateTotalSizeByClient(*client, clinicID)
 
 	clinicClient := new(models.ClinicClient)
-	GormDBResult = database.GormDB.Where("client_id = ? AND clinic_id = ?", client.ID, clinicID).Find(&clinicClient)
+	GormDBResult = database.GormDB.
+		Where("client_id = ? AND clinic_id = ?", client.ID, clinicID).
+		Find(&clinicClient)
 
 	clientResponse := &modelsClients.ListClientResponse{
 		ID:             client.ID,
@@ -165,7 +150,9 @@ func GetClientById(clinicID, clientID uint) (*modelsClients.ListClientResponse, 
 
 func GetAllImagesByClientID(clientID uint) ([]models.Image, error) {
 	var list = make([]models.Image, 0)
-	if err := database.GormDB.Where("client_id = ?", clientID).Find(&list).Error; err != nil {
+	if err := database.GormDB.
+		Where("client_id = ?", clientID).
+		Find(&list).Error; err != nil {
 		return nil, err
 	}
 
@@ -175,7 +162,9 @@ func GetAllImagesByClientID(clientID uint) ([]models.Image, error) {
 func GetAllVideosByClientID(clientID uint) ([]models.Video, error) {
 	var list = make([]models.Video, 0)
 
-	if err := database.GormDB.Where("client_id = ?", clientID).Find(&list).Error; err != nil {
+	if err := database.GormDB.
+		Where("client_id = ?", clientID).
+		Find(&list).Error; err != nil {
 		return nil, err
 	}
 
@@ -185,7 +174,9 @@ func GetAllVideosByClientID(clientID uint) ([]models.Video, error) {
 func GetAllHolographicsByClientID(clientID string) ([]models.Holographic, error) {
 	var list = make([]models.Holographic, 0)
 
-	if err := database.GormDB.Where("client_id = ?", clientID).Find(&list).Error;
+	if err := database.GormDB.
+		Where("client_id = ?", clientID).
+		Find(&list).Error;
 		err != nil {
 		return nil, err
 	}
@@ -193,10 +184,12 @@ func GetAllHolographicsByClientID(clientID string) ([]models.Holographic, error)
 	return list, nil
 }
 
-func GetAllStreamingByClientID(clientID string) ([]streaming.Streaming, error) {
-	var list = make([]streaming.Streaming, 0)
+func GetAllStreamingByClientID(clientID string) ([]streamingModels.Streaming, error) {
+	var list = make([]streamingModels.Streaming, 0)
 
-	if err := database.GormDB.Where("client_id = ?", clientID).Find(&list).Error;
+	if err := database.GormDB.
+		Where("client_id = ?", clientID).
+		Find(&list).Error;
 		err != nil {
 		return nil, err
 	}
@@ -207,13 +200,6 @@ func GetAllStreamingByClientID(clientID string) ([]streaming.Streaming, error) {
 func UnassignClientByID(clientID uint, clinicId uint) error {
 	deleteClinicClient := new(models.ClinicClient)
 
-	/*// todo check clinic is who make action
-	// check if employee exist
-	utils.GetModelByField(deleteClient, "id", clientID)
-	if deleteClient.ID < 1 {
-		return errors.New("client not found")
-	}*/
-
 	GormDBResult := database.GormDB.
 		Where("clinic_id = ? AND client_id = ?", clinicId, clientID).
 		Find(&deleteClinicClient)
@@ -222,17 +208,9 @@ func UnassignClientByID(clientID uint, clinicId uint) error {
 		return GormDBResult.Error
 	}
 
-	database.GormDB.Unscoped().Delete(deleteClinicClient)
-
-	/*
-		// delete employee
-		result := database.GormDB.Delete(deleteClient)
-		if result.Error != nil {
-			return result.Error
-		}
-	*/
-
-	// todo remove content
+	database.GormDB.
+		Unscoped().
+		Delete(deleteClinicClient)
 
 	return nil
 }
@@ -240,7 +218,13 @@ func UnassignClientByID(clientID uint, clinicId uint) error {
 func RefreshClient(clientID uint) (*models.LoginClientResponse, error) {
 	client := new(models.Client)
 
-	utils.GetModelByField(client, "id", clientID)
+	err := database.GormDB.
+		Preload("Clinics").
+		First(&client,clientID).Error
+	if err != nil {
+		return nil, err
+	}
+
 	if client.ID < 1 {
 		return nil, errors.New("client not found")
 	}
@@ -257,19 +241,19 @@ func RefreshClient(clientID uint) (*models.LoginClientResponse, error) {
 		Phone:         client.Phone,
 		LastName:      client.LastName,
 		Token:         token,
-		ClinicID:      1, //client.ClinicID,
+		Clinics: client.Clinics,
 		PregnancyDate: client.PregnancyDate,
 	}
 
 	return clientLoginResponse, nil
 }
 
-func IncrementDiskQuoteLevel(clinicID uint, listClientResponse *modelsClients.ListClientResponse) error {
-	client := &models.Client{}
+func IncrementDiskQuoteLevel(clinicID uint, clientId uint) error {
 	clinicClient := new(models.ClinicClient)
 
-	GormDBResult := database.GormDB.First(&client, listClientResponse.ID)
-	GormDBResult = database.GormDB.Where("client_id = ? AND clinic_id = ?", client.ID, clinicID).Find(&clinicClient)
+	GormDBResult := database.GormDB.
+		Where("client_id = ? AND clinic_id = ?", clientId, clinicID).
+		Find(&clinicClient)
 
 	if GormDBResult.Error != nil {
 		return GormDBResult.Error

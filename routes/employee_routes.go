@@ -40,7 +40,7 @@ func EmployeeRoutes(router fiber.Router) {
 	employeeRouter.Post("/invite", controllers.Invite)
 
 	// /api/v1/employee/:employee_id/companies
-	employeeRouter.Get("/:employee_id/companies", controllers.GetCompaniesByEmployeeID)
+	employeeRouter.Get("/:employee_id/companies", controllers.GetCompaniesByEmployeeID) //TODO revisar este servicio, no tiene sentido una lista de compañias
 
 	// /api/v1/employee/:employee_id
 	employeeRouter.Delete("/:employee_id", controllers.DeleteEmployeeByEmployeeID)

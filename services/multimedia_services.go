@@ -16,10 +16,14 @@ import (
 	"strings"
 )
 
-func UploadMultimedia(context *fiber.Ctx, bucketName string, clinicName string, clientID uint, uploadedFile *multipart.FileHeader, uploadMode uint) error {
-	//fmt.Println(context)
-	//fmt.Println(clientID)
-	//fmt.Println(uploadedFile)
+func UploadMultimedia(
+	context *fiber.Ctx,
+	bucketName string,
+	clinicName string,
+	clientID uint,
+	uploadedFile *multipart.FileHeader,
+	uploadMode uint,
+	clinicId uint) error {
 
 	// Save file to root directory:
 	reg, err := regexp.Compile("[^a-zA-Z0-9-.]+")
@@ -48,7 +52,7 @@ func UploadMultimedia(context *fiber.Ctx, bucketName string, clinicName string, 
 		if storeInAmazonError != nil {
 			fmt.Println(storeInAmazonError.Error())
 		}
-		image := models.Image{Filename: cleanFilename, ClientID: clientID, Url: url, Size: uint(size)}
+		image := models.Image{Filename: cleanFilename, ClientID: clientID, Url: url, Size: uint(size), ClinicID: clinicId}
 		database.GormDB.Create(&image)
 
 		e := os.Remove("./tempFiles/" + clinicName + "/" + clientIDString + "/" + cleanFilename)
@@ -80,12 +84,12 @@ func UploadMultimedia(context *fiber.Ctx, bucketName string, clinicName string, 
 		}
 
 		if fileType == "video" {
-			video := models.Video{Filename: cleanFilename, ClientID: clientID, Url: videoUrl, ThumbnailUrl: thumbUrl, Size: uint(videoSize + thumbSize)}
+			video := models.Video{Filename: cleanFilename, ClientID: clientID, Url: videoUrl, ThumbnailUrl: thumbUrl, Size: uint(videoSize + thumbSize), ClinicID: clinicId}
 			database.GormDB.Create(&video)
 		}
 
 		if fileType == "holographic" {
-			video := models.Holographic{Filename: cleanFilename, ClientID: clientID, Url: videoUrl, ThumbnailUrl: thumbUrl, Size: uint(videoSize + thumbSize)}
+			video := models.Holographic{Filename: cleanFilename, ClientID: clientID, Url: videoUrl, ThumbnailUrl: thumbUrl, Size: uint(videoSize + thumbSize), ClinicID: clinicId}
 			database.GormDB.Create(&video)
 		}
 
@@ -117,7 +121,7 @@ func UploadMultimedia(context *fiber.Ctx, bucketName string, clinicName string, 
 		if storeInAmazonError != nil {
 			fmt.Println(storeInAmazonError.Error())
 		}
-		video := models.Heartbeat{Filename: cleanFilename, ClientID: clientID, Url: url, Size: uint(size)}
+		video := models.Heartbeat{Filename: cleanFilename, ClientID: clientID, Url: url, Size: uint(size), ClinicID: clinicId}
 		database.GormDB.Create(&video)
 		e := os.Remove("./tempFiles/" + clinicName + "/" + clientIDString + "/" + cleanFilename)
 		if e != nil {

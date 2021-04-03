@@ -5,7 +5,7 @@ import (
 	"github.com/nikola43/ecoapigorm/models/kicks"
 	"github.com/nikola43/ecoapigorm/models/promos"
 	"github.com/nikola43/ecoapigorm/models/recovery"
-	"github.com/nikola43/ecoapigorm/models/streaming"
+	streamingModels "github.com/nikola43/ecoapigorm/models/streamings"
 	"gorm.io/gorm"
 )
 
@@ -20,7 +20,7 @@ func Migrate() {
 	GormDB.Migrator().DropTable(&models.Image{})
 	GormDB.Migrator().DropTable(&models.Holographic{})
 	GormDB.Migrator().DropTable(&models.Heartbeat{})
-	GormDB.Migrator().DropTable(&streaming.Streaming{})
+	GormDB.Migrator().DropTable(&streamingModels.Streaming{})
 	GormDB.Migrator().DropTable(&recovery.UserRecovery{})
 	GormDB.Migrator().DropTable(&models.PushNotificationData{})
 	GormDB.Migrator().DropTable(&promos.Promo{})
@@ -39,7 +39,7 @@ func Migrate() {
 	GormDB.AutoMigrate(&models.Image{})
 	GormDB.AutoMigrate(&models.Holographic{})
 	GormDB.AutoMigrate(&models.Heartbeat{})
-	GormDB.AutoMigrate(&streaming.Streaming{})
+	GormDB.AutoMigrate(&streamingModels.Streaming{})
 	GormDB.AutoMigrate(&recovery.UserRecovery{})
 	GormDB.AutoMigrate(&models.PushNotificationData{})
 	GormDB.AutoMigrate(&promos.Promo{})
