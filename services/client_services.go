@@ -159,7 +159,30 @@ func GetAllImagesByClientID(clientID uint) ([]models.Image, error) {
 	return list, nil
 }
 
+func GetAllImagesByClientAndClinicID(clientID uint,clinicID uint) ([]models.Image, error) {
+	var list = make([]models.Image, 0)
+	if err := database.GormDB.
+		Where("client_id = ? AND clinic_id = ?", clientID, clinicID).
+		Find(&list).Error; err != nil {
+		return nil, err
+	}
+
+	return list, nil
+}
+
 func GetAllVideosByClientID(clientID uint) ([]models.Video, error) {
+	var list = make([]models.Video, 0)
+
+	if err := database.GormDB.
+		Where("client_id = ?", clientID).
+		Find(&list).Error; err != nil {
+		return nil, err
+	}
+
+	return list, nil
+}
+
+func GetAllVideosByClientAndClinicID(clientID uint,clinicID uint) ([]models.Video, error) {
 	var list = make([]models.Video, 0)
 
 	if err := database.GormDB.
@@ -189,6 +212,19 @@ func GetAllStreamingByClientID(clientID string) ([]streamingModels.Streaming, er
 
 	if err := database.GormDB.
 		Where("client_id = ?", clientID).
+		Find(&list).Error;
+		err != nil {
+		return nil, err
+	}
+
+	return list, nil
+}
+
+func GetAllStreamingByClientANDClinicID(clientID string,clinicID string) ([]streamingModels.Streaming, error) {
+	var list = make([]streamingModels.Streaming, 0)
+
+	if err := database.GormDB.
+		Where("client_id = ? AND clinic_id = ?", clientID, clinicID).
 		Find(&list).Error;
 		err != nil {
 		return nil, err

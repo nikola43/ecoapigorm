@@ -48,11 +48,23 @@ func UploadMultimedia(
 	if fileType == "image" {
 		// image
 
-		url, size, storeInAmazonError := wasabis3manager.WasabiS3Client.UploadObject(bucketName, clinicName, "tempFiles/"+clinicName+"/"+clientIDString+"/"+cleanFilename, clientID, fileType)
+		url, size, storeInAmazonError := wasabis3manager.WasabiS3Client.UploadObject(
+			bucketName,
+			clinicName,
+			"tempFiles/"+clinicName+"/"+clientIDString+"/"+cleanFilename,
+			clientID,
+			fileType,
+		)
 		if storeInAmazonError != nil {
 			fmt.Println(storeInAmazonError.Error())
 		}
-		image := models.Image{Filename: cleanFilename, ClientID: clientID, Url: url, Size: uint(size), ClinicID: clinicId}
+		image := models.Image{
+			Filename: cleanFilename,
+			ClientID: clientID,
+			Url: url,
+			Size: uint(size),
+			ClinicID: clinicId,
+		}
 		database.GormDB.Create(&image)
 
 		e := os.Remove("./tempFiles/" + clinicName + "/" + clientIDString + "/" + cleanFilename)
@@ -63,7 +75,13 @@ func UploadMultimedia(
 		return err
 	} else if fileType == "video" || fileType == "holographic" {
 		// upload video
-		videoUrl, videoSize, storeInAmazonError := wasabis3manager.WasabiS3Client.UploadObject(bucketName, clinicName, "tempFiles/"+clinicName+"/"+clientIDString+"/"+cleanFilename, clientID, fileType)
+		videoUrl, videoSize, storeInAmazonError := wasabis3manager.WasabiS3Client.UploadObject(
+			bucketName,
+			clinicName,
+			"tempFiles/"+clinicName+"/"+clientIDString+"/"+cleanFilename,
+			clientID,
+			fileType,
+		)
 		if storeInAmazonError != nil {
 			return err
 		}
@@ -78,18 +96,38 @@ func UploadMultimedia(
 		}
 
 		// thumb video
-		thumbUrl, thumbSize, storeThumbInAmazonError := wasabis3manager.WasabiS3Client.UploadObject(bucketName, clinicName, thumbnailPath, clientID, fileType)
+		thumbUrl, thumbSize, storeThumbInAmazonError := wasabis3manager.WasabiS3Client.UploadObject(
+			bucketName,
+			clinicName,
+			thumbnailPath,
+			clientID,
+			fileType,
+		)
 		if storeThumbInAmazonError != nil {
 			return storeThumbInAmazonError
 		}
 
 		if fileType == "video" {
-			video := models.Video{Filename: cleanFilename, ClientID: clientID, Url: videoUrl, ThumbnailUrl: thumbUrl, Size: uint(videoSize + thumbSize), ClinicID: clinicId}
+			video := models.Video{
+				Filename: cleanFilename,
+				ClientID: clientID,
+				Url: videoUrl,
+				ThumbnailUrl: thumbUrl,
+				Size: uint(videoSize + thumbSize),
+				ClinicID: clinicId,
+			}
 			database.GormDB.Create(&video)
 		}
 
 		if fileType == "holographic" {
-			video := models.Holographic{Filename: cleanFilename, ClientID: clientID, Url: videoUrl, ThumbnailUrl: thumbUrl, Size: uint(videoSize + thumbSize), ClinicID: clinicId}
+			video := models.Holographic{
+				Filename: cleanFilename,
+				ClientID: clientID,
+				Url: videoUrl,
+				ThumbnailUrl: thumbUrl,
+				Size: uint(videoSize + thumbSize),
+				ClinicID: clinicId,
+			}
 			database.GormDB.Create(&video)
 		}
 

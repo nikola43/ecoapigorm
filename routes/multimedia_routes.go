@@ -10,6 +10,7 @@ import (
 func MultimediaRoutes (router fiber.Router) {
 	multimediaRouter := router.Group("/multimedia")
 	multimediaClientRouter := multimediaRouter.Group("/client")
+	multimediaClinicRouter := multimediaRouter.Group("/clinic")
 
 	// use middleware
 	multimediaRouter.Use(jwtware.New(jwtware.Config{SigningKey: []byte(utils.GetEnvVariable("JWT_CLIENT_KEY"))}))
@@ -36,14 +37,26 @@ func MultimediaRoutes (router fiber.Router) {
 	// /api/v1/multimedia/client/:client_id/videos
 	multimediaClientRouter.Get("/:client_id/videos", controllers.GetAllVideosByClientID)
 
-	// /api/v1/multimedia/client/:client_id/holographics
-	multimediaClientRouter.Get("/:client_id/holographics", controllers.GetAllHolographicsByClientID)
-
 	// /api/v1/multimedia/client/:client_id/heartbeat
 	multimediaClientRouter.Get("/:client_id/heartbeat", controllers.GetHeartbeatByClientID)
 
 	// /api/v1/multimedia/client/:client_id/heartbeat
 	multimediaClientRouter.Get("/:client_id/streamings", controllers.GetAllStreamingByClientID)
+
+	// /api/v1/multimedia/clinic/:clinic_id/:client_id/images
+	multimediaClinicRouter.Get("/:clinic_id/client/:client_id/images", controllers.GetAllImagesByClientAndClinicID)
+
+	multimediaClinicRouter.Get("/:clinic_id/client/:client_id/videos", controllers.GetAllVideosByClientAndClinicID)
+
+	multimediaClinicRouter.Get("/:clinic_id/client/:client_id/heartbeat", controllers.GetHeartbeatByClientAndClinicID)
+
+	multimediaClinicRouter.Get("/:clinic_id/client/:client_id/streamings", controllers.GetAllStreamingByClientANDClinicID)
+
+	multimediaClinicRouter.Get("/:clinic_id/client/:client_id/holographics", controllers.GetAllHolographicsByClientID)
+
+
+	// /api/v1/multimedia/client/:client_id/holographics
+	multimediaClientRouter.Get("/:client_id/holographics", controllers.GetAllHolographicsByClientID)
 
 	// /api/v1/multimedia/client/:client_id/download
 	multimediaClientRouter.Get("/:client_id/download", controllers.DownloadAllMultimediaContentByClientID)

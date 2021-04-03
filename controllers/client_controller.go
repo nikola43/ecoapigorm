@@ -58,6 +58,19 @@ func GetAllImagesByClientID(context *fiber.Ctx) error {
 	return context.Status(fiber.StatusOK).JSON(images)
 }
 
+func GetAllImagesByClientAndClinicID(context *fiber.Ctx) error {
+	var err error
+	images := make([]models.Image, 0)
+	clientID, _ := strconv.ParseUint(context.Params("client_id"), 10, 64)
+	clinicID, _ := strconv.ParseUint(context.Params("clinic_id"), 10, 64)
+
+	if images, err = services.GetAllImagesByClientAndClinicID(uint(clientID),uint(clinicID)); err != nil {
+		return context.SendStatus(fiber.StatusInternalServerError)
+	}
+
+	return context.Status(fiber.StatusOK).JSON(images)
+}
+
 func GetAllStreamingByClientID(context *fiber.Ctx) error {
 	clientID := context.Params("client_id")
 	videos := make([]streamingModels.Streaming, 0)
@@ -70,12 +83,38 @@ func GetAllStreamingByClientID(context *fiber.Ctx) error {
 	return context.Status(fiber.StatusOK).JSON(videos)
 }
 
+func GetAllStreamingByClientANDClinicID(context *fiber.Ctx) error {
+	clientID := context.Params("client_id")
+	clinicID := context.Params("clinic_id")
+	videos := make([]streamingModels.Streaming, 0)
+	var err error
+
+	if videos, err = services.GetAllStreamingByClientANDClinicID(clientID,clinicID); err != nil {
+		return context.SendStatus(fiber.StatusInternalServerError)
+	}
+
+	return context.Status(fiber.StatusOK).JSON(videos)
+}
+
 func GetAllVideosByClientID(context *fiber.Ctx) error {
 	clientID, _ := strconv.ParseUint(context.Params("client_id"), 10, 64)
 	videos := make([]models.Video, 0)
 	var err error
 
 	if videos, err = services.GetAllVideosByClientID(uint(clientID)); err != nil {
+		return context.SendStatus(fiber.StatusInternalServerError)
+	}
+
+	return context.Status(fiber.StatusOK).JSON(videos)
+}
+
+func GetAllVideosByClientAndClinicID(context *fiber.Ctx) error {
+	clientID, _ := strconv.ParseUint(context.Params("client_id"), 10, 64)
+	clinicID, _ := strconv.ParseUint(context.Params("clinic_id"), 10, 64)
+	videos := make([]models.Video, 0)
+	var err error
+
+	if videos, err = services.GetAllVideosByClientAndClinicID(uint(clientID), uint(clinicID)); err != nil {
 		return context.SendStatus(fiber.StatusInternalServerError)
 	}
 
@@ -101,6 +140,22 @@ func GetHeartbeatByClientID(context *fiber.Ctx) error {
 	var err error
 
 	if heartbeat, err = services.GetHeartbeatByClientID(uint(clientID)); err != nil {
+		return context.Status(fiber.StatusNotFound).JSON(&fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return context.Status(fiber.StatusOK).JSON(heartbeat)
+}
+
+func GetHeartbeatByClientAndClinicID(context *fiber.Ctx) error {
+	clientID, _ := strconv.ParseUint(context.Params("client_id"), 10, 64)
+	clinicID, _ := strconv.ParseUint(context.Params("clinic_id"), 10, 64)
+
+	heartbeat := &models.Heartbeat{}
+	var err error
+
+	if heartbeat, err = services.GetHeartbeatByClientAndClinicID(uint(clientID),uint(clinicID)); err != nil {
 		return context.Status(fiber.StatusNotFound).JSON(&fiber.Map{
 			"error": err.Error(),
 		})
