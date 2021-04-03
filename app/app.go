@@ -32,6 +32,7 @@ func (a *App) Initialize(port string) {
 	database.Migrate()
 	fakedatabase.CreateFakeData()
 
+
 	fmt.Println(utils.GetEnvVariable("AWS_ACCESS_KEY"))
 	fmt.Println(utils.GetEnvVariable("AWS_SECRET_KEY"))
 	fmt.Println(utils.GetEnvVariable("AWS_ENDPOINT"))
