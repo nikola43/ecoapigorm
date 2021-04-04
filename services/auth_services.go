@@ -25,7 +25,7 @@ func LoginClient(email, password string) (*models.LoginClientResponse, error) {
 		return nil, errors.New("not found")
 	}
 
-	if token, err = utils.GenerateClientToken(client.Email, client.ID, 1/*client.ClinicID*/); err != nil {
+	if token, err = utils.GenerateClientToken(client.Email, client.ID); err != nil {
 		return nil, err
 	}
 

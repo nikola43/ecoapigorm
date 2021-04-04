@@ -32,7 +32,7 @@ func CreateClientFromApp(createClientRequest *modelsClients.CreateClientFromAppR
 		return nil, result.Error
 	}
 
-	token, err := utils.GenerateClientToken(client.Email, client.ID, 0)
+	token, err := utils.GenerateClientToken(client.Email, client.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -265,7 +265,7 @@ func RefreshClient(clientID uint) (*models.LoginClientResponse, error) {
 		return nil, errors.New("client not found")
 	}
 
-	token, err := utils.GenerateClientToken(client.Email, client.ID, 1 /* client.ClinicID*/)
+	token, err := utils.GenerateClientToken(client.Email, client.ID)
 	if err != nil {
 		return nil, err
 	}

@@ -10,19 +10,17 @@ import (
 	"time"
 )
 
-func GenerateClientToken(email string, client_id uint, clinic_id uint) (string, error) {
+func GenerateClientToken(email string, client_id uint) (string, error) {
 	// Create token
 	token := jwt.New(jwt.SigningMethodHS256)
 
 	// Set claims
 	claims := token.Claims.(jwt.MapClaims)
 	claims["id"] = client_id
-	claims["clinic_id"] = clinic_id
 	claims["email"] = email
 	claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
 
 	fmt.Println(claims["id"])
-	fmt.Println(claims["clinic_id"])
 	fmt.Println(claims["email"])
 	fmt.Println(claims["exp"])
 
@@ -39,9 +37,6 @@ func GetClientTokenClaims(context *fiber.Ctx) (*models.ClientTokenClaims, error)
 	if claims, ok := user.Claims.(jwt.MapClaims); ok && user.Valid {
 		clientTokenClaims := &models.ClientTokenClaims{}
 
-		fmt.Println(claims)
-
-		/*
 		if claims["id"] != nil {
 			clientTokenClaims.ID = uint(math.Round(claims["id"].(float64)))
 		}
@@ -50,22 +45,14 @@ func GetClientTokenClaims(context *fiber.Ctx) (*models.ClientTokenClaims, error)
 			clientTokenClaims.Email = claims["email"].(string)
 		}
 
-		/*
-		if claims["clinic_id"] != nil {
-			clientTokenClaims.ClinicID = uint(math.Round(claims["clinic_id"].(float64)))
-		}
-
-
 		if claims["exp"] != nil {
-			clientTokenClaims.ClinicID = uint(math.Round(claims["exp"].(float64)))
+			clientTokenClaims.Exp = uint(math.Round(claims["exp"].(float64)))
 		}
-		*/
 
 		return clientTokenClaims, nil
 	} else {
 		return nil, errors.New("invalid claims")
 	}
-	return nil, errors.New("invalid claims")
 }
 
 func GetEmployeeTokenClaims(context *fiber.Ctx) (*models.EmployeeTokenClaims, error) {

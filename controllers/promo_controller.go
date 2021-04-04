@@ -4,6 +4,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/nikola43/ecoapigorm/models/promos"
 	"github.com/nikola43/ecoapigorm/services"
+	"github.com/nikola43/ecoapigorm/utils"
 	"strconv"
 )
 
@@ -27,9 +28,15 @@ func CreatePromo(context *fiber.Ctx) error {
 	return context.Status(fiber.StatusOK).JSON(response)
 
 }
-func GetPromosController(context *fiber.Ctx) error {
+func GetPromosForClientController(context *fiber.Ctx) error {
+	clientTokenClaims, err := utils.GetClientTokenClaims(context)
+	if err != nil {
+		return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+			"error": err.Error(),
+		})
+	}
 
-	promos, err := services.GetAllPromos()
+	promos, err := services.GetAllPromosForClient(clientTokenClaims.ID)
 	if err != nil {
 		return context.SendStatus(fiber.StatusInternalServerError)
 	}

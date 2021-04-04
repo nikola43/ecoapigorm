@@ -188,6 +188,28 @@ func GetAllPromosByClinicID(clinicID string) ([]promos.Promo, error) {
 	return promos, nil
 }
 
+func GetAllPromosForClient(clientId uint) ([]promos.Promo, error) {
+	var promos = make([]promos.Promo, 0)
+	clinicClient := models.ClinicClient{}
+
+	err := database.GormDB.Where("client_id = ?", clientId).Find(&clinicClient)
+	if err.Error != nil {
+		return nil, err.Error
+	}
+
+	clientIds := make([]uint, 0)
+	linq.From(clinicClient).
+		SelectT(func(clinicClientRelation models.ClinicClient) uint { return clinicClientRelation.ClientID }).
+		ToSlice(&clientIds)
+
+	err = database.GormDB.Where("clinic_id IN ?", clientIds).Find(&promos)
+	if err.Error != nil {
+		return nil, err.Error
+	}
+
+	return promos, nil
+}
+
 func GetAllStreamingByClinicID(clinicID string) ([]streamingModels.Streaming, error) {
 	var list = make([]streamingModels.Streaming, 0)
 	var clients = make([]models.Client, 0)
