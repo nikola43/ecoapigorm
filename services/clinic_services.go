@@ -33,7 +33,7 @@ func CreateClinic(companyID uint, createClinicRequest *clinicModels.CreateClinic
 	}
 
 	clinic := models.Clinic{
-		Name: createClinicRequest.Name,
+		Name:             createClinicRequest.Name,
 		CompanyID:        companyID,
 		AvailableCredits: uint(credits),
 	}
@@ -44,8 +44,8 @@ func CreateClinic(companyID uint, createClinicRequest *clinicModels.CreateClinic
 	}
 
 	createEmployeeResponse := &clinicModels.CreateClinicResponse{
-		ID:   clinic.ID,
-		Name: clinic.Name,
+		ID:               clinic.ID,
+		Name:             clinic.Name,
 		CompanyID:        companyID,
 		AvailableCredits: uint(credits),
 	}
@@ -81,14 +81,14 @@ func GetClientsByClinicID(id uint) ([]clients.ListClientResponse, error) {
 		return list, nil
 	}
 
-	clientIds := make([]uint,0)
+	clientIds := make([]uint, 0)
 	linq.From(listClinicClients).
 		SelectT(func(clinicClientRelation models.ClinicClient) uint { return clinicClientRelation.ClientID }).
 		ToSlice(&clientIds)
 
 	database.GormDB.Find(&clientsList, &clientIds)
 
-	for i,client := range clientsList {
+	for i, client := range clientsList {
 		totalSize := utils.CalculateTotalSizeByClient(client, clinic.ID)
 		list = append(
 			list,
@@ -239,6 +239,9 @@ func UpdateClinic(clinic *models.Clinic) (*models.Clinic, error) {
 }
 
 func LinkClient(clientID uint, clinicID uint) error {
+
+	// todo check credits
+
 	client := &models.Client{}
 	clinic := &models.Clinic{}
 
@@ -272,6 +275,9 @@ func LinkClient(clientID uint, clinicID uint) error {
 	if result.Error != nil {
 		return result.Error
 	}
+
+	database.GormDB.Model(&clinic).Update("available_credits", clinic.AvailableCredits-1)
+
 	return nil
 }
 
