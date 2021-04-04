@@ -190,11 +190,15 @@ func GetAllPromosByClinicID(clinicID string) ([]promos.Promo, error) {
 
 func GetAllPromosForClient(clientId uint) ([]promos.Promo, error) {
 	var promos = make([]promos.Promo, 0)
-	clinicClient := models.ClinicClient{}
+	clinicClient := make([]models.ClinicClient, 0)
 
 	err := database.GormDB.Where("client_id = ?", clientId).Find(&clinicClient)
 	if err.Error != nil {
 		return nil, err.Error
+	}
+
+	if len(clinicClient) == 0 {
+		return promos, nil
 	}
 
 	clientIds := make([]uint, 0)
