@@ -28,8 +28,6 @@ func MultimediaRoutes (router fiber.Router) {
 	multimediaRouter.Delete("/heartbeat/:id", controllers.DeleteHeartbeat)
 
 	// CLIENT
-	// /api/v1/multimedia/client/:client_id/upload/:upload_mode
-	multimediaClientRouter.Post("/:client_id/upload/:upload_mode", controllers.UploadMultimedia)
 
 	// /api/v1/multimedia/client/:client_id/images
 	multimediaClientRouter.Get("/:client_id/images", controllers.GetAllImagesByClientID)
@@ -42,6 +40,9 @@ func MultimediaRoutes (router fiber.Router) {
 
 	// /api/v1/multimedia/client/:client_id/heartbeat
 	multimediaClientRouter.Get("/:client_id/streamings", controllers.GetAllStreamingByClientID)
+
+	// /api/v1/multimedia/clinic/:clinic_id/client/:client_id/upload/:upload_mode
+	multimediaClinicRouter.Post("/:clinic_id/client/:client_id/upload/:upload_mode", controllers.UploadMultimedia)
 
 	// /api/v1/multimedia/clinic/:clinic_id/:client_id/images
 	multimediaClinicRouter.Get("/:clinic_id/client/:client_id/images", controllers.GetAllImagesByClientAndClinicID)

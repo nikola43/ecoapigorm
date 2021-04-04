@@ -3,6 +3,8 @@ package controllers
 import (
 	"fmt"
 	"github.com/gofiber/fiber/v2"
+	database "github.com/nikola43/ecoapigorm/database"
+	"github.com/nikola43/ecoapigorm/models"
 	"github.com/nikola43/ecoapigorm/services"
 	"github.com/nikola43/ecoapigorm/utils"
 	"github.com/nikola43/ecoapigorm/wasabis3manager"
@@ -13,6 +15,7 @@ import (
 
 func UploadMultimedia(context *fiber.Ctx) error {
 	clientID, _ := strconv.ParseUint(context.Params("client_id"), 10, 64)
+	clinicId, _ := strconv.ParseUint(context.Params("clinic_id"), 10, 64)
 	uploadMode, _ := strconv.ParseUint(context.Params("upload_mode"), 10, 64)
 	uploadedFile, err := context.FormFile("file")
 	employeeTokenClaims, err := utils.GetEmployeeTokenClaims(context)
@@ -22,14 +25,22 @@ func UploadMultimedia(context *fiber.Ctx) error {
 
 	bucketName := strings.ToLower(strings.ReplaceAll(employeeTokenClaims.CompanyName, " ", ""))
 
+	clinic := models.Clinic{}
+	database.GormDB.First(&clinic, clinicId)
+	if clinic.ID < 1 {
+		return context.Status(fiber.StatusNotFound).JSON(&fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
 	err = services.UploadMultimedia(
 		context,
 		bucketName,
-		employeeTokenClaims.ClinicName,
+		clinic.Name,
 		uint(clientID),
 		uploadedFile,
 		uint(uploadMode),
-		employeeTokenClaims.ClinicID)
+		clinic.ID)
 	if err != nil {
 		return err
 	}
