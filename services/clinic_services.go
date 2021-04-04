@@ -206,7 +206,7 @@ func GetAllPromosForClient(clientId uint) ([]promos.Promo, error) {
 		SelectT(func(clinicClientRelation models.ClinicClient) uint { return clinicClientRelation.ClientID }).
 		ToSlice(&clientIds)
 
-	err = database.GormDB.Where("clinic_id IN ?", clientIds).Find(&promos)
+	err = database.GormDB.Where("client_id IN ?", clientIds).Find(&promos)
 	if err.Error != nil {
 		return nil, err.Error
 	}
