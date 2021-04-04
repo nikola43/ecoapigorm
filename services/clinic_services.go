@@ -283,7 +283,7 @@ func LinkClient(clientID uint, clinicID uint) error {
 
 func DeleteClinicByID(clinicID uint) error {
 	deleteClinic := new(models.Clinic)
-	clinicClients := make([]models.Client, 0)
+	clinicClients := make([]models.ClinicClient, 0)
 	clinicEmployees := make([]models.Employee, 0)
 
 	// todo check clinic is who make action
