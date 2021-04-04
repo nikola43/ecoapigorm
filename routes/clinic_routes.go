@@ -21,6 +21,9 @@ func ClinicRoutes(router fiber.Router) {
 	// /api/v1/clinic/create_client
 	clinicRouter.Post("/create_client", controllers.CreateClientFromClinic)
 
+	// /api/v1/clinic/:clinic_id/client/:client_id | READ
+	clinicRouter.Get("/:clinic_id/client/:client_id", controllers.GetClientById)
+
 	// /api/v1/clinic/:clinic_id/streamings
 	clinicRouter.Get("/:clinic_id/streamings", controllers.GetAllStreamingByClinicID)
 

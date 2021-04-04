@@ -14,12 +14,8 @@ func ClientRoutes(router fiber.Router) {
 	// /api/v1/client | CREATE
 	clientRouter.Post("/", controllers.CreateClient)
 
-
-
 	// /api/v1/client/:client_email | READ
 	clientRouter.Get("/:client_email/exist", controllers.GetClientByEmail)
-
-
 
 	// /api/v1/client/:client_id | DELETE
 	// clientRouter.Delete("/:client_id", controllers.CreateClient)
@@ -32,9 +28,6 @@ func ClientRoutes(router fiber.Router) {
 
 	// use jwt
 	clientRouter.Use(jwtware.New(jwtware.Config{SigningKey: []byte(utils.GetEnvVariable("JWT_CLIENT_KEY"))}))
-
-	// /api/v1/client/:client_id | READ
-	clientRouter.Get("/:client_id", controllers.GetClientById)
 
 	// /api/v1/client/:client_email | READ
 	clientRouter.Post("/:client_id/increment_disk_quote_level", controllers.IncrementDiskQuoteLevel)
