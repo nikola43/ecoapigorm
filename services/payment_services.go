@@ -24,15 +24,6 @@ func CreatePayment(createPaymentRequest *payments.CreatePaymentRequest) (*models
 		return nil, errors.New("clinic not found")
 	}
 
-	/*
-		fmt.Println(sessionID)
-		for ok := true; ok; ok = len(payment.SessionID) > 0 {
-			sessionID = GenerateRandomCode(8)
-			database.GormDB.Where("session_id = ?", sessionID).Find(&payment)
-		}
-		fmt.Println(sessionID)
-	*/
-
 	params := &stripe.CheckoutSessionParams{
 		PaymentMethodTypes: stripe.StringSlice([]string{
 			"card",
@@ -45,7 +36,7 @@ func CreatePayment(createPaymentRequest *payments.CreatePaymentRequest) (*models
 					ProductData: &stripe.CheckoutSessionLineItemPriceDataProductDataParams{
 						Name: stripe.String("Cliente 0,50"),
 					},
-					UnitAmount: stripe.Int64(1),
+					UnitAmountDecimal: stripe.Float64(0.5),
 				},
 				Quantity: stripe.Int64(int64(createPaymentRequest.Quantity)),
 			},
