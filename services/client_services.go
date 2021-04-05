@@ -92,8 +92,10 @@ func UpdateClientService(id uint, updateClientRequest *modelsClients.UpdateClien
 	return client, nil
 }
 
-func GetClientByEmail(clientEmail string) (*models.Client, error) {
+func GetClientByEmail(clientEmail string) (*modelsClients.ListClientResponse, error) {
 	client := &models.Client{}
+	var clinicID uint
+	var totalSize uint = 0
 
 	GormDBResult := database.GormDB.
 		Where("email = ?", clientEmail).
@@ -104,10 +106,34 @@ func GetClientByEmail(clientEmail string) (*models.Client, error) {
 	}
 
 	if client.ID < 1 {
-		return nil, errors.New("not found")
+		return nil, errors.New("client not found")
 	}
 
-	return client, nil
+	clinicClient := &models.ClinicClient{}
+	result := database.GormDB.Where("client_id", client.ID).First(&clinicClient)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	if clinicClient.ClinicID > 0 && clinicClient.ClientID > 0 {
+		clinicID = clinicClient.ClinicID
+		totalSize = utils.CalculateTotalSizeByClient(*client, clinicID)
+	}
+
+	clientResponse := &modelsClients.ListClientResponse{
+		ID:             client.ID,
+		ClinicID:       clinicID,
+		Email:          client.Email,
+		Name:           client.Name,
+		LastName:       client.LastName,
+		Phone:          client.Phone,
+		CreatedAt:      client.CreatedAt,
+		PregnancyDate:  client.PregnancyDate,
+		UsedSize:       totalSize,
+		DiskQuoteLevel: clinicClient.DiskQuoteLevel,
+	}
+
+	return clientResponse, nil
 }
 
 func GetClientById(clinicID, clientID uint) (*modelsClients.ListClientResponse, error) {

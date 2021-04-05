@@ -283,21 +283,23 @@ func LinkClient(clientID uint, clinicID uint) error {
 		return result.Error
 	}
 
-	// check if client not is already linked by other clinic
-	//todo
-	/*	if client.ClinicID > 0 {
-		return errors.New("client is already linked by other clinic")
-	}*/
+	clinicClient := &models.ClinicClient{}
+	result = database.GormDB.Where("clinic_id = ? AND client_id", clinicID, clientID).First(&clinicClient)
+	if result.Error != nil {
+		return result.Error
+	}
 
-	clinicClient := &models.ClinicClient{
+	// check if client not is already linked by other clinic
+	if clinicClient.ClinicID > 0 && clinicClient.ClientID > 0 {
+		return errors.New("client is already linked by other clinic")
+	}
+
+	clinicClient = &models.ClinicClient{
 		ClinicID: clinic.ID,
 		ClientID: client.ID,
 	}
-	result = database.GormDB.Create(&clinicClient)
 
-	/*//update clinic id
-	//client.ClinicID = clinic.ID
-	result = database.GormDB.Save(&client)*/
+	result = database.GormDB.Create(&clinicClient)
 	if result.Error != nil {
 		return result.Error
 	}

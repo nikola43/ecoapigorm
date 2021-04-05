@@ -61,15 +61,16 @@ func UploadMultimedia(
 		image := models.Image{
 			Filename: cleanFilename,
 			ClientID: clientID,
-			Url: url,
-			Size: uint(size),
+			Url:      url,
+			Size:     uint(size),
 			ClinicID: clinicId,
 		}
 		database.GormDB.Create(&image)
 
-		e := os.Remove("./tempFiles/" + clinicName + "/" + clientIDString + "/" + cleanFilename)
+		e := os.Remove(fmt.Sprintf("./tempFiles/%s/%s/%s", clinicName, clientIDString, cleanFilename))
 		if e != nil {
-			log.Fatal(e)
+			fmt.Println(e)
+			//log.Fatal(e)
 		}
 
 		return err
@@ -109,36 +110,36 @@ func UploadMultimedia(
 
 		if fileType == "video" {
 			video := models.Video{
-				Filename: cleanFilename,
-				ClientID: clientID,
-				Url: videoUrl,
+				Filename:     cleanFilename,
+				ClientID:     clientID,
+				Url:          videoUrl,
 				ThumbnailUrl: thumbUrl,
-				Size: uint(videoSize + thumbSize),
-				ClinicID: clinicId,
+				Size:         uint(videoSize + thumbSize),
+				ClinicID:     clinicId,
 			}
 			database.GormDB.Create(&video)
 		}
 
 		if fileType == "holographic" {
 			video := models.Holographic{
-				Filename: cleanFilename,
-				ClientID: clientID,
-				Url: videoUrl,
+				Filename:     cleanFilename,
+				ClientID:     clientID,
+				Url:          videoUrl,
 				ThumbnailUrl: thumbUrl,
-				Size: uint(videoSize + thumbSize),
-				ClinicID: clinicId,
+				Size:         uint(videoSize + thumbSize),
+				ClinicID:     clinicId,
 			}
 			database.GormDB.Create(&video)
 		}
 
-		e := os.Remove("./tempFiles/" + clinicName + "/" + clientIDString + "/" + cleanFilename)
+		e := os.Remove(fmt.Sprintf("./tempFiles/%s/%s/%s", clinicName, clientIDString, cleanFilename))
 		if e != nil {
-			log.Fatal(e)
+			fmt.Println(e)
 		}
 
 		e = os.Remove(thumbnailPath)
 		if e != nil {
-			log.Fatal(e)
+			fmt.Println(e)
 		}
 
 		return err
@@ -161,9 +162,10 @@ func UploadMultimedia(
 		}
 		video := models.Heartbeat{Filename: cleanFilename, ClientID: clientID, Url: url, Size: uint(size), ClinicID: clinicId}
 		database.GormDB.Create(&video)
-		e := os.Remove("./tempFiles/" + clinicName + "/" + clientIDString + "/" + cleanFilename)
+		e := os.Remove(fmt.Sprintf("./tempFiles/%s/%s/%s", clinicName, clientIDString, cleanFilename))
+
 		if e != nil {
-			log.Fatal(e)
+			fmt.Println(e)
 		}
 
 		return err
