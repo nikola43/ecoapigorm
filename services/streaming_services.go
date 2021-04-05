@@ -35,6 +35,7 @@ func CreateStreaming(createStreamingRequest *streamings.CreateStreamingRequest) 
 	fmt.Println(code)
 	streaming.Url = createStreamingRequest.Url
 	streaming.ClientID = createStreamingRequest.ClientID
+	streaming.ClinicID = createStreamingRequest.ClinicID
 	streaming.Code = code
 
 	database.GormDB.Create(&streaming)
