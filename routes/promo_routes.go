@@ -17,7 +17,7 @@ func PromoRoutes(router fiber.Router) {
 
 	// MOBILE ENDPOINT
 	// /api/v1/promo/client
-	promoRouter.Get("/client", controllers.GetPromosForClientController)
+	promoRouter.Get("clinic/:clinic_id/client", controllers.GetPromosForClientController)
 
 	// /api/v1/promo/:promo_id
 	promoRouter.Delete("/:promo_id", controllers.DeletePromoByID)
