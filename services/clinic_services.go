@@ -189,11 +189,13 @@ func GetAllPromosByClinicID(clinicID string) ([]promos.Promo, error) {
 	return promosList, nil
 }
 
-func GetAllPromosForClient(clientId uint) ([]promos.Promo, error) {
+func GetAllPromosForClient(clientId uint,clinicId uint) ([]promos.Promo, error) {
 	var promos = make([]promos.Promo, 0)
 	clinicClient := make([]models.ClinicClient, 0)
 
-	err := database.GormDB.Where("client_id = ?", clientId).Find(&clinicClient)
+	err := database.GormDB.
+		Where("client_id = ? AND clinic_id = ?", clientId, clinicId).
+		Find(&clinicClient)
 	if err.Error != nil {
 		return nil, err.Error
 	}
@@ -202,12 +204,11 @@ func GetAllPromosForClient(clientId uint) ([]promos.Promo, error) {
 		return promos, nil
 	}
 
-	clientIds := make([]uint, 0)
-	linq.From(clinicClient).
-		SelectT(func(clinicClientRelation models.ClinicClient) uint { return clinicClientRelation.ClientID }).
-		ToSlice(&clientIds)
+	// TODO Añadir week
 
-	err = database.GormDB.Where("client_id IN ?", clientIds).Find(&promos)
+	err = database.GormDB.
+		Where("clinic_id = ?", clinicId).
+		Find(&promos)
 	if err.Error != nil {
 		return nil, err.Error
 	}
