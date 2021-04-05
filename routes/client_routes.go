@@ -14,8 +14,7 @@ func ClientRoutes(router fiber.Router) {
 	// /api/v1/client | CREATE
 	clientRouter.Post("/", controllers.CreateClient)
 
-	// /api/v1/client/:client_email | READ
-	clientRouter.Get("/:client_email/exist", controllers.GetClientByEmail)
+
 
 	// /api/v1/client/:client_id | DELETE
 	// clientRouter.Delete("/:client_id", controllers.CreateClient)

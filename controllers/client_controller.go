@@ -15,10 +15,11 @@ import (
 )
 
 
-func GetClientByEmail(context *fiber.Ctx) error {
+func GetClientClinicIDByEmail(context *fiber.Ctx) error {
 	clientEmail := context.Params("client_email")
+	clinicID, _ := strconv.ParseUint(context.Params("clinic_id"), 10, 64)
 
-	client, err := services.GetClientByEmail(clientEmail)
+	client, err := services.GetClientClinicIDByEmail(uint(clinicID),clientEmail)
 	if err != nil {
 		return context.Status(fiber.StatusNotFound).JSON(&fiber.Map{
 			"error": err.Error(),

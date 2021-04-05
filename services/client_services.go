@@ -92,9 +92,8 @@ func UpdateClientService(id uint, updateClientRequest *modelsClients.UpdateClien
 	return client, nil
 }
 
-func GetClientByEmail(clientEmail string) (*modelsClients.ListClientResponse, error) {
+func GetClientClinicIDByEmail(clinicID uint, clientEmail string) (*modelsClients.ListClientResponse, error) {
 	client := &models.Client{}
-	var clinicID uint
 	var totalSize uint = 0
 
 	GormDBResult := database.GormDB.
@@ -110,7 +109,8 @@ func GetClientByEmail(clientEmail string) (*modelsClients.ListClientResponse, er
 	}
 
 	clinicClient := &models.ClinicClient{}
-	result := database.GormDB.Where("client_id", client.ID).First(&clinicClient)
+	result := database.GormDB.Where("clinic_id = ? AND client_id", clinicID, client.ID).First(&clinicClient)
+
 	if result.Error != nil {
 		// return nil, result.Error
 	}
