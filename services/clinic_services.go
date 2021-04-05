@@ -53,6 +53,16 @@ func CreateClinic(companyID uint, createClinicRequest *clinicModels.CreateClinic
 	return createEmployeeResponse, result.Error
 }
 
+func GetCreditsClinicById(id uint) (uint, error) {
+	clinic := models.Clinic{}
+
+	if err := database.GormDB.First(&clinic, id).Error; err != nil {
+		return 0, err
+	}
+
+	return clinic.AvailableCredits, nil
+}
+
 func GetClinicByID(id uint) (*models.Clinic, error) {
 	clinic := models.Clinic{}
 
@@ -275,14 +285,14 @@ func LinkClient(clientID uint, clinicID uint) error {
 	}
 
 	clinicClient := &models.ClinicClient{}
-	result = database.GormDB.Where("clinic_id = ? AND client_id", clinicID, clientID).First(&clinicClient)
+	result = database.GormDB.Where("clinic_id = ? AND client_id = ?", clinicID, clientID).First(&clinicClient)
 	if result.Error != nil {
-		return result.Error
+		// todo revisar
+		// return result.Error
 	}
 
 	// check if client not is already linked by other clinic
-	if clinicClient.ClinicID > 0 &&
-		clinicClient.ClientID > 0 {
+	if clinicClient.ClinicID > 0 && clinicClient.ClientID > 0 {
 		return errors.New("client is already linked")
 	}
 

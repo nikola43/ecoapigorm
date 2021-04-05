@@ -16,6 +16,22 @@ import (
 	"strconv"
 )
 
+func GetCreditsClinicById(context *fiber.Ctx) error {
+	clinicID, _ := strconv.ParseUint(context.Params("clinic_id"), 10, 64)
+	var credits uint = 0
+	var err error
+
+	if credits, err = services.GetCreditsClinicById(uint(clinicID)); err != nil {
+		return context.Status(fiber.StatusNotFound).JSON(&fiber.Map{
+			"error": "clinic not found",
+		})
+	}
+
+	return context.Status(fiber.StatusOK).JSON(&fiber.Map{
+		"available_credits": credits,
+	})
+}
+
 func GetClinicById(context *fiber.Ctx) error {
 	clinicID, _ := strconv.ParseUint(context.Params("clinic_id"), 10, 64)
 	clinic := &models.Clinic{}
@@ -257,7 +273,6 @@ func GetPromosByWeekAndClinicID(context *fiber.Ctx) error {
 
 	return context.Status(fiber.StatusOK).JSON(promosList)
 }
-
 
 func GetClientById(context *fiber.Ctx) error {
 	clientID, _ := strconv.ParseUint(context.Params("client_id"), 10, 64)
