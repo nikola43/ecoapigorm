@@ -43,9 +43,9 @@ func CreatePayment(createPaymentRequest *payments.CreatePaymentRequest) (*models
 				PriceData: &stripe.CheckoutSessionLineItemPriceDataParams{
 					Currency: stripe.String("eur"),
 					ProductData: &stripe.CheckoutSessionLineItemPriceDataProductDataParams{
-						Name: stripe.String("Cliente"),
+						Name: stripe.String("Cliente 0,50"),
 					},
-					UnitAmount: stripe.Int64(3),
+					UnitAmount: stripe.Int64(1),
 				},
 				Quantity: stripe.Int64(int64(createPaymentRequest.Quantity)),
 			},
