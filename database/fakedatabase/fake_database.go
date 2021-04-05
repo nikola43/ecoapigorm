@@ -26,16 +26,16 @@ func CreateFakeData() {
 		Role:             "admin",
 	}
 	database.GormDB.Create(&employee1)
-
+/*
 	clinic1 := models.Clinic{
 		Name:      "Paulo Clinic",
 		CompanyID: company1.ID,
 	}
-	database.GormDB.Create(&clinic1)
+	database.GormDB.Create(&clinic1)*/
 	//database.GormDB.Model(&employee1).Update("clinic_id", clinic1.ID)
 
 
-	employee2 := models.Employee{Name: "Migue", LastName: "Barrera", Phone: "999999999", Email: "migue@gmail.com", Password: utils.HashPassword([]byte("migue")), Role: "employee", ClinicID: clinic1.ID, CompanyID: company1.ID}
+	/*employee2 := models.Employee{Name: "Migue", LastName: "Barrera", Phone: "999999999", Email: "migue@gmail.com", Password: utils.HashPassword([]byte("migue")), Role: "employee", ClinicID: clinic1.ID, CompanyID: company1.ID}
 	database.GormDB.Create(&employee2)
 
 	client1 := models.Client{
@@ -66,7 +66,7 @@ func CreateFakeData() {
 		ClinicID:  clinic1.ID,
 		ClientID:  client2.ID,
 	}
-	database.GormDB.Create(&clinicClient2)
+	database.GormDB.Create(&clinicClient2)*/
 
 	// EMPLOYEES ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
