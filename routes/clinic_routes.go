@@ -56,7 +56,4 @@ func ClinicRoutes(router fiber.Router) {
 
 	// /api/v1/clinic
 	clinicRouter.Patch("/", controllers.UpdateClinicByID)
-
-
-
 }

@@ -10,6 +10,15 @@ import (
 
 func CreatePayment(createPaymentRequest *payments.CreatePaymentRequest) (*models.Payment, error) {
 	payment := new(models.Payment)
+	clinic := models.Clinic{}
+	fmt.Println(createPaymentRequest)
+	if err := database.GormDB.First(&clinic, createPaymentRequest.ClinicID).Error; err != nil {
+		return nil, err
+	}
+
+	if clinic.ID < 1 {
+		return nil, errors.New("clinic not found")
+	}
 
 	sessionID := ""
 	fmt.Println(sessionID)
@@ -23,6 +32,7 @@ func CreatePayment(createPaymentRequest *payments.CreatePaymentRequest) (*models
 	payment.SessionID = sessionID
 	payment.EmployeeID = createPaymentRequest.EmployeeID
 	payment.ClinicID = createPaymentRequest.ClinicID
+	payment.ClinicName = clinic.Name
 	payment.Amount = createPaymentRequest.Amount
 	payment.Quantity = createPaymentRequest.Quantity
 	payment.IsPaid = false

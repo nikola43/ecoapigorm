@@ -10,6 +10,7 @@ type Payment struct {
 	SessionID  string  `json:"session_id"`
 	EmployeeID uint    `gorm:"type:INTEGER not null" json:"employee_id"`
 	ClinicID   uint    `gorm:"type:INTEGER null" json:"clinic_id"`
+	ClinicName string  `json:"clinic_name"`
 	Amount     float32 `json:"amount"`
 	Quantity   uint    `json:"quantity"`
 	IsPaid     bool    `json:"is_paid"`
