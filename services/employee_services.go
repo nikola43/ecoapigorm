@@ -78,6 +78,11 @@ func Invite(employeeTokenClaims *models.EmployeeTokenClaims, employees []models.
 	for _, employee := range employees {
 		temp := new(models.Employee)
 		utils.GetModelByField(temp, "email", employee.Email)
+
+		if temp.ClinicID > 0 {
+			return errors.New("employee already assigned")
+		}
+
 		invitationToken, err := utils.GenerateInvitationToken()
 		if err != nil {
 			return err
