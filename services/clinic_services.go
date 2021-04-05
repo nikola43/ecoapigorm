@@ -113,7 +113,6 @@ func GetClientsByClinicID(id uint) ([]clients.ListClientResponse, error) {
 func CreateClientFromClinic(createClientRequest *clients.CreateClientRequest) (*clients.ListClientResponse, error) {
 	client := models.Client{}
 	clinic := models.Clinic{}
-	useClinicAvailableUsers := false
 
 	// check if client already exist
 	if err := database.GormDB.
@@ -122,20 +121,16 @@ func CreateClientFromClinic(createClientRequest *clients.CreateClientRequest) (*
 		return nil, err
 	}
 
-	if client.ID > 0 {
-		return nil, errors.New("client already exist")
-	}
-
 	// check if client has been created by clinic
 	if err := database.GormDB.First(&clinic, createClientRequest.ClinicID).Error; err != nil {
 		return nil, errors.New("clinic_id not found")
 	}
 
-	// check if clinic has sufficient credits
-	if clinic.AvailableCredits > 0 {
-		useClinicAvailableUsers = true
-	} else {
+	clinicClient := &models.ClinicClient{}
+	result := database.GormDB.Where("clinic_id = ? AND client_id", clinic.ID, client.ID).First(&clinicClient)
 
+	if clinicClient.ClinicID == clinic.ID && clinicClient.ClientID == client.ID {
+		return nil, errors.New("client already assigned to this clinic")
 	}
 
 	client = models.Client{
@@ -146,14 +141,14 @@ func CreateClientFromClinic(createClientRequest *clients.CreateClientRequest) (*
 		PregnancyDate: createClientRequest.PregnancyDate,
 		Phone:         createClientRequest.Phone,
 	}
-	result := database.GormDB.Create(&client)
+	result = database.GormDB.Create(&client)
 
-	clinicClient := &models.ClinicClient{
+	clinicClient = &models.ClinicClient{
 		ClinicID: clinic.ID,
 		ClientID: client.ID,
 	}
-	result = database.GormDB.Create(&clinicClient)
 
+	result = database.GormDB.Create(&clinicClient)
 	if result.Error != nil {
 		return nil, result.Error
 	}
@@ -169,23 +164,19 @@ func CreateClientFromClinic(createClientRequest *clients.CreateClientRequest) (*
 		CreatedAt:     client.CreatedAt,
 	}
 
-	// check if client has been created by clinic
-	if useClinicAvailableUsers {
-		database.GormDB.Model(&clinic).Update("available_credits", clinic.AvailableCredits-1)
-	}
-
+	database.GormDB.Model(&clinic).Update("available_credits", clinic.AvailableCredits-1)
 	return listClientResponse, result.Error
 }
 
 func GetAllPromosByClinicID(clinicID string) ([]promos.Promo, error) {
-	var promos = make([]promos.Promo, 0)
+	promosList := make([]promos.Promo, 0)
 
-	err := database.GormDB.Where("clinic_id = ?", clinicID).Find(&promos)
+	err := database.GormDB.Where("clinic_id = ?", clinicID).Find(&promosList)
 	if err.Error != nil {
 		return nil, err.Error
 	}
 
-	return promos, nil
+	return promosList, nil
 }
 
 func GetAllPromosForClient(clientId uint) ([]promos.Promo, error) {
