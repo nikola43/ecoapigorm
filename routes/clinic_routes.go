@@ -50,6 +50,10 @@ func ClinicRoutes(router fiber.Router) {
 	// /api/v1/clinic/:clinic_id/employees
 	clinicRouter.Get("/:clinic_id/employees", controllers.GetEmployeesByClinicID)
 
+
+	// /api/v1/clinic/:clinic_id
+	clinicRouter.Get("/:clinic_id/credits", controllers.GetCreditsClinicById)
+
 	// check Employee.Role == 'admin'
 	clinicRouter.Use(middleware.AdminEmployeeMiddleware)
 

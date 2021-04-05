@@ -122,7 +122,7 @@ func GetClientClinicIDByEmail(clinicID uint, clientEmail string) (*modelsClients
 
 	clientResponse := &modelsClients.ListClientResponse{
 		ID:             client.ID,
-		ClinicID:       clinicID,
+		ClinicID:       clinicClient.ClinicID,
 		Email:          client.Email,
 		Name:           client.Name,
 		LastName:       client.LastName,
