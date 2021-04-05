@@ -109,7 +109,7 @@ func GetClientClinicIDByEmail(clinicID uint, clientEmail string) (*modelsClients
 	}
 
 	clinicClient := &models.ClinicClient{}
-	result := database.GormDB.Where("clinic_id = ? AND client_id", clinicID, client.ID).First(&clinicClient)
+	result := database.GormDB.Where("clinic_id = ? AND client_id = ?", clinicID, client.ID).First(&clinicClient)
 
 	if result.Error != nil {
 		// return nil, result.Error
