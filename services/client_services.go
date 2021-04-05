@@ -112,7 +112,7 @@ func GetClientByEmail(clientEmail string) (*modelsClients.ListClientResponse, er
 	clinicClient := &models.ClinicClient{}
 	result := database.GormDB.Where("client_id", client.ID).First(&clinicClient)
 	if result.Error != nil {
-		return nil, result.Error
+		// return nil, result.Error
 	}
 
 	if clinicClient.ClinicID > 0 && clinicClient.ClientID > 0 {

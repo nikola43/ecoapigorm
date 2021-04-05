@@ -290,8 +290,9 @@ func LinkClient(clientID uint, clinicID uint) error {
 	}
 
 	// check if client not is already linked by other clinic
-	if clinicClient.ClinicID > 0 && clinicClient.ClientID > 0 {
-		return errors.New("client is already linked by other clinic")
+	if clinicClient.ClinicID > 0 &&
+		clinicClient.ClientID > 0 {
+		return errors.New("client is already linked")
 	}
 
 	clinicClient = &models.ClinicClient{
