@@ -15,6 +15,9 @@ func PaymentRoutes(router fiber.Router) {
 	// /api/v1/payment
 	promoRouter.Post("/", controllers.CreatePayment)
 
+	// /api/v1/paymentv2
+	promoRouter.Post("/", controllers.CreateCheckoutSession)
+
 	// /api/v1/payment/:session_id
 	promoRouter.Get("/:session_id", controllers.GetPaymentBySessionID)
 

@@ -6,6 +6,26 @@ import (
 	"github.com/nikola43/ecoapigorm/services"
 )
 
+func CreateCheckoutSession(context *fiber.Ctx) error {
+	createPaymentRequest := new(payments.CreatePaymentRequest)
+
+	// parse request
+	err := context.BodyParser(createPaymentRequest)
+	if err != nil {
+		return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	payment, err := services.CreatePayment(createPaymentRequest)
+	if err != nil {
+		return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return context.Status(fiber.StatusOK).JSON(payment)
+}
 func CreatePayment(context *fiber.Ctx) error {
 	// todo validate company, clinic y employee
 
