@@ -183,7 +183,7 @@ func DeleteImage(bucketName string, imageID uint) error {
 	}
 
 	url := strings.Split(image.Url, "/")
-	key := url[4] + "/" + url[5] + "/" + url[6]
+	key := url[4] + "/" + url[5] + "/" + url[6] + "/" + url[7]
 
 	// delete from S3
 	err := wasabis3manager.WasabiS3Client.DeleteObject(bucketName, &key)
@@ -210,8 +210,8 @@ func DeleteVideo(bucketName string, imageID uint) error {
 
 	videoUrl := strings.Split(video.Url, "/")
 	thumbnailUrl := strings.Split(video.ThumbnailUrl, "/")
-	videoKey := videoUrl[4] + "/" + videoUrl[5] + "/" + videoUrl[6]
-	thumbnailKey := thumbnailUrl[4] + "/" + thumbnailUrl[5] + "/" + thumbnailUrl[6]
+	videoKey := videoUrl[4] + "/" + videoUrl[5] + "/" + videoUrl[6] + "/" + videoUrl[7]
+	thumbnailKey := thumbnailUrl[4] + "/" + thumbnailUrl[5] + "/" + thumbnailUrl[6] + "/" + thumbnailUrl[7]
 
 	// delete video
 	err := wasabis3manager.WasabiS3Client.DeleteObject(bucketName, &videoKey)
@@ -243,7 +243,7 @@ func DeleteHeartbeat(bucketName string, imageID uint) error {
 	}
 
 	url := strings.Split(heartbeat.Url, "/")
-	key := url[4] + "/" + url[5] + "/" + url[6]
+	key := url[4] + "/" + url[5] + "/" + url[6] + "/" + url[7]
 
 	// delete from S3
 	err := wasabis3manager.WasabiS3Client.DeleteObject(bucketName, &key)
