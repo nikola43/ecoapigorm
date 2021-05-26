@@ -259,11 +259,11 @@ func GetAllStreamingByClientANDClinicID(clientID string,clinicID string) ([]stre
 	return list, nil
 }
 
-func UnassignClientByID(clientID uint, clinicId uint) error {
+func UnassignClientByID(clinicID uint, clientID uint) error {
 	deleteClinicClient := new(models.ClinicClient)
 
 	GormDBResult := database.GormDB.
-		Where("clinic_id = ? AND client_id = ?", clinicId, clientID).
+		Where("clinic_id = ? AND client_id = ?", clinicID, clientID).
 		Find(&deleteClinicClient)
 
 	if GormDBResult.Error != nil {

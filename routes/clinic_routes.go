@@ -67,6 +67,6 @@ func ClinicRoutes(router fiber.Router) {
 	// /api/v1/clinic/:clinic_id/credits
 	clinicRouter.Patch("/:clinic_id/credits", controllers.UpdateCredits)
 
-	// /api/v1/clinic/:client_id
+	// /api/v1/clinic/:clinic_id/:client_id/unassign
 	clinicRouter.Delete("/:clinic_id/:client_id/unassign", controllers.UnassignClientByID)
 }
