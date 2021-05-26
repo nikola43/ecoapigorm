@@ -14,12 +14,11 @@ import (
 	//"strings"
 )
 
-
 func GetClientClinicIDByEmail(context *fiber.Ctx) error {
 	clientEmail := context.Params("client_email")
 	clinicID, _ := strconv.ParseUint(context.Params("clinic_id"), 10, 64)
 
-	client, err := services.GetClientClinicIDByEmail(uint(clinicID),clientEmail)
+	client, err := services.GetClientClinicIDByEmail(uint(clinicID), clientEmail)
 	if err != nil {
 		return context.Status(fiber.StatusNotFound).JSON(&fiber.Map{
 			"error": err.Error(),
@@ -46,7 +45,7 @@ func GetAllImagesByClientAndClinicID(context *fiber.Ctx) error {
 	clientID, _ := strconv.ParseUint(context.Params("client_id"), 10, 64)
 	clinicID, _ := strconv.ParseUint(context.Params("clinic_id"), 10, 64)
 
-	if images, err = services.GetAllImagesByClientAndClinicID(uint(clientID),uint(clinicID)); err != nil {
+	if images, err = services.GetAllImagesByClientAndClinicID(uint(clientID), uint(clinicID)); err != nil {
 		return context.SendStatus(fiber.StatusInternalServerError)
 	}
 
@@ -71,7 +70,7 @@ func GetAllStreamingByClientANDClinicID(context *fiber.Ctx) error {
 	videos := make([]streamingModels.Streaming, 0)
 	var err error
 
-	if videos, err = services.GetAllStreamingByClientANDClinicID(clientID,clinicID); err != nil {
+	if videos, err = services.GetAllStreamingByClientANDClinicID(clientID, clinicID); err != nil {
 		return context.SendStatus(fiber.StatusInternalServerError)
 	}
 
@@ -137,7 +136,7 @@ func GetHeartbeatByClientAndClinicID(context *fiber.Ctx) error {
 	heartbeat := &models.Heartbeat{}
 	var err error
 
-	if heartbeat, err = services.GetHeartbeatByClientAndClinicID(uint(clientID),uint(clinicID)); err != nil {
+	if heartbeat, err = services.GetHeartbeatByClientAndClinicID(uint(clientID), uint(clinicID)); err != nil {
 		return context.Status(fiber.StatusNotFound).JSON(&fiber.Map{
 			"error": err.Error(),
 		})
@@ -190,9 +189,6 @@ func CreateClient(context *fiber.Ctx) error {
 func IncrementDiskQuoteLevel(context *fiber.Ctx) error {
 	listClientResponse := new(modelsClient.ListClientResponse)
 
-
-
-
 	if err := context.BodyParser(listClientResponse);
 		err != nil {
 		return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
@@ -206,7 +202,6 @@ func IncrementDiskQuoteLevel(context *fiber.Ctx) error {
 			"error": err.Error(),
 		})
 	}
-
 
 	err = services.IncrementDiskQuoteLevel(employeeTokenClaims.ClinicID, listClientResponse.ID)
 
@@ -267,16 +262,20 @@ func UpdateClient(context *fiber.Ctx) error {
 }
 
 func UnassignClientByID(context *fiber.Ctx) error {
+	clinicID, _ := strconv.ParseUint(context.Params("clinic_id"), 10, 64)
 	clientID, _ := strconv.ParseUint(context.Params("client_id"), 10, 64)
 
-	employeeTokenClaims, err := utils.GetEmployeeTokenClaims(context)
-	if err != nil {
-		return context.Status(fiber.StatusUnauthorized).JSON(&fiber.Map{
-			"error": err.Error(),
-		})
-	}
+	// TODO Cualquier propietario podría borrar usuarios de otras clínicas
+	/*
+		employeeTokenClaims, err := utils.GetEmployeeTokenClaims(context)
+		if err != nil {
+			return context.Status(fiber.StatusUnauthorized).JSON(&fiber.Map{
+				"error": err.Error(),
+			})
+		}
+	*/
 
-	err = services.UnassignClientByID(uint(clientID),uint(employeeTokenClaims.ClinicID))
+	err := services.UnassignClientByID(uint(clientID), uint(clinicID))
 	if err != nil {
 		return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 			"error": err.Error(),
@@ -290,7 +289,6 @@ func UnassignClientByID(context *fiber.Ctx) error {
 
 func RefreshClient(context *fiber.Ctx) error {
 	clientID, _ := strconv.ParseUint(context.Params("client_id"), 10, 64)
-
 
 	client, err := services.RefreshClient(uint(clientID))
 	if err != nil {
