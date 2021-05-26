@@ -36,9 +36,6 @@ func ClientRoutes(router fiber.Router) {
 	// /api/v1/clinic/refresh
 	clientRouter.Get("/:client_id/refresh", controllers.RefreshClient)
 
-	// /api/v1/client/:client_id
-	clientRouter.Delete("/:clinic_id/:client_id/", controllers.UnassignClientByID)
-
 	// /api/v1/client/:client_id | UPDATE
 	clientRouter.Patch("/:client_id", controllers.UpdateClient)
 }
