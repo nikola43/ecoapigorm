@@ -271,6 +271,7 @@ func UnassignClientByID(clinicID uint, clientID uint) error {
 	}
 
 	database.GormDB.
+		Where("clinic_id = ? AND client_id = ?", clinicID, clientID).
 		Unscoped().
 		Delete(deleteClinicClient)
 
