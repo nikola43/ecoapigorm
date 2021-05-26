@@ -2,7 +2,6 @@ package services
 
 import (
 	"errors"
-	"fmt"
 	database "github.com/nikola43/ecoapigorm/database"
 	"github.com/nikola43/ecoapigorm/models"
 	modelsClients "github.com/nikola43/ecoapigorm/models/clients"
@@ -270,10 +269,6 @@ func UnassignClientByID(clinicID uint, clientID uint) error {
 	if GormDBResult.Error != nil {
 		return GormDBResult.Error
 	}
-
-	fmt.Println(deleteClinicClient)
-
-
 
 	database.GormDB.
 		Where("clinic_id = ? AND client_id = ?", clinicID, clientID).

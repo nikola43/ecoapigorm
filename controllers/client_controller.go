@@ -275,7 +275,7 @@ func UnassignClientByID(context *fiber.Ctx) error {
 		}
 	*/
 
-	err := services.UnassignClientByID(uint(clientID), uint(clinicID))
+	err := services.UnassignClientByID(uint(clinicID), uint(clientID))
 	if err != nil {
 		return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 			"error": err.Error(),
