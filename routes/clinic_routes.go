@@ -49,7 +49,7 @@ func ClinicRoutes(router fiber.Router) {
 	clinicRouter.Get("/:clinic_id/employees", controllers.GetEmployeesByClinicID)
 
 
-	// /api/v1/clinic/:clinic_id
+	// /api/v1/clinic/:clinic_id/credits
 	clinicRouter.Get("/:clinic_id/credits", controllers.GetCreditsClinicById)
 
 	// check Employee.Role == 'admin'
@@ -63,4 +63,7 @@ func ClinicRoutes(router fiber.Router) {
 
 	// /api/v1/clinic
 	clinicRouter.Patch("/", controllers.UpdateClinicByID)
+
+	// /api/v1/clinic/:clinic_id/credits
+	clinicRouter.Patch("/:clinic_id/credits", controllers.UpdateCredits)
 }

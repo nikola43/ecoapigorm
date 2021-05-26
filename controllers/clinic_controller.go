@@ -232,6 +232,29 @@ func UpdateClinicByID(context *fiber.Ctx) error {
 
 }
 
+
+func UpdateCredits(context *fiber.Ctx) error {
+	clinic := new(models.Clinic)
+
+	// parse request
+	err := context.BodyParser(clinic)
+	if err != nil {
+		return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	updatedClinic, err := services.UpdateClinic(clinic)
+	if err != nil {
+		return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+			"error": err.Error(),
+		})
+	}
+	return context.JSON(updatedClinic)
+
+}
+
+
 func LinkClient(context *fiber.Ctx) error {
 	clinicID, _ := strconv.ParseUint(context.Params("clinic_id"), 10, 64)
 	clientID, _ := strconv.ParseUint(context.Params("client_id"), 10, 64)
