@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"github.com/h2non/bimg"
 	"github.com/joho/godotenv"
 	"log"
 	"os"
@@ -117,12 +118,11 @@ func GenerateHologramVideo(inFile string) (string, error) {
 	return outFile, nil
 }
 
-func CompressMP4(inFile string) (string, error) {
-	outFile := inFile + "_compress.mp4"
+func CompressMP4(inFile, outFile string) error {
 
 	// check if input file exists
 	if !CheckIfFileExists(inFile) {
-		return "", errors.New("not such file")
+		return errors.New("not such file")
 	}
 
 	// extract audio from video using ffmpeg library
@@ -132,10 +132,10 @@ func CompressMP4(inFile string) (string, error) {
 	err := ExecuteSystemCommandVerbose(FFMPEG_PATH, "-i", inFile, "-y", "-preset", "veryfast", "-c:v", "libx264", "-crf", "30", "-c:a", "aac", outFile)
 
 	if err != nil {
-		return "", err
+		return err
 	}
 
-	return outFile, err
+	return err
 }
 
 func ExecuteSystemCommandVerbose(commandName string, arg ...string) error {
@@ -199,21 +199,44 @@ func GetFileType(file string, uploadMode uint) string {
 	return fileType
 }
 
-func ExtractThumbnailFromVideo(inFile string) (string,error) {
-	outFile := inFile + "_thumbnail.jpg"
+func ExtractThumbnailFromVideo(inFile string, outFile string) error {
 
 	// check if input file exists
 	if !CheckIfFileExists(inFile) {
-		return "", errors.New("not such file")
+		return errors.New("not such file")
 	}
-
 
 	// extract audio from video using ffmpeg library
 	cmd := exec.Command(FFMPEG_PATH, "-y", "-i", inFile, "-ss", "00:00:05.000", "-vframes", "1", outFile)
 	err := cmd.Run()
 	if err != nil {
-		return "", err
+		return err
 	}
 
-	return outFile, err
+	return err
+}
+
+func CompressImage(inputFilePath, outFilePath string) error {
+	options := bimg.Options{
+		Quality: 10,
+	}
+
+	// open file
+	buffer, err := bimg.Read(inputFilePath)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+	}
+
+	// process file
+	newImage, err := bimg.NewImage(buffer).Process(options)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+	}
+
+	// save file
+	err = bimg.Write(outFilePath, newImage)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+	}
+	return err
 }

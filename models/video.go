@@ -12,4 +12,5 @@ type Video struct {
 	Url          string `gorm:"type:varchar(256) not null" json:"url"`
 	ThumbnailUrl string `gorm:"type:varchar(256) not null" json:"thumbnail_url"`
 	Size         uint   `gorm:"type:INTEGER not null" json:"size"`
+	Available bool   `gorm:"not null" json:"available"`
 }

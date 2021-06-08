@@ -6,9 +6,10 @@ import (
 
 type Image struct {
 	base.CustomGormModel
-	ClientID uint   `gorm:"type:INTEGER not null" json:"client_id"`
-	ClinicID     uint   `gorm:"type:INTEGER not null" json:"clinic_id"`
-	Filename string `json:"filename"`
-	Url      string `gorm:"type:varchar(256) not null" json:"url"`
-	Size     uint   `gorm:"type:INTEGER not null" json:"size"`
+	ClientID  uint   `gorm:"type:INTEGER not null" json:"client_id"`
+	ClinicID  uint   `gorm:"type:INTEGER not null" json:"clinic_id"`
+	Filename  string `json:"filename"`
+	Url       string `gorm:"type:varchar(256) not null" json:"url"`
+	Size      uint   `gorm:"type:INTEGER not null" json:"size"`
+	Available bool   `gorm:"not null" json:"available"`
 }
