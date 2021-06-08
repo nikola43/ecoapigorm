@@ -1,13 +1,16 @@
 package services
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/gofiber/fiber/v2"
 	database "github.com/nikola43/ecoapigorm/database"
 	"github.com/nikola43/ecoapigorm/models"
+	"github.com/nikola43/ecoapigorm/socketinstance"
 	"github.com/nikola43/ecoapigorm/utils"
 	"github.com/nikola43/ecoapigorm/wasabis3manager"
+	"io/ioutil"
 	"log"
 	"mime/multipart"
 	"os"
@@ -24,6 +27,8 @@ func UploadMultimedia(
 	uploadedFile *multipart.FileHeader,
 	uploadMode uint,
 	clinicId uint) error {
+
+	var insertedID uint
 
 	// sanitize file name
 	reg, _ := regexp.Compile("[^a-zA-Z0-9-.]+")
@@ -76,15 +81,34 @@ func UploadMultimedia(
 		}
 		database.GormDB.Create(&image)
 
+		insertedID = image.ID
+		fmt.Println(insertedID)
+
 		go func() {
+			/*
 			err = utils.CompressImage("tempFiles/"+clinicName+"/"+clientIDString+"/"+cleanFilename, "tempFiles/"+clinicName+"/"+clientIDString+"/"+fileType+"/"+cleanFilename)
 			if err != nil {
 				fmt.Println(err.Error())
+			}
+			*/
+
+			input, err := ioutil.ReadFile("tempFiles/"+clinicName+"/"+clientIDString+"/"+cleanFilename)
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
+
+			err = ioutil.WriteFile("tempFiles/"+clinicName+"/"+clientIDString+"/"+fileType+"/"+cleanFilename, input, 0644)
+			if err != nil {
+				fmt.Println("Error creating", "tempFiles/"+clinicName+"/"+clientIDString+"/"+fileType+"/"+cleanFilename)
+				fmt.Println(err)
+				return
 			}
 
 			imageUrl, imageSize, storeInAmazonError := wasabis3manager.WasabiS3Client.UploadObject(
 				bucketName,
 				clinicName,
+				//"tempFiles/"+clinicName+"/"+clientIDString+"/"+fileType+"/"+cleanFilename,
 				"tempFiles/"+clinicName+"/"+clientIDString+"/"+fileType+"/"+cleanFilename,
 				clientID,
 				fileType,
@@ -94,14 +118,17 @@ func UploadMultimedia(
 			}
 
 			imageUpdate := new(models.Image)
-			result := database.GormDB.Where("url = ?", imageUrl).Find(&imageUpdate)
+			imageUpdate.ID = insertedID
+			result := database.GormDB.Where("id = ?", imageUrl).Find(&imageUpdate)
 			if result.Error != nil {
 				log.Fatal(result.Error)
 				return
 			}
 
-			database.GormDB.Model(&imageUpdate).Where("url = ?", imageUrl).Update("available", true)
 
+
+			database.GormDB.Model(&imageUpdate).Where("id = ?", imageUpdate.ID).Update("available", true)
+			imageUpdate.Available = true
 			fmt.Println(imageUrl)
 			fmt.Println(imageSize)
 
@@ -117,6 +144,15 @@ func UploadMultimedia(
 					panic(e)
 				}
 			*/
+
+			socketEvent := models.SocketEvent{
+				Type:   "image",
+				Action: "update",
+				Data:   imageUpdate,
+			}
+
+			b, _ := json.Marshal(socketEvent)
+			socketinstance.SocketInstance.Emit(b)
 		}()
 
 		return err
@@ -152,8 +188,13 @@ func UploadMultimedia(
 				ThumbnailUrl: thumbUrl,
 				Size:         uint(size + thumbSize),
 				ClinicID:     clinicId,
+				Available:     false,
+
 			}
 			database.GormDB.Create(&video)
+
+			insertedID = video.ID
+			fmt.Println(insertedID)
 		}
 
 		if fileType == "holographic" {
@@ -192,14 +233,16 @@ func UploadMultimedia(
 			fmt.Println(videoUrl)
 			fmt.Println(videoSize)
 
-			videoUpdate := new(models.Image)
-			result := database.GormDB.Where("url = ?", videoUrl).Find(&videoUpdate)
+			videoUpdate := new(models.Video)
+			videoUpdate.ID = insertedID
+			result := database.GormDB.Where("id = ?", videoUrl).Find(&videoUpdate)
 			if result.Error != nil {
 				log.Fatal(result.Error)
 				return
 			}
 
-			database.GormDB.Model(&videoUpdate).Where("url = ?", videoUrl).Update("available", true)
+			database.GormDB.Model(&videoUpdate).Where("id = ?", videoUpdate.ID).Update("available", true)
+			videoUpdate.Available = true
 
 			fmt.Println("fin")
 
@@ -217,6 +260,14 @@ func UploadMultimedia(
 			}
 			*/
 
+			socketEvent := models.SocketEvent{
+				Type:   "video",
+				Action: "update",
+				Data:   videoUpdate,
+			}
+
+			b, _ := json.Marshal(socketEvent)
+			socketinstance.SocketInstance.Emit(b)
 		}()
 
 		return err

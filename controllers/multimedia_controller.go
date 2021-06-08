@@ -121,6 +121,18 @@ func DeleteImage(context *fiber.Ctx) error {
 	}
 	fmt.Println(id)
 
+
+	/*
+	socketEvent := models.SocketEvent{
+		Type:   "image",
+		Action: "delete",
+		Data:   1,
+	}
+
+	b, _ := json.Marshal(socketEvent)
+	socketinstance.SocketInstance.Emit(b)
+	*/
+
 	return context.Status(fiber.StatusOK).JSON(&fiber.Map{
 		"success": true,
 	})

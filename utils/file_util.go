@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"github.com/h2non/bimg"
 	"github.com/joho/godotenv"
 	"log"
 	"os"
@@ -14,8 +13,8 @@ import (
 )
 
 //const FFMPEG_PATH = "/usr/bin/ffmpeg"
-
-const FFMPEG_PATH = "/usr/local/bin/ffmpeg"
+const FFMPEG_PATH = "ffmpeg"
+//const FFMPEG_PATH = "/usr/local/bin/ffmpeg"
 
 /**
 Check if file exist and its size
@@ -215,7 +214,7 @@ func ExtractThumbnailFromVideo(inFile string, outFile string) error {
 
 	return err
 }
-
+/*
 func CompressImage(inputFilePath, outFilePath string) error {
 	options := bimg.Options{
 		Quality: 10,
@@ -240,3 +239,5 @@ func CompressImage(inputFilePath, outFilePath string) error {
 	}
 	return err
 }
+
+ */
