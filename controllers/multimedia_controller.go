@@ -5,6 +5,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	database "github.com/nikola43/ecoapigorm/database"
 	"github.com/nikola43/ecoapigorm/models"
+	"github.com/nikola43/ecoapigorm/models/promos"
 	"github.com/nikola43/ecoapigorm/services"
 	"github.com/nikola43/ecoapigorm/utils"
 	"github.com/nikola43/ecoapigorm/wasabis3manager"
@@ -12,6 +13,55 @@ import (
 	"strconv"
 	"strings"
 )
+
+func UploadPromoImage(context *fiber.Ctx) error {
+	promoID, _ := strconv.ParseUint(context.Params("promo_id"), 10, 64)
+	clinicID, _ := strconv.ParseUint(context.Params("clinic_id"), 10, 64)
+	uploadedFile, err := context.FormFile("file")
+	employeeTokenClaims, err := utils.GetEmployeeTokenClaims(context)
+	if err != nil {
+		return context.SendStatus(fiber.StatusUnauthorized)
+	}
+
+	fmt.Println(promoID)
+	fmt.Println(clinicID)
+
+	bucketName := strings.ToLower(strings.ReplaceAll(employeeTokenClaims.CompanyName, " ", ""))
+
+	clinic := new(models.Clinic)
+	database.GormDB.Where("id = ?", clinicID).Find(clinic)
+	if clinic.ID < 1 {
+		return context.Status(fiber.StatusNotFound).JSON(&fiber.Map{
+			"error": "clini not found",
+		})
+	}
+
+	fmt.Println(clinic)
+
+	promo := new(promos.Promo)
+	database.GormDB.Where("id = ?", promoID).Find(promo)
+	if promo.ID < 1 {
+		return context.Status(fiber.StatusNotFound).JSON(&fiber.Map{
+			"error": "promo not found",
+		})
+	}
+
+	fmt.Println(promo)
+
+	err = services.UploadPromoImage(
+		context,
+		bucketName,
+		uploadedFile,
+		clinic.Name,
+		promo)
+	if err != nil {
+		return err
+	}
+
+	return context.Status(fiber.StatusOK).JSON(&fiber.Map{
+		"file": uploadedFile.Filename,
+	})
+}
 
 func UploadMultimedia(context *fiber.Ctx) error {
 	clientID, _ := strconv.ParseUint(context.Params("client_id"), 10, 64)
@@ -121,16 +171,15 @@ func DeleteImage(context *fiber.Ctx) error {
 	}
 	fmt.Println(id)
 
-
 	/*
-	socketEvent := models.SocketEvent{
-		Type:   "image",
-		Action: "delete",
-		Data:   1,
-	}
+		socketEvent := models.SocketEvent{
+			Type:   "image",
+			Action: "delete",
+			Data:   1,
+		}
 
-	b, _ := json.Marshal(socketEvent)
-	socketinstance.SocketInstance.Emit(b)
+		b, _ := json.Marshal(socketEvent)
+		socketinstance.SocketInstance.Emit(b)
 	*/
 
 	return context.Status(fiber.StatusOK).JSON(&fiber.Map{

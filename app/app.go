@@ -2,12 +2,10 @@ package app
 
 import (
 	"database/sql"
-	"encoding/json"
 	"fmt"
 	"github.com/antoniodipinto/ikisocket"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
-	"github.com/gofiber/websocket/v2"
 	database "github.com/nikola43/ecoapigorm/database"
 	middlewares "github.com/nikola43/ecoapigorm/middleware"
 	"github.com/nikola43/ecoapigorm/routes"
@@ -17,28 +15,10 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 	"log"
-	"math/rand"
-	"time"
 )
-
-// MessageObject Basic chat message object
-type MessageObject struct {
-	Data string `json:"data"`
-	From string `json:"from"`
-	Room string `json:"room"`
-	To   string `json:"to"`
-}
-
-// Room Chat Room message object
-type Room struct {
-	Name  string   `json:"name"`
-	UUID  string   `json:"uuid"`
-	Users []string `json:"users"`
-}
 
 var httpServer *fiber.App
 var clients map[string]string
-var rooms map[string]*Room
 
 
 type App struct {
@@ -96,18 +76,7 @@ func InitializeHttpServer(port string) {
 	ws := httpServer.Group("/ws")          // /api/v1
 
 	// Setup the middleware to retrieve the data sent in first GET request
-	ws.Use(func(c *fiber.Ctx) error {
-		// IsWebSocketUpgrade returns true if the client
-		// requested upgrade to the WebSocket protocol.
-		if websocket.IsWebSocketUpgrade(c) {
-			c.Locals("allowed", true)
-			return c.Next()
-		}
-		return fiber.ErrUpgradeRequired
-	})
-
-
-
+	ws.Use(middlewares.WebSocketUpgradeMiddleware)
 
 	// Pull out in another function
 	// all the ikisocket callbacks and listeners
@@ -165,31 +134,6 @@ func InitializeDatabase(user, password, database_name string) {
 	}
 }
 
-// random room id generator
-func generateRoomId() string {
-	length := 100
-	seed := rand.New(rand.NewSource(time.Now().UnixNano()))
-	charset := "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz"
-
-	b := make([]byte, length)
-	for i := range b {
-		b[i] = charset[seed.Intn(len(charset))]
-	}
-
-	return string(b)
-}
-
-// for beautify purposes we clean the rooms object to a list of rooms
-func beautifyRoomsObject(rooms map[string]*Room) []*Room {
-	var result []*Room
-
-	for _, room := range rooms {
-		result = append(result, room)
-	}
-
-	return result
-}
-
 // Setup all the ikisocket listeners
 // pulled out main function
 func setupSocketListeners() {
@@ -197,9 +141,6 @@ func setupSocketListeners() {
 	// The key for the map is message.to
 	clients = make(map[string]string)
 
-	// Rooms will be kept in memory as map
-	// for faster and easier handling
-	rooms = make(map[string]*Room)
 
 	// Multiple event handling supported
 	ikisocket.On(ikisocket.EventConnect, func(ep *ikisocket.EventPayload) {
@@ -209,46 +150,6 @@ func setupSocketListeners() {
 	// On message event
 	ikisocket.On(ikisocket.EventMessage, func(ep *ikisocket.EventPayload) {
 
-		fmt.Println(fmt.Sprintf("Message event - User: %s - Message: %s", ep.Kws.GetStringAttribute("user_id"), string(ep.Data)))
-
-		message := MessageObject{}
-
-		// Unmarshal the json message
-		// {
-		//  "from": "<user-id>",
-		//  "to": "<recipient-user-id>",
-		//  "room": "<room-id>",
-		//  "data": "hello"
-		//}
-		err := json.Unmarshal(ep.Data, &message)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-
-		// If the user is trying to send message
-		// into a specific group, iterate over the
-		// group user socket UUIDs
-		if message.Room != "" {
-			// Emit the message to all the room participants
-			// iterating on all the uuids
-			for _, userId := range rooms[message.Room].Users {
-				_ = ep.Kws.EmitTo(clients[userId], ep.Data)
-			}
-
-			// Other way can be used EmitToList method
-			// if you have a []string of ikisocket uuids
-			//
-			// ep.Kws.EmitToList(list, data)
-			//
-			return
-		}
-
-		// Emit the message directly to specified user
-		err = ep.Kws.EmitTo(clients[message.To], ep.Data)
-		if err != nil {
-			fmt.Println(err)
-		}
 	})
 
 	// On disconnect event

@@ -8,6 +8,15 @@ import (
 	"strconv"
 )
 
+func GetPromoByID(context *fiber.Ctx) error {
+	promoID, _ := strconv.ParseUint(context.Params("promo_id"), 10, 64)
+
+	promo, err := services.GetPromoByID(uint(promoID))
+	if err !=nil{
+		return utils.ReturnErrorResponse(fiber.StatusBadRequest, err, context)
+	}
+	return context.JSON(promo)
+}
 func CreatePromo(context *fiber.Ctx) error {
 	createPromoRequest := new(promos.CreatePromoRequest)
 	err := context.BodyParser(&createPromoRequest)

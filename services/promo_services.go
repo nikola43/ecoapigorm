@@ -8,6 +8,13 @@ import (
 	"github.com/nikola43/ecoapigorm/utils"
 )
 
+func GetPromoByID(id uint) (*promos.Promo, error) {
+	promo := new(promos.Promo)
+
+	queryResult := database.GormDB.Where("id = ?", id).First(&promo)
+
+	return promo, queryResult.Error
+}
 func GetAllPromos() ([]promos.Promo, error) {
 	var list = make([]promos.Promo, 0)
 	result := database.GormDB.

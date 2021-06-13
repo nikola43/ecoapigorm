@@ -44,6 +44,9 @@ func MultimediaRoutes (router fiber.Router) {
 	// /api/v1/multimedia/clinic/:clinic_id/client/:client_id/upload/:upload_mode
 	multimediaClinicRouter.Post("/:clinic_id/client/:client_id/upload/:upload_mode", controllers.UploadMultimedia)
 
+	// /api/v1/multimedia/clinic/:clinic_id/promo/:promo_id/upload
+	multimediaClinicRouter.Post("/:clinic_id/promo/:promo_id/upload", controllers.UploadPromoImage)
+
 	// /api/v1/multimedia/clinic/:clinic_id/:client_id/images
 	multimediaClinicRouter.Get("/:clinic_id/client/:client_id/images", controllers.GetAllImagesByClientAndClinicID)
 
