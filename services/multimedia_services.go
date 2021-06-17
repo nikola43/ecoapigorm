@@ -61,6 +61,7 @@ func UploadPromoImage(
 	return nil
 }
 
+
 func UploadMultimedia(
 	context *fiber.Ctx,
 	bucketName string,
