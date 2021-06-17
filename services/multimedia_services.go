@@ -286,17 +286,15 @@ func UploadMultimedia(
 
 		fmt.Println("fin")
 
-		/*
-			e := os.Remove(fmt.Sprintf("./tempFiles/%s/%s/%s", clinicName, clientIDString, cleanFilename))
-			if e != nil {
-				fmt.Println(e)
-			}
+		e := os.Remove(fmt.Sprintf("./tempFiles/%s/%s/%s", clinicName, clientIDString, cleanFilename))
+		if e != nil {
+			fmt.Println(e)
+		}
 
-			e = os.Remove("tempFiles/"+clinicName+"/"+clientIDString+"/"+fileType+"/"+cleanFilename+"_thumbnail.jpg")
-			if e != nil {
-				fmt.Println(e)
-			}
-		*/
+		e = os.Remove("tempFiles/" + clinicName + "/" + clientIDString + "/" + fileType + "/" + cleanFilename + "_thumbnail.jpg")
+		if e != nil {
+			fmt.Println(e)
+		}
 
 		socketEvent := models.SocketEvent{
 			Type:   "video",
@@ -338,13 +336,12 @@ func UploadMultimedia(
 		}
 		heartbeat := models.Heartbeat{Filename: cleanFilename, ClientID: clientID, Url: heartbeatUrl, Size: uint(hearbeatSize), ClinicID: clinicId}
 		database.GormDB.Create(&heartbeat)
-		/*
-			e := os.Remove(fmt.Sprintf("./tempFiles/%s/%s/%s/%s", clinicName, clientIDString, "heartbeat", cleanFilename ))
 
-			if e != nil {
-				fmt.Println(e)
-			}
-		*/
+		e := os.Remove(fmt.Sprintf("./tempFiles/%s/%s/%s/%s", clinicName, clientIDString, "heartbeat", cleanFilename))
+		e = os.Remove(fmt.Sprintf("./tempFiles/%s/%s/%s", clinicName, clientIDString, cleanFilename))
+		if e != nil {
+			fmt.Println(e)
+		}
 
 		return err
 		break
