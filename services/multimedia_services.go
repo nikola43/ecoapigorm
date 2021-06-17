@@ -101,6 +101,12 @@ func UploadMultimedia(
 		//panic(e)
 	}
 
+	e = os.Remove(uploadedFile.Filename)
+	if e != nil {
+		fmt.Println(e)
+		//panic(e)
+	}
+
 	err := context.SaveFile(uploadedFile, clientFolder+"/"+cleanFilename)
 	if err != nil {
 		return err
