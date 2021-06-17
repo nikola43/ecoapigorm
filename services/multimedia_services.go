@@ -94,18 +94,6 @@ func UploadMultimedia(
 		os.MkdirAll(clientFolder, os.ModePerm)
 	}
 
-	e := os.Remove(fmt.Sprintf(clientFolder + "/" + cleanFilename))
-	if e != nil {
-		fmt.Println(e)
-		//panic(e)
-	}
-
-	e = os.Remove(uploadedFile.Filename)
-	if e != nil {
-		fmt.Println(e)
-		//panic(e)
-	}
-
 	err := context.SaveFile(uploadedFile, clientFolder+"/"+cleanFilename)
 	if err != nil {
 		return err
@@ -324,18 +312,39 @@ func UploadMultimedia(
 		break
 	case "heartbeat":
 
+		//Read all the contents of the  original file
+		bytesRead, err := ioutil.ReadFile("tempFiles/" + clinicName + "/" + clientIDString + "/" + cleanFilename)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		//Copy all the contents to the desitination file
+		err = ioutil.WriteFile("tempFiles/"+clinicName+"/"+clientIDString+"/"+"heartbeat/"+cleanFilename, bytesRead, 0755)
+		if err != nil {
+			log.Fatal(err)
+		}
+
 		// holo
-		heartbeatUrl, hearbeatSize, storeInAmazonError := wasabis3manager.WasabiS3Client.UploadObject(bucketName, clinicName, "tempFiles/"+clinicName+"/"+clientIDString+"/"+"fileType/"+cleanFilename, strconv.FormatInt(int64(clientID), 10), fileType)
+		heartbeatUrl, hearbeatSize, storeInAmazonError := wasabis3manager.WasabiS3Client.UploadObject(
+			bucketName,
+			clinicName,
+			"tempFiles/"+clinicName+"/"+clientIDString+"/"+"heartbeat/"+cleanFilename,
+			strconv.FormatInt(int64(clientID), 10),
+			fileType)
+
 		if storeInAmazonError != nil {
+			fmt.Println("storeInAmazonError.Error()")
 			fmt.Println(storeInAmazonError.Error())
 		}
 		heartbeat := models.Heartbeat{Filename: cleanFilename, ClientID: clientID, Url: heartbeatUrl, Size: uint(hearbeatSize), ClinicID: clinicId}
 		database.GormDB.Create(&heartbeat)
-		e := os.Remove(fmt.Sprintf("./tempFiles/%s/%s/%s", clinicName, clientIDString, cleanFilename))
+		/*
+			e := os.Remove(fmt.Sprintf("./tempFiles/%s/%s/%s/%s", clinicName, clientIDString, "heartbeat", cleanFilename ))
 
-		if e != nil {
-			fmt.Println(e)
-		}
+			if e != nil {
+				fmt.Println(e)
+			}
+		*/
 
 		return err
 		break
