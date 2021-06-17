@@ -15,6 +15,9 @@ func PromoRoutes(router fiber.Router) {
 	// /api/v1/promo/create
 	promoRouter.Post("/", controllers.CreatePromo)
 
+	// /api/v1/promo/:promo_id
+	promoRouter.Get("/:promo_id", controllers.GetPromoByID)
+
 	// MOBILE ENDPOINT
 	// /api/v1/promo/client
 	promoRouter.Get("clinic/:clinic_id/client", controllers.GetPromosForClientController)

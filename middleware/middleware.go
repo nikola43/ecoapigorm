@@ -3,10 +3,20 @@ package middleware
 import (
 	"fmt"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/websocket/v2"
 	"github.com/nikola43/ecoapigorm/models"
 	"github.com/nikola43/ecoapigorm/utils"
 )
 
+func WebSocketUpgradeMiddleware(context *fiber.Ctx) error {
+	// IsWebSocketUpgrade returns true if the client
+	// requested upgrade to the WebSocket protocol.
+	if websocket.IsWebSocketUpgrade(context) {
+		context.Locals("allowed", true)
+		return context.Next()
+	}
+	return fiber.ErrUpgradeRequired
+}
 func XApiKeyMiddleware(context *fiber.Ctx) error {
 	// todo investigar por que no llega X_API_KEY
 /*

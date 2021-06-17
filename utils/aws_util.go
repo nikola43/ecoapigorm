@@ -11,7 +11,6 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"net/http"
 	"os"
-	"strconv"
 	"strings"
 )
 
@@ -45,7 +44,7 @@ func (awsClient *WasabiS3Client) DownloadObject(filekey string, filepath string)
 	fmt.Println(bytes)
 	return nil
 }
-func (awsClient *WasabiS3Client) UploadObject(bucketName, clinicName, filepath string, clientID uint, tipo string) (string, int64, error) {
+func (awsClient *WasabiS3Client) UploadObject(bucketName, clinicName, filepath string, clientID string, tipo string) (string, int64, error) {
 
 	file, err := os.Open("./" + filepath)
 	if err != nil {
@@ -63,7 +62,7 @@ func (awsClient *WasabiS3Client) UploadObject(bucketName, clinicName, filepath s
 	fmt.Println("file.Name()")
 	fmt.Println(file.Name())
 
-	path := "/" + clinicName + "/" + strconv.FormatInt(int64(clientID), 10) + "/" + tipo + "/" + strings.Split(file.Name(), "/")[4]
+	path := "/" + clinicName + "/" + clientID + "/" + tipo + "/" + strings.Split(file.Name(), "/")[5]
 	input := &s3.CreateMultipartUploadInput{
 		Bucket:      aws.String(bucketName),
 		Key:         aws.String(path),
