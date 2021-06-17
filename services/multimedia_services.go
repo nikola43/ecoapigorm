@@ -94,7 +94,11 @@ func UploadMultimedia(
 		os.MkdirAll(clientFolder, os.ModePerm)
 	}
 
-
+	e := os.Remove(fmt.Sprintf(clientFolder + "/" + cleanFilename))
+	if e != nil {
+		fmt.Println(e)
+		//panic(e)
+	}
 
 	err := context.SaveFile(uploadedFile, clientFolder+"/"+cleanFilename)
 	if err != nil {
@@ -179,18 +183,17 @@ func UploadMultimedia(
 			fmt.Println(imageUrl)
 			fmt.Println(imageSize)
 
-			/*
-				e := os.Remove("tempFiles/" + clinicName + "/" + clientIDString + "/" + cleanFilename)
-				if e != nil {
-					//fmt.Println(e)
-					panic(e)
-				}
-				e = os.Remove(fmt.Sprintf("tempFiles/" + clinicName + "/" + clientIDString + "/" + fileType + "/" + cleanFilename)
-				if e != nil {
-					//fmt.Println(e)
-					panic(e)
-				}
-			*/
+			e := os.Remove("tempFiles/" + clinicName + "/" + clientIDString + "/" + cleanFilename)
+			if e != nil {
+				fmt.Println(e)
+				//panic(e)
+			}
+
+			e = os.Remove(fmt.Sprintf("tempFiles/" + clinicName + "/" + clientIDString + "/" + fileType + "/" + cleanFilename)
+			if e != nil {
+				fmt.Println(e)
+				//panic(e)
+			}
 
 			socketEvent := models.SocketEvent{
 				Type:   "image",
