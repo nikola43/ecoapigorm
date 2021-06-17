@@ -80,6 +80,11 @@ func UploadMultimedia(
 
 	clientIDString := strconv.FormatUint(uint64(clientID), 10)
 	fileType := utils.GetFileType(cleanFilename, uploadMode)
+
+	if strings.Contains(cleanFilename, ".avi") {
+		cleanFilename = cleanFilename + ".mp4"
+	}
+
 	url := "https://s3.eu-central-1.wasabisys.com/steleros/" + clinicName + "/" + clientIDString + "/" + fileType + "/" + cleanFilename
 
 	//uploadedFilePath := ""
@@ -88,6 +93,8 @@ func UploadMultimedia(
 	if _, err := os.Stat(clientFolder); os.IsNotExist(err) {
 		os.MkdirAll(clientFolder, os.ModePerm)
 	}
+
+
 
 	err := context.SaveFile(uploadedFile, clientFolder+"/"+cleanFilename)
 	if err != nil {

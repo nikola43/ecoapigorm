@@ -128,7 +128,8 @@ func CompressMP4(inFile, outFile string) error {
 	// ffmpeg -i input.mp4 -vcodec h264 -acodec aac output.mp4
 	//err = ExecuteSystemCommandVerbose(FFMPEG_PATH, "-y", "-i", inFile, "-vcodec", "h264", "-acodec", "aac", outFile)
 	// -y -preset veryfast -c:v libx264 -crf 30 -c:a aac tatiana.mp4
-	err := ExecuteSystemCommandVerbose(FFMPEG_PATH, "-i", inFile, "-y", "-preset", "veryfast", "-c:v", "libx264", "-crf", "30", "-c:a", "aac", outFile)
+	//err := ExecuteSystemCommandVerbose(FFMPEG_PATH, "-i", inFile, "-y", "-preset", "veryfast", "-c:v", "libx264", "-crf", "30", "-c:a", "aac", outFile)
+	err := ExecuteSystemCommandVerbose(FFMPEG_PATH, "-i", inFile, outFile)
 
 	if err != nil {
 		return err
