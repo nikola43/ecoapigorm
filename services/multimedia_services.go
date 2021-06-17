@@ -325,12 +325,12 @@ func UploadMultimedia(
 	case "heartbeat":
 
 		// holo
-		url, size, storeInAmazonError := wasabis3manager.WasabiS3Client.UploadObject(bucketName, clinicName, "tempFiles/"+clinicName+"/"+clientIDString+"/"+"fileType/"+cleanFilename, strconv.FormatInt(int64(clientID), 10), fileType)
+		heartbeatUrl, hearbeatSize, storeInAmazonError := wasabis3manager.WasabiS3Client.UploadObject(bucketName, clinicName, "tempFiles/"+clinicName+"/"+clientIDString+"/"+"fileType/"+cleanFilename, strconv.FormatInt(int64(clientID), 10), fileType)
 		if storeInAmazonError != nil {
 			fmt.Println(storeInAmazonError.Error())
 		}
-		video := models.Heartbeat{Filename: cleanFilename, ClientID: clientID, Url: url, Size: uint(size), ClinicID: clinicId}
-		database.GormDB.Create(&video)
+		heartbeat := models.Heartbeat{Filename: cleanFilename, ClientID: clientID, Url: heartbeatUrl, Size: uint(hearbeatSize), ClinicID: clinicId}
+		database.GormDB.Create(&heartbeat)
 		e := os.Remove(fmt.Sprintf("./tempFiles/%s/%s/%s", clinicName, clientIDString, cleanFilename))
 
 		if e != nil {
