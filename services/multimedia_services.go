@@ -189,7 +189,7 @@ func UploadMultimedia(
 				//panic(e)
 			}
 
-			e = os.Remove(fmt.Sprintf("tempFiles/" + clinicName + "/" + clientIDString + "/" + fileType + "/" + cleanFilename)
+			e = os.Remove(fmt.Sprintf("tempFiles/" + clinicName + "/" + clientIDString + "/" + fileType + "/" + cleanFilename))
 			if e != nil {
 				fmt.Println(e)
 				//panic(e)
