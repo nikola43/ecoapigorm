@@ -14,6 +14,7 @@ import (
 
 //const FFMPEG_PATH = "/usr/bin/ffmpeg"
 const FFMPEG_PATH = "ffmpeg"
+
 //const FFMPEG_PATH = "/usr/local/bin/ffmpeg"
 
 /**
@@ -129,7 +130,7 @@ func CompressMP4(inFile, outFile string) error {
 	//err = ExecuteSystemCommandVerbose(FFMPEG_PATH, "-y", "-i", inFile, "-vcodec", "h264", "-acodec", "aac", outFile)
 	// -y -preset veryfast -c:v libx264 -crf 30 -c:a aac tatiana.mp4
 	//err := ExecuteSystemCommandVerbose(FFMPEG_PATH, "-i", inFile, "-y", "-preset", "veryfast", "-c:v", "libx264", "-crf", "30", "-c:a", "aac", outFile)
-	err := ExecuteSystemCommandVerbose(FFMPEG_PATH, "-i", inFile, outFile)
+	err := ExecuteSystemCommandVerbose(FFMPEG_PATH, "-i", inFile, "-y", outFile)
 
 	if err != nil {
 		return err
@@ -215,6 +216,7 @@ func ExtractThumbnailFromVideo(inFile string, outFile string) error {
 
 	return err
 }
+
 /*
 func CompressImage(inputFilePath, outFilePath string) error {
 	options := bimg.Options{
@@ -241,4 +243,4 @@ func CompressImage(inputFilePath, outFilePath string) error {
 	return err
 }
 
- */
+*/
