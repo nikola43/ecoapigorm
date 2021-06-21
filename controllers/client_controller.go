@@ -32,7 +32,9 @@ func NotifyClient(context *fiber.Ctx) error {
 
 	sendEmailManager.SendMail("notify.html", "Nuevo contenido disponible")
 
-	return nil
+	return context.Status(fiber.StatusOK).JSON(&fiber.Map{
+		"success": true,
+	})
 }
 
 func GetClientClinicIDByEmail(context *fiber.Ctx) error {
