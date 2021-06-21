@@ -1,14 +1,12 @@
 package services
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/gofiber/fiber/v2"
 	database "github.com/nikola43/ecoapigorm/database"
 	"github.com/nikola43/ecoapigorm/models"
 	"github.com/nikola43/ecoapigorm/models/promos"
-	"github.com/nikola43/ecoapigorm/socketinstance"
 	"github.com/nikola43/ecoapigorm/utils"
 	"github.com/nikola43/ecoapigorm/wasabis3manager"
 	"io/ioutil"
@@ -186,6 +184,7 @@ func UploadMultimedia(
 			//panic(e)
 		}
 
+		/*
 		socketEvent := models.SocketEvent{
 			Type:   "image",
 			Action: "update",
@@ -194,7 +193,10 @@ func UploadMultimedia(
 
 		b, _ := json.Marshal(socketEvent)
 		socketinstance.SocketInstance.Emit(b)
-		//}()
+
+		*/
+
+
 
 		return err
 		break
@@ -296,14 +298,16 @@ func UploadMultimedia(
 			fmt.Println(e)
 		}
 
+		/*
 		socketEvent := models.SocketEvent{
 			Type:   "video",
 			Action: "update",
 			Data:   videoUpdate,
 		}
+		*/
 
-		b, _ := json.Marshal(socketEvent)
-		socketinstance.SocketInstance.Emit(b)
+		// b, _ := json.Marshal(socketEvent)
+		// socketinstance.SocketInstance.Emit(b)
 		//}()
 
 		return err
