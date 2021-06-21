@@ -83,6 +83,10 @@ func UploadMultimedia(
 		cleanFilename = cleanFilename + ".mp4"
 	}
 
+	if strings.Contains(cleanFilename, ".mpg") {
+		cleanFilename = cleanFilename + ".mp4"
+	}
+
 	url := "https://s3.eu-central-1.wasabisys.com/steleros/" + clinicName + "/" + clientIDString + "/" + fileType + "/" + cleanFilename
 
 	//uploadedFilePath := ""
