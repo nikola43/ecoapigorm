@@ -14,6 +14,27 @@ import (
 	//"strings"
 )
 
+func NotifyClient(context *fiber.Ctx) error {
+	client := new(models.Client)
+	var err error
+
+	// parse request
+	if err = context.BodyParser(client);
+		err != nil {
+		return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	sendEmailManager := utils.SendEmailManager{
+		ToEmail:         client.Email,
+	}
+
+	sendEmailManager.SendMail("notify.html", "Nuevo contenido disponible")
+
+	return nil
+}
+
 func GetClientClinicIDByEmail(context *fiber.Ctx) error {
 	clientEmail := context.Params("client_email")
 	clinicID, _ := strconv.ParseUint(context.Params("clinic_id"), 10, 64)
