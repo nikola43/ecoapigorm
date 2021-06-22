@@ -2,9 +2,12 @@ package utils
 
 import (
 	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/joho/godotenv"
+	"github.com/nikola43/ecoapigorm/models"
+	"github.com/nikola43/ecoapigorm/socketinstance"
 	"github.com/tidwall/gjson"
 	ffmpeg "github.com/u2takey/ffmpeg-go"
 	"github.com/u2takey/go-utils/rand"
@@ -138,7 +141,7 @@ func CompressMP4V2(inFile, outFile string, file interface{}) error {
 
 	err = ffmpeg.Input(inFile).
 		Output(outFile, ffmpeg.KwArgs{"c:v": "libx264", "preset": "veryslow"}).
-		//GlobalArgs("-progress", "unix://"+TempSock(totalDuration, file)).
+		GlobalArgs("-progress", "unix://"+TempSock(totalDuration, file)).
 		OverWriteOutput().
 		Run()
 	if err != nil {
@@ -188,22 +191,29 @@ func TempSock(totalDuration float64, file interface{}) string {
 			if cp != progress {
 				progress = cp
 
-				/*
-				defer func() {
-					socketEvent := models.SocketEvent{
-						Type:   "video",
-						Action: "update",
-						Data:   file,
-					}
+				type VideoConversionProgress struct {
+					ID   uint      `json:"id"`
+					Progress string      `json:"progress"`
+				}
 
-					b, _ := json.Marshal(socketEvent)
-					socketinstance.SocketInstance.Emit(b)
 
-					if socketError := recover(); socketError != nil {
-						log.Println("panic occurred:", socketError)
-					}
-				}()
-				*/
+				videoConversionProgress := VideoConversionProgress{
+					ID:       file.(models.Video).ID,
+					Progress: progress,
+				}
+
+				socketEvent := models.SocketEvent{
+					Type:   "video",
+					Action: "progress",
+					Data:   videoConversionProgress,
+				}
+
+				b, _ := json.Marshal(socketEvent)
+				socketinstance.SocketInstance.Emit(b)
+
+				if socketError := recover(); socketError != nil {
+					log.Println("panic occurred:", socketError)
+				}
 
 				fmt.Println("progress: ", progress)
 			}
