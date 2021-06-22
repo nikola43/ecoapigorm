@@ -84,7 +84,7 @@ func GetClinicsByCompanyID(companyId uint) ([]models.Clinic, error) {
 }
 
 func GetCompaniesByEmployeeID(employeeID uint) ([]models.Company, error) {
-	var list []models.Company
+	list := make([]models.Company, 0)
 
 	result := database.GormDB.Where("employee_id = ?", employeeID).
 		Preload("Clinics").
