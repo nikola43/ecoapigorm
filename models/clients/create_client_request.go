@@ -13,4 +13,5 @@ type CreateClientRequest struct {
 	PregnancyDate base.CustomNullTime `json:"pregnancy_date" xml:"pregnancy_date"`
 	Phone         string    `json:"phone" xml:"phone" form:"phone"`
 	Week          uint      `json:"week" xml:"week" form:"week"`
+	ProfileColor          string      `json:"profile_color" xml:"profile_color" form:"profile_color"`
 }

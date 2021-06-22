@@ -131,6 +131,7 @@ func GetClientClinicIDByEmail(clinicID uint, clientEmail string) (*modelsClients
 		PregnancyDate:  client.PregnancyDate,
 		UsedSize:       totalSize,
 		DiskQuoteLevel: clinicClient.DiskQuoteLevel,
+		ProfileColor: client.ProfileColor,
 	}
 
 	return clientResponse, nil
@@ -169,6 +170,7 @@ func GetClientById(clinicID, clientID uint) (*modelsClients.ListClientResponse, 
 		PregnancyDate:  client.PregnancyDate,
 		UsedSize:       totalSize,
 		DiskQuoteLevel: clinicClient.DiskQuoteLevel,
+		ProfileColor: client.ProfileColor,
 	}
 
 	return clientResponse, nil

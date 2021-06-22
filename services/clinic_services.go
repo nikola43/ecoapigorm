@@ -113,6 +113,7 @@ func GetClientsByClinicID(id uint) ([]clients.ListClientResponse, error) {
 				PregnancyDate:  client.PregnancyDate,
 				UsedSize:       totalSize,
 				DiskQuoteLevel: listClinicClients[i].DiskQuoteLevel,
+				ProfileColor: client.ProfileColor,
 			},
 		)
 	}
@@ -150,6 +151,7 @@ func CreateClientFromClinic(createClientRequest *clients.CreateClientRequest) (*
 		LastName:      createClientRequest.LastName,
 		PregnancyDate: createClientRequest.PregnancyDate,
 		Phone:         createClientRequest.Phone,
+		ProfileColor:  createClientRequest.ProfileColor,
 	}
 	result = database.GormDB.Create(&client)
 
@@ -189,7 +191,7 @@ func GetAllPromosByClinicID(clinicID string) ([]promos.Promo, error) {
 	return promosList, nil
 }
 
-func GetAllPromosForClient(clientId uint,clinicId uint) ([]promos.Promo, error) {
+func GetAllPromosForClient(clientId uint, clinicId uint) ([]promos.Promo, error) {
 	var promos = make([]promos.Promo, 0)
 	clinicClient := make([]models.ClinicClient, 0)
 

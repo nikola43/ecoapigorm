@@ -77,12 +77,11 @@ func UploadMultimedia(context *fiber.Ctx) error {
 	clinicId, _ := strconv.ParseUint(context.Params("clinic_id"), 10, 64)
 	uploadMode, _ := strconv.ParseUint(context.Params("upload_mode"), 10, 64)
 	uploadedFile, err := context.FormFile("file")
-	employeeTokenClaims, err := utils.GetEmployeeTokenClaims(context)
 	if err != nil {
 		return context.SendStatus(fiber.StatusUnauthorized)
 	}
 
-	bucketName := strings.ToLower(strings.ReplaceAll(employeeTokenClaims.CompanyName, " ", ""))
+
 
 	clinic := models.Clinic{}
 	database.GormDB.First(&clinic, clinicId)
@@ -91,6 +90,16 @@ func UploadMultimedia(context *fiber.Ctx) error {
 			"error": err.Error(),
 		})
 	}
+
+	company := models.Company{}
+	database.GormDB.First(&company, clinic.CompanyID)
+	if clinic.ID < 1 {
+		return context.Status(fiber.StatusNotFound).JSON(&fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	bucketName := strings.ToLower(strings.ReplaceAll(company.Name, " ", ""))
 
 	err = services.UploadMultimedia(
 		context,
