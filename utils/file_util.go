@@ -5,10 +5,18 @@ import (
 	"errors"
 	"fmt"
 	"github.com/joho/godotenv"
+	"github.com/tidwall/gjson"
+	ffmpeg "github.com/u2takey/ffmpeg-go"
+	"github.com/u2takey/go-utils/rand"
 	"log"
+	"net"
 	"os"
 	"os/exec"
+	"path"
 	"path/filepath"
+	"regexp"
+	"strconv"
+	"strings"
 	"time"
 )
 
@@ -116,6 +124,93 @@ func GenerateHologramVideo(inFile string) (string, error) {
 	}
 
 	return outFile, nil
+}
+
+func CompressMP4V2(inFile, outFile string, file interface{}) error {
+
+	a, err := ffmpeg.Probe(inFile)
+	if err != nil {
+		panic(err)
+	}
+	totalDuration := gjson.Get(a, "format.duration").Float()
+
+	fmt.Println(totalDuration)
+
+	err = ffmpeg.Input(inFile).
+		Output(outFile, ffmpeg.KwArgs{"c:v": "libx264", "preset": "veryslow"}).
+		//GlobalArgs("-progress", "unix://"+TempSock(totalDuration, file)).
+		OverWriteOutput().
+		Run()
+	if err != nil {
+		fmt.Println(err.Error())
+		panic(err)
+	}
+	return nil
+}
+
+func TempSock(totalDuration float64, file interface{}) string {
+	// serve
+
+	rand.Seed(time.Now().Unix())
+	sockFileName := path.Join(os.TempDir(), fmt.Sprintf("%d_sock", rand.Int()))
+	l, err := net.Listen("unix", sockFileName)
+	if err != nil {
+		panic(err)
+	}
+
+	go func() {
+		re := regexp.MustCompile(`out_time_ms=(\d+)`)
+		fd, err := l.Accept()
+		if err != nil {
+			log.Fatal("accept error:", err)
+		}
+		buf := make([]byte, 16)
+		data := ""
+		progress := ""
+		for {
+			_, err := fd.Read(buf)
+			if err != nil {
+				return
+			}
+			data += string(buf)
+			a := re.FindAllStringSubmatch(data, -1)
+			cp := ""
+			if len(a) > 0 && len(a[len(a)-1]) > 0 {
+				c, _ := strconv.Atoi(a[len(a)-1][len(a[len(a)-1])-1])
+				cp = fmt.Sprintf("%.2f", float64(c)/totalDuration/1000000)
+			}
+			if strings.Contains(data, "progress=end") {
+				cp = "done"
+			}
+			if cp == "" {
+				cp = ".0"
+			}
+			if cp != progress {
+				progress = cp
+
+				/*
+				defer func() {
+					socketEvent := models.SocketEvent{
+						Type:   "video",
+						Action: "update",
+						Data:   file,
+					}
+
+					b, _ := json.Marshal(socketEvent)
+					socketinstance.SocketInstance.Emit(b)
+
+					if socketError := recover(); socketError != nil {
+						log.Println("panic occurred:", socketError)
+					}
+				}()
+				*/
+
+				fmt.Println("progress: ", progress)
+			}
+		}
+	}()
+
+	return sockFileName
 }
 
 func CompressMP4(inFile, outFile string) error {

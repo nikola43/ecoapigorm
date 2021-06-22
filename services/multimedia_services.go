@@ -269,10 +269,12 @@ func UploadMultimedia(
 
 		go func() {
 			fmt.Println("fileComrpess")
-			err := utils.CompressMP4("./tempFiles/"+clinicName+"/"+clientIDString+"/"+cleanFilename, "./tempFiles/"+clinicName+"/"+clientIDString+"/"+fileType+"/"+cleanFilename)
+			err = utils.CompressMP4V2("./tempFiles/"+clinicName+"/"+clientIDString+"/"+cleanFilename,
+				"./tempFiles/"+clinicName+"/"+clientIDString+"/"+fileType+"/"+cleanFilename,
+				video,
+			)
 			if err != nil {
 				log.Fatal(err)
-
 			}
 
 			// upload video
