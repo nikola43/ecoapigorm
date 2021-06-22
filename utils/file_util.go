@@ -2,6 +2,8 @@ package utils
 
 import (
 	"bytes"
+	crand "crypto/rand"
+	"encoding/binary"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -10,7 +12,6 @@ import (
 	"github.com/nikola43/ecoapigorm/socketinstance"
 	"github.com/tidwall/gjson"
 	ffmpeg "github.com/u2takey/ffmpeg-go"
-	"github.com/u2takey/go-utils/rand"
 	"log"
 	"net"
 	"os"
@@ -151,11 +152,23 @@ func CompressMP4V2(inFile, outFile string, file interface{}) error {
 	return nil
 }
 
+func RandomUint64() (v uint64) {
+	err := binary.Read(crand.Reader, binary.BigEndian, &v)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return v
+}
+
+
 func TempSock(totalDuration float64, file interface{}) string {
 	// serve
 
-	rand.Seed(time.Now().Unix())
-	sockFileName := path.Join(os.TempDir(), fmt.Sprintf("%d_sock", rand.Int()))
+	// rand.Seed(time.Now().Unix())
+
+
+
+	sockFileName := path.Join(os.TempDir(), fmt.Sprintf("%d_sock", RandomUint64()))
 	l, err := net.Listen("unix", sockFileName)
 	if err != nil {
 		panic(err)

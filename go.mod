@@ -14,6 +14,7 @@ require (
 	github.com/joho/godotenv v1.3.0
 	github.com/stretchr/testify v1.7.0
 	github.com/stripe/stripe-go/v72 v72.51.0
+	github.com/thanhpk/randstr v1.0.4
 	github.com/tidwall/gjson v1.6.3
 	github.com/tidwall/match v1.0.3 // indirect
 	github.com/tidwall/pretty v1.2.0 // indirect
