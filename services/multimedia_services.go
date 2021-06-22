@@ -1,12 +1,14 @@
 package services
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/gofiber/fiber/v2"
 	database "github.com/nikola43/ecoapigorm/database"
 	"github.com/nikola43/ecoapigorm/models"
 	"github.com/nikola43/ecoapigorm/models/promos"
+	"github.com/nikola43/ecoapigorm/socketinstance"
 	"github.com/nikola43/ecoapigorm/utils"
 	"github.com/nikola43/ecoapigorm/wasabis3manager"
 	"io/ioutil"
@@ -133,78 +135,86 @@ func UploadMultimedia(
 		insertedID = image.ID
 		fmt.Println(insertedID)
 
-		//go func() {
-		/*
-			err = utils.CompressImage("tempFiles/"+clinicName+"/"+clientIDString+"/"+cleanFilename, "tempFiles/"+clinicName+"/"+clientIDString+"/"+fileType+"/"+cleanFilename)
+		go func() {
+			/*
+				err = utils.CompressImage("tempFiles/"+clinicName+"/"+clientIDString+"/"+cleanFilename, "tempFiles/"+clinicName+"/"+clientIDString+"/"+fileType+"/"+cleanFilename)
+				if err != nil {
+					fmt.Println(err.Error())
+				}
+			*/
+
+			input, err := ioutil.ReadFile("tempFiles/" + clinicName + "/" + clientIDString + "/" + cleanFilename)
 			if err != nil {
-				fmt.Println(err.Error())
+				fmt.Println(err)
 			}
-		*/
 
-		input, err := ioutil.ReadFile("tempFiles/" + clinicName + "/" + clientIDString + "/" + cleanFilename)
-		if err != nil {
-			fmt.Println(err)
-		}
+			err = ioutil.WriteFile("tempFiles/"+clinicName+"/"+clientIDString+"/"+fileType+"/"+cleanFilename, input, 0644)
+			if err != nil {
+				fmt.Println("Error creating", "tempFiles/"+clinicName+"/"+clientIDString+"/"+fileType+"/"+cleanFilename)
+				fmt.Println(err)
+			}
 
-		err = ioutil.WriteFile("tempFiles/"+clinicName+"/"+clientIDString+"/"+fileType+"/"+cleanFilename, input, 0644)
-		if err != nil {
-			fmt.Println("Error creating", "tempFiles/"+clinicName+"/"+clientIDString+"/"+fileType+"/"+cleanFilename)
-			fmt.Println(err)
-		}
+			imageUrl, imageSize, storeInAmazonError := wasabis3manager.WasabiS3Client.UploadObject(
+				bucketName,
+				clinicName,
+				//"tempFiles/"+clinicName+"/"+clientIDString+"/"+fileType+"/"+cleanFilename,
+				"tempFiles/"+clinicName+"/"+clientIDString+"/"+fileType+"/"+cleanFilename,
+				strconv.FormatInt(int64(clientID), 10),
+				fileType,
+			)
+			if storeInAmazonError != nil {
+				fmt.Println(storeInAmazonError.Error())
+			}
 
-		imageUrl, imageSize, storeInAmazonError := wasabis3manager.WasabiS3Client.UploadObject(
-			bucketName,
-			clinicName,
-			//"tempFiles/"+clinicName+"/"+clientIDString+"/"+fileType+"/"+cleanFilename,
-			"tempFiles/"+clinicName+"/"+clientIDString+"/"+fileType+"/"+cleanFilename,
-			strconv.FormatInt(int64(clientID), 10),
-			fileType,
-		)
-		if storeInAmazonError != nil {
-			fmt.Println(storeInAmazonError.Error())
-		}
+			imageUpdate := new(models.Image)
+			imageUpdate.ID = insertedID
+			imageUpdate.Filename = image.Filename
+			result := database.GormDB.Where("id = ?", imageUrl).Find(&imageUpdate)
+			if result.Error != nil {
+				log.Fatal(result.Error)
+			}
+			fmt.Println("imageUpdate")
+			fmt.Println(imageUpdate)
 
-		imageUpdate := new(models.Image)
-		imageUpdate.ID = insertedID
-		result := database.GormDB.Where("id = ?", imageUrl).Find(&imageUpdate)
-		if result.Error != nil {
-			log.Fatal(result.Error)
-		}
+			database.GormDB.Model(&imageUpdate).Where("id = ?", imageUpdate.ID).Update("available", true)
+			imageUpdate.Available = true
+			fmt.Println(imageUrl)
+			fmt.Println(imageSize)
 
-		database.GormDB.Model(&imageUpdate).Where("id = ?", imageUpdate.ID).Update("available", true)
-		imageUpdate.Available = true
-		fmt.Println(imageUrl)
-		fmt.Println(imageSize)
+			e := os.Remove("tempFiles/" + clinicName + "/" + clientIDString + "/" + cleanFilename)
+			if e != nil {
+				fmt.Println(e)
+				//panic(e)
+			}
 
-		e := os.Remove("tempFiles/" + clinicName + "/" + clientIDString + "/" + cleanFilename)
-		if e != nil {
-			fmt.Println(e)
-			//panic(e)
-		}
+			e = os.Remove(fmt.Sprintf("tempFiles/" + clinicName + "/" + clientIDString + "/" + fileType + "/" + cleanFilename))
+			if e != nil {
+				fmt.Println(e)
+				//panic(e)
+			}
 
-		e = os.Remove(fmt.Sprintf("tempFiles/" + clinicName + "/" + clientIDString + "/" + fileType + "/" + cleanFilename))
-		if e != nil {
-			fmt.Println(e)
-			//panic(e)
-		}
+			defer func() {
+				socketEvent := models.SocketEvent{
+					Type:   "image",
+					Action: "update",
+					Data:   imageUpdate,
+				}
 
-		/*
-		socketEvent := models.SocketEvent{
-			Type:   "image",
-			Action: "update",
-			Data:   imageUpdate,
-		}
+				b, _ := json.Marshal(socketEvent)
+				socketinstance.SocketInstance.Emit(b)
 
-		b, _ := json.Marshal(socketEvent)
-		socketinstance.SocketInstance.Emit(b)
-
-		*/
-
-
+				if socketError := recover(); socketError != nil {
+					log.Println("panic occurred:", socketError)
+				}
+			}()
+		}()
 
 		return err
 		break
 	case "video":
+
+		var video models.Video
+		// var holographic models.Holographic
 
 		ThumbnailCleanFilename := "tempFiles/" + clinicName + "/" + clientIDString + "/" + cleanFilename + "_thumbnail.jpg"
 		ThumbnailCleanFilename = strings.ToLower(strings.ReplaceAll(ThumbnailCleanFilename, " ", ""))
@@ -228,7 +238,7 @@ func UploadMultimedia(
 		}
 
 		if fileType == "video" {
-			video := models.Video{
+			video = models.Video{
 				Filename:     cleanFilename,
 				ClientID:     clientID,
 				Url:          url,
@@ -244,7 +254,8 @@ func UploadMultimedia(
 		}
 
 		if fileType == "holographic" {
-			video := models.Holographic{
+			/*
+			video = models.Holographic{
 				Filename:     cleanFilename,
 				ClientID:     clientID,
 				Url:          url,
@@ -253,66 +264,72 @@ func UploadMultimedia(
 				ClinicID:     clinicId,
 			}
 			database.GormDB.Create(&video)
+			*/
 		}
 
-		//go func() {
-		fmt.Println("fileComrpess")
-		err := utils.CompressMP4("tempFiles/"+clinicName+"/"+clientIDString+"/"+cleanFilename, "tempFiles/"+clinicName+"/"+clientIDString+"/"+fileType+"/"+cleanFilename)
-		if err != nil {
-			log.Fatal(err)
+		go func() {
+			fmt.Println("fileComrpess")
+			err := utils.CompressMP4("./tempFiles/"+clinicName+"/"+clientIDString+"/"+cleanFilename, "./tempFiles/"+clinicName+"/"+clientIDString+"/"+fileType+"/"+cleanFilename)
+			if err != nil {
+				log.Fatal(err)
 
-		}
+			}
 
-		// upload video
-		videoUrl, videoSize, storeInAmazonError := wasabis3manager.WasabiS3Client.UploadObject(
-			bucketName,
-			clinicName,
-			"tempFiles/"+clinicName+"/"+clientIDString+"/"+fileType+"/"+cleanFilename,
-			strconv.FormatInt(int64(clientID), 10),
-			fileType,
-		)
-		if storeInAmazonError != nil {
-			log.Fatal(storeInAmazonError)
+			// upload video
+			videoUrl, videoSize, storeInAmazonError := wasabis3manager.WasabiS3Client.UploadObject(
+				bucketName,
+				clinicName,
+				"tempFiles/"+clinicName+"/"+clientIDString+"/"+fileType+"/"+cleanFilename,
+				strconv.FormatInt(int64(clientID), 10),
+				fileType,
+			)
+			if storeInAmazonError != nil {
+				log.Fatal(storeInAmazonError)
 
-		}
+			}
 
-		fmt.Println(videoUrl)
-		fmt.Println(videoSize)
+			fmt.Println(videoUrl)
+			fmt.Println(videoSize)
 
-		videoUpdate := new(models.Video)
-		videoUpdate.ID = insertedID
-		result := database.GormDB.Where("id = ?", videoUrl).Find(&videoUpdate)
-		if result.Error != nil {
-			log.Fatal(result.Error)
+			videoUpdate := new(models.Video)
+			videoUpdate.ID = insertedID
+			videoUpdate.Filename = video.Filename
+			result := database.GormDB.Where("id = ?", videoUrl).Find(&videoUpdate)
+			if result.Error != nil {
+				log.Fatal(result.Error)
 
-		}
+			}
 
-		database.GormDB.Model(&videoUpdate).Where("id = ?", videoUpdate.ID).Update("available", true)
-		videoUpdate.Available = true
+			database.GormDB.Model(&videoUpdate).Where("id = ?", videoUpdate.ID).Update("available", true)
+			videoUpdate.Available = true
 
-		fmt.Println("fin")
+			fmt.Println("fin")
 
-		e := os.Remove(fmt.Sprintf("./tempFiles/%s/%s/%s", clinicName, clientIDString, cleanFilename))
-		if e != nil {
-			fmt.Println(e)
-		}
+			e := os.Remove(fmt.Sprintf("./tempFiles/%s/%s/%s", clinicName, clientIDString, cleanFilename))
+			if e != nil {
+				fmt.Println(e)
+			}
 
-		e = os.Remove("tempFiles/" + clinicName + "/" + clientIDString + "/" + fileType + "/" + cleanFilename + "_thumbnail.jpg")
-		if e != nil {
-			fmt.Println(e)
-		}
+			e = os.Remove("tempFiles/" + clinicName + "/" + clientIDString + "/" + fileType + "/" + cleanFilename + "_thumbnail.jpg")
+			if e != nil {
+				fmt.Println(e)
+			}
 
-		/*
-		socketEvent := models.SocketEvent{
-			Type:   "video",
-			Action: "update",
-			Data:   videoUpdate,
-		}
-		*/
+			defer func() {
+				socketEvent := models.SocketEvent{
+					Type:   "video",
+					Action: "update",
+					Data:   videoUpdate,
+				}
 
-		// b, _ := json.Marshal(socketEvent)
-		// socketinstance.SocketInstance.Emit(b)
-		//}()
+				b, _ := json.Marshal(socketEvent)
+				socketinstance.SocketInstance.Emit(b)
+
+				if socketError := recover(); socketError != nil {
+					log.Println("panic occurred:", socketError)
+				}
+			}()
+		}()
 
 		return err
 		break
