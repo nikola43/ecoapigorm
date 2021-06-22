@@ -18,7 +18,6 @@ func UploadPromoImage(context *fiber.Ctx) error {
 	promoID, _ := strconv.ParseUint(context.Params("promo_id"), 10, 64)
 	clinicID, _ := strconv.ParseUint(context.Params("clinic_id"), 10, 64)
 	uploadedFile, err := context.FormFile("file")
-	employeeTokenClaims, err := utils.GetEmployeeTokenClaims(context)
 	if err != nil {
 		return context.SendStatus(fiber.StatusUnauthorized)
 	}
@@ -26,7 +25,7 @@ func UploadPromoImage(context *fiber.Ctx) error {
 	fmt.Println(promoID)
 	fmt.Println(clinicID)
 
-	bucketName := strings.ToLower(strings.ReplaceAll(employeeTokenClaims.CompanyName, " ", ""))
+
 
 	clinic := new(models.Clinic)
 	database.GormDB.Where("id = ?", clinicID).Find(clinic)
@@ -35,6 +34,16 @@ func UploadPromoImage(context *fiber.Ctx) error {
 			"error": "clini not found",
 		})
 	}
+
+	company := new(models.Company)
+	database.GormDB.Where("id = ?", clinic.CompanyID).Find(company)
+	if company.ID < 1 {
+		return context.Status(fiber.StatusNotFound).JSON(&fiber.Map{
+			"error": "company not found",
+		})
+	}
+
+	bucketName := strings.ToLower(strings.ReplaceAll(company.Name, " ", ""))
 
 	fmt.Println(clinic)
 
