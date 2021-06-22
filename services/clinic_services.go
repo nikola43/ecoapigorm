@@ -16,12 +16,12 @@ import (
 	"gorm.io/gorm"
 )
 
-func CreateClinic(companyID uint, createClinicRequest *clinicModels.CreateClinicRequest) (*clinicModels.CreateClinicResponse, error) {
+func CreateClinic(createClinicRequest *clinicModels.CreateClinicRequest) (*clinicModels.CreateClinicResponse, error) {
 	// give 30 credits first time
 	var clinics = make([]*models.Clinic, 0)
 	credits := 0
 
-	GormDBResult := database.GormDB.Where("company_id = ?", companyID).Find(&clinics)
+	GormDBResult := database.GormDB.Where("company_id = ?", createClinicRequest.CompanyID).Find(&clinics)
 	if GormDBResult.Error != nil {
 
 	}
@@ -34,7 +34,7 @@ func CreateClinic(companyID uint, createClinicRequest *clinicModels.CreateClinic
 
 	clinic := models.Clinic{
 		Name:             createClinicRequest.Name,
-		CompanyID:        companyID,
+		CompanyID:        createClinicRequest.CompanyID,
 		AvailableCredits: uint(credits),
 	}
 	result := database.GormDB.Create(&clinic)
@@ -46,7 +46,7 @@ func CreateClinic(companyID uint, createClinicRequest *clinicModels.CreateClinic
 	createEmployeeResponse := &clinicModels.CreateClinicResponse{
 		ID:               clinic.ID,
 		Name:             clinic.Name,
-		CompanyID:        companyID,
+		CompanyID:        createClinicRequest.CompanyID,
 		AvailableCredits: uint(credits),
 	}
 

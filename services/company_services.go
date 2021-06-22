@@ -11,7 +11,7 @@ import (
 func CreateCompany(employeeID uint, createEmployeeRequest *companyModels.CreateCompanyRequest) (*companyModels.CreateCompanyResponse, error) {
 	company := models.Company{
 		Name:       createEmployeeRequest.Name,
-		//EmployeeID: employeeID,
+		EmployeeID: employeeID,
 	}
 
 	if err := database.GormDB.Create(&company).Error; err != nil {
@@ -21,7 +21,7 @@ func CreateCompany(employeeID uint, createEmployeeRequest *companyModels.CreateC
 	createCompanyResponse := &companyModels.CreateCompanyResponse{
 		ID:         company.ID,
 		Name:       company.Name,
-		//EmployeeID: company.EmployeeID,
+		EmployeeID: company.EmployeeID,
 		CreatedAt:  company.CreatedAt.String(),
 	}
 

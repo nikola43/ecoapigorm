@@ -12,7 +12,6 @@ import (
 	"github.com/nikola43/ecoapigorm/models/promos"
 	streamingModels "github.com/nikola43/ecoapigorm/models/streamings"
 	"github.com/nikola43/ecoapigorm/services"
-	"github.com/nikola43/ecoapigorm/utils"
 	"strconv"
 )
 
@@ -52,15 +51,6 @@ func CreateClinic(context *fiber.Ctx) error {
 	var err error
 	clinic := models.Clinic{}
 
-	employeeTokenClaims, err := utils.GetEmployeeTokenClaims(context)
-	if err != nil {
-		return context.Status(fiber.StatusUnauthorized).JSON(&fiber.Map{
-			"error": err.Error(),
-		})
-	}
-
-	// parse request
-
 	err = context.BodyParser(createClinicRequest)
 	if err != nil {
 		return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
@@ -96,7 +86,7 @@ func CreateClinic(context *fiber.Ctx) error {
 	}
 
 	// create and response
-	if createClinicResponse, err = services.CreateClinic(employeeTokenClaims.CompanyID, createClinicRequest);
+	if createClinicResponse, err = services.CreateClinic(createClinicRequest);
 		err != nil {
 		return context.Status(fiber.StatusNotFound).JSON(&fiber.Map{
 			"error": err.Error(),
