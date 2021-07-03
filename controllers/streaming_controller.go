@@ -5,42 +5,41 @@ import (
 	"github.com/gofiber/fiber/v2"
 	streamings "github.com/nikola43/ecoapigorm/models/streamings"
 	"github.com/nikola43/ecoapigorm/services"
+	"github.com/nikola43/ecoapigorm/utils"
 	"strconv"
 )
 
 func GetStreamingByCodeController(context *fiber.Ctx) error {
 	code := context.Params("code")
-	var streaming = streamings.Streaming{}
-	var err error
-
-	if streaming, err = services.GetStreamingByCodeService(code);
-		err != nil {
-		return context.SendStatus(fiber.StatusNotFound)
+	streaming, err := services.GetStreamingByCodeService(code)
+	if err != nil {
+		return utils.ReturnErrorResponse(fiber.StatusNotFound, err, context)
 	}
+
 
 	return context.Status(fiber.StatusOK).JSON(streaming)
 }
 
 func CreateStreaming(context *fiber.Ctx) error {
+	employeeTokenClaims, getEmployeeTokenClaimsErr := utils.GetEmployeeTokenClaims(context)
+	if getEmployeeTokenClaimsErr != nil {
+		return utils.ReturnErrorResponse(fiber.StatusUnauthorized, getEmployeeTokenClaimsErr, context)
+	}
+	fmt.Println(employeeTokenClaims)
+
+
 	createStreamingRequest := new(streamings.CreateStreamingRequest)
-	fmt.Println(createStreamingRequest)
 
-	// parse request
-	err := context.BodyParser(createStreamingRequest)
-
+	err := utils.ParseAndValidate(context, createStreamingRequest)
 	if err != nil {
-		return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-			"error": err.Error(),
-		})
+		return utils.ReturnErrorResponse(fiber.StatusBadRequest, err, context)
 	}
 
-	createStreamingResponse, err := services.CreateStreaming(createStreamingRequest)
-	if err != nil {
-		return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-			"error": err.Error(),
-		})
+	createStreamingResponse, createErr := services.CreateStreaming(createStreamingRequest)
+	if createErr != nil {
+		return utils.ReturnErrorResponse(fiber.StatusBadRequest, createErr, context)
 	}
-	fmt.Println(createStreamingResponse)
+
 	return context.Status(fiber.StatusOK).JSON(createStreamingResponse)
 }
 
@@ -49,35 +48,24 @@ func DeleteStreamingByID(context *fiber.Ctx) error {
 
 	err := services.DeleteStreamingByID(uint(streamingID))
 	if err != nil {
-		return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-			"error": err.Error(),
-		})
+		return utils.ReturnErrorResponse(fiber.StatusBadRequest, err, context)
 	}
 
-	return context.Status(fiber.StatusOK).JSON(&fiber.Map{
-		"success": true,
-	})
+	return utils.ReturnSuccessResponse(context)
 }
 
 func UpdateStreaming(context *fiber.Ctx) error {
 	streaming := new(streamings.Streaming)
 
-	// parse request
-	err := context.BodyParser(streaming)
+	err := utils.ParseAndValidate(context, streaming)
 	if err != nil {
-		return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-			"error": err.Error(),
-		})
+		return utils.ReturnErrorResponse(fiber.StatusBadRequest, err, context)
 	}
 
-	// todo validate
-	// validation ---------------------------------------------------------------------
 	streaming, err = services.UpdateStreaming(streaming)
 	if err != nil {
-		return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-			"error": err.Error(),
-		})
+		return utils.ReturnErrorResponse(fiber.StatusBadRequest, err, context)
 	}
-	return context.Status(fiber.StatusOK).JSON(streaming)
 
+	return context.Status(fiber.StatusOK).JSON(streaming)
 }

@@ -30,22 +30,25 @@ func (awsClient *WasabiS3Client) DownloadObject(filekey string, filepath string)
 	if err != nil {
 		fmt.Println(err)
 	}
-	defer file.Close()
+	defer func() {
+		closeFileErr := file.Close()
+		if closeFileErr != nil {
+			fmt.Println(closeFileErr)
+		}
+	}()
 
 	downloader := s3manager.NewDownloader(awsClient.s3Session)
-	bytes, err := downloader.Download(file,
-		&s3.GetObjectInput{
-			Bucket: aws.String(GetEnvVariable("AWS_BUCKET_NAME")),
-			Key:    aws.String(filekey),
-		})
-	if err != nil {
-		fmt.Println(err)
+	downloadedBytes, downloadFileErr := downloader.Download(file, &s3.GetObjectInput{
+		Bucket: aws.String(GetEnvVariable("AWS_BUCKET_NAME")),
+		Key:    aws.String(filekey),
+	})
+	if downloadFileErr != nil {
+		fmt.Println(downloadFileErr)
 	}
-	fmt.Println(bytes)
+	fmt.Println(downloadedBytes)
 	return nil
 }
 func (awsClient *WasabiS3Client) UploadObject(bucketName, clinicName, filepath string, clientID string, tipo string) (string, int64, error) {
-
 	file, err := os.Open("./" + filepath)
 	if err != nil {
 		fmt.Printf("err opening file: %s", err)

@@ -73,6 +73,11 @@ func UploadPromoImage(context *fiber.Ctx) error {
 }
 
 func UploadMultimedia(context *fiber.Ctx) error {
+	employeeTokenClaims, getEmployeeTokenClaimsErr := utils.GetEmployeeTokenClaims(context)
+	if getEmployeeTokenClaimsErr != nil {
+		return utils.ReturnErrorResponse(fiber.StatusUnauthorized, getEmployeeTokenClaimsErr, context)
+	}
+
 	clientID, _ := strconv.ParseUint(context.Params("client_id"), 10, 64)
 	clinicId, _ := strconv.ParseUint(context.Params("clinic_id"), 10, 64)
 	uploadMode, _ := strconv.ParseUint(context.Params("upload_mode"), 10, 64)
@@ -108,7 +113,8 @@ func UploadMultimedia(context *fiber.Ctx) error {
 		uint(clientID),
 		uploadedFile,
 		uint(uploadMode),
-		clinic.ID)
+		clinic.ID,
+		employeeTokenClaims.ID)
 	if err != nil {
 		return err
 	}

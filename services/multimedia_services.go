@@ -1,16 +1,15 @@
 package services
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/gofiber/fiber/v2"
 	database "github.com/nikola43/ecoapigorm/database"
 	"github.com/nikola43/ecoapigorm/models"
 	"github.com/nikola43/ecoapigorm/models/promos"
-	"github.com/nikola43/ecoapigorm/socketinstance"
 	"github.com/nikola43/ecoapigorm/utils"
 	"github.com/nikola43/ecoapigorm/wasabis3manager"
+	"github.com/nikola43/ecoapigorm/websockets"
 	"io/ioutil"
 	"log"
 	"mime/multipart"
@@ -68,7 +67,8 @@ func UploadMultimedia(
 	clientID uint,
 	uploadedFile *multipart.FileHeader,
 	uploadMode uint,
-	clinicId uint) error {
+	clinicId uint,
+	employeeID uint) error {
 
 	var insertedID uint
 
@@ -193,15 +193,17 @@ func UploadMultimedia(
 				//panic(e)
 			}
 
-			defer func() {
-				socketEvent := models.SocketEvent{
-					Type:   "image",
-					Action: "update",
-					Data:   imageUpdate,
-				}
+			socketEvent := models.SocketEvent{
+				Type:   "image",
+				Action: "update",
+				Data:   imageUpdate,
+			}
 
-				b, _ := json.Marshal(socketEvent)
-				socketinstance.SocketInstance.Emit(b)
+			defer func() {
+
+
+				websockets.Emit(socketEvent, employeeID)
+				websockets.Emit(socketEvent, clientID)
 
 				if socketError := recover(); socketError != nil {
 					log.Println("panic occurred:", socketError)
@@ -317,15 +319,15 @@ func UploadMultimedia(
 				fmt.Println(e)
 			}
 
-			defer func() {
-				socketEvent := models.SocketEvent{
-					Type:   "video",
-					Action: "update",
-					Data:   videoUpdate,
-				}
+			socketEvent := models.SocketEvent{
+				Type:   "video",
+				Action: "update",
+				Data:   videoUpdate,
+			}
 
-				b, _ := json.Marshal(socketEvent)
-				socketinstance.SocketInstance.Emit(b)
+			defer func() {
+				websockets.Emit(socketEvent, employeeID)
+				websockets.Emit(socketEvent, clientID)
 
 				if socketError := recover(); socketError != nil {
 					log.Println("panic occurred:", socketError)

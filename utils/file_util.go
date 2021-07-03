@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"github.com/joho/godotenv"
 	"github.com/nikola43/ecoapigorm/models"
-	"github.com/nikola43/ecoapigorm/socketinstance"
+	"github.com/nikola43/ecoapigorm/websockets"
 	"github.com/tidwall/gjson"
 	ffmpeg "github.com/u2takey/ffmpeg-go"
 	"log"
@@ -222,7 +222,7 @@ func TempSock(totalDuration float64, file interface{}) string {
 				}
 
 				b, _ := json.Marshal(socketEvent)
-				socketinstance.SocketInstance.Emit(b)
+				websockets.SocketInstance.Emit(b)
 
 				if socketError := recover(); socketError != nil {
 					log.Println("panic occurred:", socketError)

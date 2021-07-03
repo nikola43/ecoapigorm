@@ -10,13 +10,13 @@ import (
 	"time"
 )
 
-func GenerateClientToken(email string, client_id uint) (string, error) {
+func GenerateClientToken(email string, clientId uint) (string, error) {
 	// Create token
 	token := jwt.New(jwt.SigningMethodHS256)
 
 	// Set claims
 	claims := token.Claims.(jwt.MapClaims)
-	claims["id"] = client_id
+	claims["id"] = clientId
 	claims["email"] = email
 	claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
 
@@ -29,7 +29,7 @@ func GenerateClientToken(email string, client_id uint) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return tokenString, err
+	return tokenString, nil
 }
 
 func GetClientTokenClaims(context *fiber.Ctx) (*models.ClientTokenClaims, error) {
@@ -56,8 +56,11 @@ func GetClientTokenClaims(context *fiber.Ctx) (*models.ClientTokenClaims, error)
 }
 
 func GetEmployeeTokenClaims(context *fiber.Ctx) (*models.EmployeeTokenClaims, error) {
-	user := context.Locals("user").(*jwt.Token)
+	if context.Locals("user") == nil {
+		return nil, errors.New("invalid token")
+	}
 
+	user := context.Locals("user").(*jwt.Token)
 	if claims, ok := user.Claims.(jwt.MapClaims); ok && user.Valid {
 		employeeTokenClaims := &models.EmployeeTokenClaims{}
 
@@ -103,9 +106,9 @@ func GetEmployeeTokenClaims(context *fiber.Ctx) (*models.EmployeeTokenClaims, er
 }
 
 func GenerateEmployeeToken(name string,
-	company_id uint,
-	clinic_id uint,
-	employee_id uint,
+	companyId uint,
+	clinicId uint,
+	employeeId uint,
 	email string,
 	companyName string,
 	clinicName string,
@@ -115,10 +118,10 @@ func GenerateEmployeeToken(name string,
 
 	// Set claims
 	claims := token.Claims.(jwt.MapClaims)
-	claims["id"] = employee_id
-	claims["clinic_id"] = clinic_id
+	claims["id"] = employeeId
+	claims["clinic_id"] = clinicId
 	claims["clinic_name"] = clinicName
-	claims["company_id"] = company_id
+	claims["company_id"] = companyId
 	claims["company_name"] = companyName
 	claims["email"] = email
 	claims["name"] = name
@@ -126,10 +129,10 @@ func GenerateEmployeeToken(name string,
 	claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
 
 	fmt.Println("token claims")
-	fmt.Println(employee_id)
-	fmt.Println(clinic_id)
+	fmt.Println(employeeId)
+	fmt.Println(clinicId)
 	fmt.Println(clinicName)
-	fmt.Println(company_id)
+	fmt.Println(companyId)
 	fmt.Println(companyName)
 	fmt.Println(email)
 	fmt.Println(name)
@@ -137,11 +140,11 @@ func GenerateEmployeeToken(name string,
 	fmt.Println(claims["exp"])
 	fmt.Println("token claims -----------")
 	// Generate encoded token and send it as response.
-	tokenString, err := token.SignedString([]byte(GetEnvVariable("JWT_CLIENT_KEY")))
+	tokenString, err := token.SignedString([]byte(GetEnvVariable("JWT_EMPLOYEE_KEY")))
 	if err != nil {
 		return "", err
 	}
-	return tokenString, err
+	return tokenString, nil
 }
 
 func GenerateInvitationToken() (string, error) {
@@ -156,7 +159,7 @@ func GenerateInvitationToken() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return tokenString, err
+	return tokenString, nil
 }
 
 func GeneratePasswordRecoveryToken(recoveryType string, id uint) (string, error) {
@@ -173,5 +176,5 @@ func GeneratePasswordRecoveryToken(recoveryType string, id uint) (string, error)
 	if err != nil {
 		return "", err
 	}
-	return tokenString, err
+	return tokenString, nil
 }

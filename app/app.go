@@ -9,7 +9,7 @@ import (
 	database "github.com/nikola43/ecoapigorm/database"
 	middlewares "github.com/nikola43/ecoapigorm/middleware"
 	"github.com/nikola43/ecoapigorm/routes"
-	"github.com/nikola43/ecoapigorm/socketinstance"
+	"github.com/nikola43/ecoapigorm/websockets"
 	"github.com/nikola43/ecoapigorm/utils"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -18,8 +18,6 @@ import (
 )
 
 var httpServer *fiber.App
-var clients map[string]string
-
 
 type App struct {
 }
@@ -73,7 +71,7 @@ func InitializeHttpServer(port string) {
 	httpServer.Use(middlewares.XApiKeyMiddleware)
 	httpServer.Use(cors.New(cors.Config{}))
 
-	ws := httpServer.Group("/ws")          // /api/v1
+	ws := httpServer.Group("/ws")
 
 	// Setup the middleware to retrieve the data sent in first GET request
 	ws.Use(middlewares.WebSocketUpgradeMiddleware)
@@ -83,7 +81,7 @@ func InitializeHttpServer(port string) {
 	setupSocketListeners()
 
 	ws.Get("/:id", ikisocket.New(func(kws *ikisocket.Websocket) {
-		socketinstance.SocketInstance = kws
+		websockets.SocketInstance = kws
 
 		// Retrieve the user id from endpoint
 		userId := kws.Params("id")
@@ -91,9 +89,7 @@ func InitializeHttpServer(port string) {
 		// Add the connection to the list of the connected clients
 		// The UUID is generated randomly and is the key that allow
 		// ikisocket to manage Emit/EmitTo/Broadcast
-		clients[userId] = kws.UUID
-
-		fmt.Println(clients[userId])
+		websockets.SocketClients[userId] = kws.UUID
 
 		// Every websocket connection has an optional session key => value storage
 		kws.SetAttribute("user_id", userId)
@@ -103,7 +99,6 @@ func InitializeHttpServer(port string) {
 		//Write welcome message
 		kws.Emit([]byte(fmt.Sprintf("Socket connected")))
 	}))
-
 
 	api := httpServer.Group("/api") // /api
 	v1 := api.Group("/v1")          // /api/v1
@@ -138,24 +133,20 @@ func InitializeDatabase(user, password, database_name string) {
 // pulled out main function
 func setupSocketListeners() {
 
-	// The key for the map is message.to
-	clients = make(map[string]string)
-
-
 	// Multiple event handling supported
 	ikisocket.On(ikisocket.EventConnect, func(ep *ikisocket.EventPayload) {
-		fmt.Println(fmt.Sprintf("Connection event 1 - User: %s", ep.Kws.GetStringAttribute("user_id")))
+		fmt.Println(fmt.Sprintf("Connection socket event - User: %s", ep.Kws.GetStringAttribute("user_id")))
 	})
 
 	// On message event
 	ikisocket.On(ikisocket.EventMessage, func(ep *ikisocket.EventPayload) {
-
+		fmt.Println(fmt.Sprintf("Message socket event - User: %s", ep.Kws.GetStringAttribute("user_id")))
 	})
 
 	// On disconnect event
 	ikisocket.On(ikisocket.EventDisconnect, func(ep *ikisocket.EventPayload) {
 		// Remove the user from the local clients
-		delete(clients, ep.Kws.GetStringAttribute("user_id"))
+		delete(websockets.SocketClients, ep.Kws.GetStringAttribute("user_id"))
 		fmt.Println(fmt.Sprintf("Disconnection event - User: %s", ep.Kws.GetStringAttribute("user_id")))
 	})
 
@@ -163,7 +154,7 @@ func setupSocketListeners() {
 	// This event is called when the server disconnects the user actively with .Close() method
 	ikisocket.On(ikisocket.EventClose, func(ep *ikisocket.EventPayload) {
 		// Remove the user from the local clients
-		delete(clients, ep.Kws.GetStringAttribute("user_id"))
+		delete(websockets.SocketClients, ep.Kws.GetStringAttribute("user_id"))
 		fmt.Println(fmt.Sprintf("Close event - User: %s", ep.Kws.GetStringAttribute("user_id")))
 	})
 
