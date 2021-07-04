@@ -193,15 +193,13 @@ func UploadMultimedia(
 				//panic(e)
 			}
 
-			socketEvent := models.SocketEvent{
+			socketEvent := websockets.SocketEvent{
 				Type:   "image",
 				Action: "update",
 				Data:   imageUpdate,
 			}
 
 			defer func() {
-
-
 				websockets.Emit(socketEvent, employeeID)
 				websockets.Emit(socketEvent, clientID)
 
@@ -319,7 +317,7 @@ func UploadMultimedia(
 				fmt.Println(e)
 			}
 
-			socketEvent := models.SocketEvent{
+			socketEvent := websockets.SocketEvent{
 				Type:   "video",
 				Action: "update",
 				Data:   videoUpdate,

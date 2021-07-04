@@ -16,7 +16,6 @@ func GetStreamingByCodeController(context *fiber.Ctx) error {
 		return utils.ReturnErrorResponse(fiber.StatusNotFound, err, context)
 	}
 
-
 	return context.Status(fiber.StatusOK).JSON(streaming)
 }
 

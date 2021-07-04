@@ -2,7 +2,6 @@ package services
 
 import (
 	"errors"
-	"fmt"
 	database "github.com/nikola43/ecoapigorm/database"
 	"github.com/nikola43/ecoapigorm/models"
 	"github.com/nikola43/ecoapigorm/utils"
@@ -44,13 +43,13 @@ func LoginClient(email, password string) (*models.LoginClientResponse, error) {
 }
 
 func LoginEmployee(email, password string) (*models.LoginEmployeeResponse, error) {
-	employee := &models.Employee{}
-	clinic := models.Clinic{}
-	company := models.Company{}
-	token := ""
-	var err error
+	employee := new(models.Employee)
+	clinic := new(models.Clinic)
+	company := new(models.Company)
+	var token string
 
-	if err := database.GormDB.Where("email = ?", email).Find(&employee).Error; err != nil {
+	err := database.GormDB.Where("email = ?", email).Find(&employee).Error
+	if err != nil {
 		return nil, err
 	}
 
@@ -58,20 +57,20 @@ func LoginEmployee(email, password string) (*models.LoginEmployeeResponse, error
 	if !match {
 		return nil, errors.New("not found")
 	}
-	fmt.Println(employee)
 
-	database.GormDB.First(&company,employee.CompanyID)
-
-	fmt.Println("clinicID")
-	fmt.Println(clinic.ID)
+	err = database.GormDB.First(&company,employee.CompanyID).Error
+	if err != nil {
+		return nil, err
+	}
 
 	//Si es admin le metemos todas las clinicas de la company
 	if employee.Role == "admin" {
-		database.GormDB.
-			Where("company_id = ?", employee.CompanyID).
-			First(&clinic) //TODO enviar todas en lugar de una
+		database.GormDB.Where("company_id = ?", employee.CompanyID).First(&clinic) //TODO enviar todas en lugar de una
 	}else {
-		database.GormDB.First(&clinic, employee.ClinicID)
+		err = database.GormDB.First(&clinic, employee.ClinicID).Error
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	token, err = utils.GenerateEmployeeToken(
@@ -96,7 +95,7 @@ func LoginEmployee(email, password string) (*models.LoginEmployeeResponse, error
 		IsFirstLogin: employee.IsFirstLogin,
 		LastName:     employee.LastName,
 		Token:        token,
-		Clinic:       clinic,
+		Clinic:       *clinic,
 	}
 
 	return &clientEmployeeResponse, err

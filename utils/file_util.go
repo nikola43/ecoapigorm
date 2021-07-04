@@ -215,7 +215,7 @@ func TempSock(totalDuration float64, file interface{}) string {
 					Progress: progress,
 				}
 
-				socketEvent := models.SocketEvent{
+				socketEvent := websockets.SocketEvent{
 					Type:   "video",
 					Action: "progress",
 					Data:   videoConversionProgress,
