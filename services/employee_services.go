@@ -14,8 +14,6 @@ func CreateEmployeeFromPanel(createEmployeeRequest *modelsEmployees.CreateEmploy
 	// todo cambiar role por constantes
 	// create newEmployee on DB
 	newEmployee := models.Employee{
-		ParentEmployeeID: createEmployeeRequest.ParentEmployeeID,
-		CompanyID:        createEmployeeRequest.CompanyID,
 		ClinicID:         createEmployeeRequest.ClinicID,
 		Name:             createEmployeeRequest.Name,
 		Email:            createEmployeeRequest.Email,
@@ -141,11 +139,6 @@ func DeleteEmployeeByEmployeeID(parentEmployeeID, deletedEmployeeID uint) error 
 		database.GormDB.Model(&deleteEmployeeClinic).Update("employee_id", parentEmployeeID)
 	}
 
-	// check if employee who make action has deleted employee parent
-	if deleteEmployee.ParentEmployeeID != parentEmployeeID {
-		// update clinic employee id with parent employee id
-		return errors.New("only parent employee can delete employee")
-	}
 
 	// delete employee
 	result := database.GormDB.Delete(deleteEmployee)

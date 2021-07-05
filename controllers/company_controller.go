@@ -121,11 +121,10 @@ func CreateCompany(context *fiber.Ctx) error {
 	employeeToken, err := utils.GenerateEmployeeToken(
 		employee.Name,
 		createCompanyResponse.ID,
-		employee.Clinic.ID,
+		employee.ClinicID,
 		employee.ID,
 		employee.Email,
 		createCompanyResponse.Name,
-		employee.Clinic.Name,
 		employee.Role)
 
 	createCompanyResponse.Token = employeeToken

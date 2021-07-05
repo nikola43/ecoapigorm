@@ -58,20 +58,7 @@ func LoginEmployee(email, password string) (*models.LoginEmployeeResponse, error
 		return nil, errors.New("not found")
 	}
 
-	err = database.GormDB.First(&company,employee.CompanyID).Error
-	if err != nil {
-		return nil, err
-	}
 
-	//Si es admin le metemos todas las clinicas de la company
-	if employee.Role == "admin" {
-		database.GormDB.Where("company_id = ?", employee.CompanyID).First(&clinic) //TODO enviar todas en lugar de una
-	}else {
-		err = database.GormDB.First(&clinic, employee.ClinicID).Error
-		if err != nil {
-			return nil, err
-		}
-	}
 
 	token, err = utils.GenerateEmployeeToken(
 		employee.Name,
@@ -80,7 +67,6 @@ func LoginEmployee(email, password string) (*models.LoginEmployeeResponse, error
 		employee.ID,
 		employee.Email,
 		company.Name,
-		clinic.Name,
 		employee.Role)
 	if err != nil {
 		return nil, err
@@ -88,7 +74,6 @@ func LoginEmployee(email, password string) (*models.LoginEmployeeResponse, error
 
 	clientEmployeeResponse := models.LoginEmployeeResponse{
 		ID:           employee.ID,
-		CompanyID:    employee.CompanyID,
 		Email:        employee.Email,
 		Name:         employee.Name,
 		Role:         employee.Role,

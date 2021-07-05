@@ -6,7 +6,6 @@ import (
 	"github.com/gofiber/fiber/v2"
 	database "github.com/nikola43/ecoapigorm/database"
 	"github.com/nikola43/ecoapigorm/models"
-	"github.com/nikola43/ecoapigorm/models/promos"
 	"github.com/nikola43/ecoapigorm/utils"
 	"github.com/nikola43/ecoapigorm/wasabis3manager"
 	"github.com/nikola43/ecoapigorm/websockets"
@@ -24,7 +23,7 @@ func UploadPromoImage(
 	bucketName string,
 	uploadedFile *multipart.FileHeader,
 	clinicName string,
-	promo *promos.Promo,
+	promo *models.Promo,
 ) error {
 	// sanitize file name
 	reg, _ := regexp.Compile("[^a-zA-Z0-9-.]+")

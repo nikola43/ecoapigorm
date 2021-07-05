@@ -4,7 +4,6 @@ import (
 	database "github.com/nikola43/ecoapigorm/database"
 	"github.com/nikola43/ecoapigorm/models"
 	"github.com/nikola43/ecoapigorm/models/kicks"
-	"github.com/nikola43/ecoapigorm/models/promos"
 	streamingModels "github.com/nikola43/ecoapigorm/models/streamings"
 	"github.com/nikola43/ecoapigorm/utils"
 	"math/rand"
@@ -140,7 +139,7 @@ func CreateFakeData() {
 func CreateFakeByClinic(clinicId uint) {
 	//PROMOS
 	for i := 1; i < 100; i++ {
-		promo := promos.Promo{
+		promo := models.Promo{
 			ClinicID: clinicId,
 			Title:    "Tu primera eco gratis",
 			Text:     "Ven a vernos y consigue que te hagamos la primera eco gratis.",

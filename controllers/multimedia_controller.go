@@ -5,7 +5,6 @@ import (
 	"github.com/gofiber/fiber/v2"
 	database "github.com/nikola43/ecoapigorm/database"
 	"github.com/nikola43/ecoapigorm/models"
-	"github.com/nikola43/ecoapigorm/models/promos"
 	"github.com/nikola43/ecoapigorm/services"
 	"github.com/nikola43/ecoapigorm/utils"
 	"github.com/nikola43/ecoapigorm/wasabis3manager"
@@ -47,7 +46,7 @@ func UploadPromoImage(context *fiber.Ctx) error {
 
 	fmt.Println(clinic)
 
-	promo := new(promos.Promo)
+	promo := new(models.Promo)
 	database.GormDB.Where("id = ?", promoID).Find(promo)
 	if promo.ID < 1 {
 		return context.Status(fiber.StatusNotFound).JSON(&fiber.Map{

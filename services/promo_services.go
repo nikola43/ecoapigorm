@@ -2,11 +2,12 @@ package services
 
 import (
 	database "github.com/nikola43/ecoapigorm/database"
+	"github.com/nikola43/ecoapigorm/models"
 	"github.com/nikola43/ecoapigorm/models/promos"
 )
 
-func GetPromoByID(id uint) (*promos.Promo, error) {
-	promo := new(promos.Promo)
+func GetPromoByID(id uint) (*models.Promo, error) {
+	promo := new(models.Promo)
 
 	err := database.GormDB.First(&promo, id).Error
 	if err != nil {
@@ -16,9 +17,8 @@ func GetPromoByID(id uint) (*promos.Promo, error) {
 	return promo, nil
 }
 
-func CreatePromoService(createPromoRequest *promos.CreatePromoRequest) (*promos.Promo, error) {
-	promo := &promos.Promo{
-		ClinicID: createPromoRequest.ClinicID,
+func CreatePromoService(createPromoRequest *promos.CreatePromoRequest) (*models.Promo, error) {
+	promo := &models.Promo{
 		Title:    createPromoRequest.Title,
 		Text:     createPromoRequest.Text,
 		Week:     createPromoRequest.Week,
@@ -35,7 +35,7 @@ func CreatePromoService(createPromoRequest *promos.CreatePromoRequest) (*promos.
 }
 
 func DeletePromoByID(id uint) error {
-	promo := new(promos.Promo)
+	promo := new(models.Promo)
 
 	err := database.GormDB.First(&promo, id).Error
 	if err != nil {

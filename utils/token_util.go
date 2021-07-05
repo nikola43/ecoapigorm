@@ -111,7 +111,6 @@ func GenerateEmployeeToken(name string,
 	employeeId uint,
 	email string,
 	companyName string,
-	clinicName string,
 	role string) (string, error) {
 	// Create token
 	token := jwt.New(jwt.SigningMethodHS256)
@@ -120,7 +119,6 @@ func GenerateEmployeeToken(name string,
 	claims := token.Claims.(jwt.MapClaims)
 	claims["id"] = employeeId
 	claims["clinic_id"] = clinicId
-	claims["clinic_name"] = clinicName
 	claims["company_id"] = companyId
 	claims["company_name"] = companyName
 	claims["email"] = email
@@ -131,7 +129,6 @@ func GenerateEmployeeToken(name string,
 	fmt.Println("token claims")
 	fmt.Println(employeeId)
 	fmt.Println(clinicId)
-	fmt.Println(clinicName)
 	fmt.Println(companyId)
 	fmt.Println(companyName)
 	fmt.Println(email)
