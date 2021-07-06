@@ -10,7 +10,7 @@ import (
 func PaymentRoutes(router fiber.Router) {
 	promoRouter := router.Group("/payment")
 
-	promoRouter.Use(jwtware.New(jwtware.Config{SigningKey: []byte(utils.GetEnvVariable("JWT_CLIENT_KEY"))}))
+	promoRouter.Use(jwtware.New(jwtware.Config{SigningKey: []byte(utils.GetEnvVariable("JWT_EMPLOYEE_KEY"))}))
 
 	// /api/v1/payment
 	promoRouter.Post("/", controllers.CreatePayment)

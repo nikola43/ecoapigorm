@@ -6,7 +6,8 @@ import (
 
 type Company struct {
 	base.CustomGormModel
-	Name       string     `gorm:"type:varchar(32)" json:"name"`
-	Clinics    []Clinic   `json:"clinics"`
-	Employees  []Employee `json:"employees"`
+	OwnerEmployeeID uint       `json:"owner_employee_id"`
+	Name            string     `gorm:"type:varchar(32)" json:"name"`
+	Clinics         []Clinic   `json:"clinics"`
+	Employees       []Employee `json:"employees"`
 }

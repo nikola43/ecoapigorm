@@ -27,12 +27,12 @@ func LoginClient(context *fiber.Ctx) error {
 func LoginEmployee(context *fiber.Ctx) error {
 	loginEmployeeRequest := new(models.LoginEmployeeRequest)
 
-	err := context.BodyParser(loginEmployeeRequest)
+	err := utils.ParseAndValidate(context, loginEmployeeRequest)
 	if err != nil {
 		return utils.ReturnErrorResponse(fiber.StatusNotFound, err, context)
 	}
 
-	clientEmployeeResponse, err := services.LoginEmployee(loginEmployeeRequest.Email, loginEmployeeRequest.Password)
+	clientEmployeeResponse, err := services.LoginEmployee(loginEmployeeRequest)
 	if err != nil {
 		return utils.ReturnErrorResponse(fiber.StatusNotFound, err, context)
 	}

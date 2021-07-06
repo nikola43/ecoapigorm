@@ -10,7 +10,8 @@ import (
 
 func CreateCompany(employeeID uint, createEmployeeRequest *companyModels.CreateCompanyRequest) (*companyModels.CreateCompanyResponse, error) {
 	company := models.Company{
-		Name:       createEmployeeRequest.Name,
+		Name:            createEmployeeRequest.Name,
+		OwnerEmployeeID: employeeID,
 	}
 
 	if err := database.GormDB.Create(&company).Error; err != nil {
@@ -18,9 +19,10 @@ func CreateCompany(employeeID uint, createEmployeeRequest *companyModels.CreateC
 	}
 
 	createCompanyResponse := &companyModels.CreateCompanyResponse{
-		ID:         company.ID,
-		Name:       company.Name,
-		CreatedAt:  company.CreatedAt.String(),
+		ID:              company.ID,
+		Name:            company.Name,
+		OwnerEmployeeID: company.OwnerEmployeeID,
+		CreatedAt:       company.CreatedAt.String(),
 	}
 
 	database.GormDB.Model(&models.Employee{}).Where("id = ? ", employeeID).
@@ -28,8 +30,6 @@ func CreateCompany(employeeID uint, createEmployeeRequest *companyModels.CreateC
 
 	database.GormDB.Model(&models.Employee{}).Where("id = ? ", employeeID).
 		Update("is_first_login", false)
-
-
 
 	return createCompanyResponse, nil
 }
@@ -68,13 +68,13 @@ func GetEmployeesByCompanyID(id uint) ([]models.Employee, error) {
 func GetClinicsByCompanyID(companyId uint) ([]models.Clinic, error) {
 	clinics := make([]models.Clinic, 0)
 
-	 err := database.GormDB.
+	err := database.GormDB.
 		Where("company_id = ?", companyId).
 		Preload("Clients").
 		Preload("Employees").
 		Find(&clinics).Error
 
-	if	err != nil {
+	if err != nil {
 		return nil, err
 	}
 
@@ -84,7 +84,7 @@ func GetClinicsByCompanyID(companyId uint) ([]models.Clinic, error) {
 func GetCompaniesByEmployeeID(employeeID uint) ([]models.Company, error) {
 	list := make([]models.Company, 0)
 
-	result := database.GormDB.Where("employee_id = ?", employeeID).
+	result := database.GormDB.Where("owner_employee_id = ?", employeeID).
 		Preload("Clinics").
 		Preload("Employees").
 		Find(&list)

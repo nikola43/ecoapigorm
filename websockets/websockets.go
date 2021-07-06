@@ -15,7 +15,7 @@ type SocketEvent struct {
 
 
 var SocketInstance *ikisocket.Websocket
-var SocketClients map[string]string
+var SocketClients map[string]string = make(map[string]string, 0)
 
 func  Emit(socketEvent SocketEvent, id uint) {
 	event, err := json.Marshal(socketEvent)

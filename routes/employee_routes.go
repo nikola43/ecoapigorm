@@ -28,7 +28,7 @@ func EmployeeRoutes(router fiber.Router) {
 	employeeRouter.Get("/validate_invitation/:invitation_token", controllers.ValidateInvitation)
 
 	// use jwt
-	employeeRouter.Use(jwtware.New(jwtware.Config{SigningKey: []byte(utils.GetEnvVariable("JWT_CLIENT_KEY"))}))
+	employeeRouter.Use(jwtware.New(jwtware.Config{SigningKey: []byte(utils.GetEnvVariable("JWT_EMPLOYEE_KEY"))}))
 
 	// /api/v1/employee/invite
 	employeeRouter.Post("/invite", controllers.Invite)

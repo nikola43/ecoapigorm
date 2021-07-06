@@ -119,6 +119,7 @@ func (awsClient *WasabiS3Client) CreateBucket(bucketName string) error {
 		ACL:    aws.String("public-read"),
 	})
 	fmt.Println(result)
+	fmt.Println(err)
 	return err
 }
 
@@ -202,9 +203,14 @@ func New(accessKey, secretKey, endpoint, bucketRegion string) *WasabiS3Client {
 		Region:           aws.String(bucketRegion),
 		S3ForcePathStyle: aws.Bool(true),
 	}
-	s3Session := session.New(s3Config)
-	awsManager.s3Client = s3.New(s3Session)
+	s3Session, err := session.NewSession(s3Config)
+	if err != nil {
+		panic(err)
+	}
 
+
+
+	awsManager.s3Client = s3.New(s3Session, s3Config)
 	awsManager.s3Session = s3Session
 	awsManager.s3BucketRegion = bucketRegion
 

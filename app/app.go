@@ -6,15 +6,18 @@ import (
 	"github.com/antoniodipinto/ikisocket"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/joho/godotenv"
 	database "github.com/nikola43/ecoapigorm/database"
 	middlewares "github.com/nikola43/ecoapigorm/middleware"
 	"github.com/nikola43/ecoapigorm/routes"
-	"github.com/nikola43/ecoapigorm/websockets"
 	"github.com/nikola43/ecoapigorm/utils"
+	"github.com/nikola43/ecoapigorm/wasabis3manager"
+	"github.com/nikola43/ecoapigorm/websockets"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 	"log"
+	"os"
 )
 
 var httpServer *fiber.App
@@ -23,26 +26,68 @@ type App struct {
 }
 
 func (a *App) Initialize(port string) {
+	// load .env file
+	err := godotenv.Load(".env")
+	if err != nil {
+		log.Fatalf("Error loading .env file")
+	}
+	PROD := os.Getenv("PROD")
+
+	MYSQL_USER := os.Getenv("MYSQL_USER")
+	MYSQL_PASSWORD := os.Getenv("MYSQL_PASSWORD")
+	MYSQL_DATABASE := os.Getenv("MYSQL_DATABASE")
+
+	S3_ACCESS_KEY := os.Getenv("S3_ACCESS_KEY")
+	S3_SECRET_KEY := os.Getenv("S3_SECRET_KEY")
+	S3_ENDPOINT := os.Getenv("S3_ENDPOINT")
+	S3_BUCKET_NAME := os.Getenv("S3_BUCKET_NAME")
+	S3_BUCKET_REGION := os.Getenv("S3_BUCKET_REGION")
+
+	X_API_KEY := os.Getenv("X_API_KEY")
+	FROM_EMAIL := os.Getenv("FROM_EMAIL")
+	FROM_EMAIL_PASSWORD := os.Getenv("FROM_EMAIL_PASSWORD")
+
+	if PROD == "1" {
+		MYSQL_USER = os.Getenv("MYSQL_USER_DEV")
+		MYSQL_PASSWORD = os.Getenv("MYSQL_PASSWORD_DEV")
+		MYSQL_DATABASE = os.Getenv("MYSQL_DATABASE_DEV")
+
+		S3_ACCESS_KEY = os.Getenv("S3_ACCESS_KEY_DEV")
+		S3_SECRET_KEY = os.Getenv("S3_SECRET_KEY_DEV")
+		S3_ENDPOINT = os.Getenv("S3_ENDPOINT_DEV")
+		S3_BUCKET_NAME = os.Getenv("S3_BUCKET_NAME_DEV")
+		S3_BUCKET_REGION = os.Getenv("S3_BUCKET_REGION_DEV")
+
+		X_API_KEY = os.Getenv("X_API_KEY_DEV")
+		FROM_EMAIL = os.Getenv("FROM_EMAIL_DEV")
+		FROM_EMAIL_PASSWORD = os.Getenv("FROM_EMAIL_PASSWORD_DEV")
+	}
+
+	fmt.Println(S3_ACCESS_KEY)
+	fmt.Println(S3_SECRET_KEY)
+	fmt.Println(S3_ENDPOINT)
+	fmt.Println(S3_BUCKET_NAME)
+	fmt.Println(S3_BUCKET_REGION)
+	fmt.Println(MYSQL_USER)
+	fmt.Println(MYSQL_PASSWORD)
+	fmt.Println(MYSQL_DATABASE)
+	fmt.Println(X_API_KEY)
+	fmt.Println(FROM_EMAIL)
+	fmt.Println(FROM_EMAIL_PASSWORD)
 
 	InitializeDatabase(
-		utils.GetEnvVariable("MYSQL_USER"),
-		utils.GetEnvVariable("MYSQL_PASSWORD"),
-		utils.GetEnvVariable("MYSQL_DATABASE"))
+		MYSQL_USER,
+		MYSQL_PASSWORD,
+		MYSQL_DATABASE)
 
-	database.Migrate()
+	// database.Migrate()
 	//fakedatabase.CreateFakeData()
 
-	fmt.Println(utils.GetEnvVariable("AWS_ACCESS_KEY"))
-	fmt.Println(utils.GetEnvVariable("AWS_SECRET_KEY"))
-	fmt.Println(utils.GetEnvVariable("AWS_ENDPOINT"))
-	fmt.Println(utils.GetEnvVariable("AWS_BUCKET_NAME"))
-	fmt.Println(utils.GetEnvVariable("AWS_BUCKET_REGION"))
-	fmt.Println(utils.GetEnvVariable("MYSQL_USER"))
-	fmt.Println(utils.GetEnvVariable("MYSQL_PASSWORD"))
-	fmt.Println(utils.GetEnvVariable("MYSQL_DATABASE"))
-	fmt.Println(utils.GetEnvVariable("X_API_KEY"))
-	fmt.Println(utils.GetEnvVariable("FROM_EMAIL"))
-	fmt.Println(utils.GetEnvVariable("FROM_EMAIL_PASSWORD"))
+	wasabis3manager.WasabiS3Client = utils.New(
+		S3_ACCESS_KEY,
+		S3_SECRET_KEY,
+		S3_ENDPOINT,
+		S3_BUCKET_REGION)
 
 	InitializeHttpServer(port)
 }
@@ -60,7 +105,8 @@ func HandleRoutes(api fiber.Router) {
 	routes.CompanyRoutes(api)
 	routes.PromoRoutes(api)
 	routes.StreamingRoutes(api)
-	routes.MultimediaRoutes(api)
+	routes.MultimediaClientRoutes(api)
+	routes.MultimediaClinicRoutes(api)
 	routes.PaymentRoutes(api)
 }
 

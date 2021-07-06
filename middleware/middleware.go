@@ -51,3 +51,16 @@ func AdminEmployeeMiddleware(context *fiber.Ctx) error {
 
 	return context.Next()
 }
+
+func EmployeeEmployeeMiddleware(context *fiber.Ctx) error {
+	employeeTokenClaims, err := utils.GetEmployeeTokenClaims(context)
+	if err != nil {
+		return utils.ReturnErrorResponse(fiber.StatusUnauthorized, err, context)
+	}
+
+	if employeeTokenClaims.Role != models.EMPLOYEE_ROLE {
+		return utils.ReturnErrorResponse(fiber.StatusUnauthorized, errors.New("user not is employee"), context)
+	}
+
+	return context.Next()
+}

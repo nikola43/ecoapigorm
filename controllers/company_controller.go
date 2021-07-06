@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"fmt"
-	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	database "github.com/nikola43/ecoapigorm/database"
 	"github.com/nikola43/ecoapigorm/models"
@@ -44,8 +43,8 @@ func GetCompanies(context *fiber.Ctx) error {
 func CreateCompany(context *fiber.Ctx) error {
 	createCompanyRequest := new(companyModels.CreateCompanyRequest)
 	createCompanyResponse := new(companyModels.CreateCompanyResponse)
-	company := models.Company{}
-	employee := models.Employee{}
+	company := new(models.Company)
+	employee := new(models.Employee)
 
 	employeeTokenClaims, err := utils.GetEmployeeTokenClaims(context)
 	if err != nil {
@@ -55,46 +54,13 @@ func CreateCompany(context *fiber.Ctx) error {
 	fmt.Println("employeeTokenClaims")
 	fmt.Println(employeeTokenClaims)
 
-	// parse request
-	if err = context.BodyParser(createCompanyRequest);
-		err != nil {
-		return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-			"error": err.Error(),
-		})
-	}
-
-	// validation ---------------------------------------------------------------------
-	v := validator.New()
-	err = v.Struct(createCompanyRequest)
+	err = utils.ParseAndValidate(context, createCompanyRequest)
 	if err != nil {
-		for _, e := range err.(validator.ValidationErrors) {
-			if e != nil {
-				return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-					"error": "validation_error: " + e.Field(),
-				})
-			}
-		}
-	}
-
-	// check if employee exist
-	GormDBResult := database.GormDB.
-		Where("id = ?", employeeTokenClaims.ID).
-		Find(&employee)
-
-	if GormDBResult.Error != nil {
-		return context.Status(fiber.StatusInternalServerError).JSON(&fiber.Map{
-			"error": "internal server",
-		})
-	}
-
-	if employeeTokenClaims.ID < 1 {
-		return context.Status(fiber.StatusNotFound).JSON(&fiber.Map{
-			"error": "employee id not found",
-		})
+		return utils.ReturnErrorResponse(fiber.StatusNotFound, err, context)
 	}
 
 	// check if Company already exist
-	GormDBResult = database.GormDB.
+	GormDBResult := database.GormDB.
 		Where("name = ?", createCompanyRequest.Name).
 		Find(&company)
 

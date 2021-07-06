@@ -84,7 +84,7 @@ func GetClientsByClinicID(id uint) ([]clients.ListClientResponse, error) {
 		return nil, errors.New("clinic_id not found")
 	}
 
-	database.GormDB.Where("clinic_id = ?", id).Find(&listClinicClients)
+	database.GormDB.Order("created_at desc").Where("clinic_id = ?", id).Find(&listClinicClients)
 
 	if len(listClinicClients) == 0 {
 		return list, nil
