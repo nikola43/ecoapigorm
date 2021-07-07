@@ -105,8 +105,9 @@ func HandleRoutes(api fiber.Router) {
 	routes.CompanyRoutes(api)
 	routes.PromoRoutes(api)
 	routes.StreamingRoutes(api)
+	multimedia := api.Group("/multimedia")
+	routes.MultimediaClinicRoutes(multimedia)
 	routes.MultimediaClientRoutes(api)
-	routes.MultimediaClinicRoutes(api)
 	routes.PaymentRoutes(api)
 }
 

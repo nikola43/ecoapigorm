@@ -7,8 +7,7 @@ import (
 	"github.com/nikola43/ecoapigorm/utils"
 )
 
-func MultimediaClientRoutes (router fiber.Router) {
-	multimediaRouter := router.Group("/multimedia")
+func MultimediaClientRoutes (multimediaRouter fiber.Router) {
 
 	multimediaClientRouter := multimediaRouter.Group("/client")
 
