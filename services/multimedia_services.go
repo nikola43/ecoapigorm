@@ -213,14 +213,11 @@ func UploadMultimedia(
 				Data:   imageUpdate,
 			}
 
-			defer func() {
-				websockets.Emit(socketEvent, employeeID)
-				websockets.Emit(socketEvent, clientID)
-
-				if socketError := recover(); socketError != nil {
-					log.Println("panic occurred:", socketError)
-				}
-			}()
+			websockets.Emit(socketEvent, employeeID)
+			websockets.Emit(socketEvent, clientID)
+			if socketError := recover(); socketError != nil {
+				log.Println("panic occurred:", socketError)
+			}
 		}()
 
 		return err
@@ -251,7 +248,6 @@ func UploadMultimedia(
 			return storeThumbInAmazonError
 		}
 
-
 		if fileType == "video" {
 			video = models.Video{
 				Filename:     cleanFilename,
@@ -273,14 +269,12 @@ func UploadMultimedia(
 				Data:   video,
 			}
 
-			defer func() {
-				websockets.Emit(socketEvent, employeeID)
-				websockets.Emit(socketEvent, clientID)
+			websockets.Emit(socketEvent, employeeID)
+			websockets.Emit(socketEvent, clientID)
 
-				if socketError := recover(); socketError != nil {
-					log.Println("panic occurred:", socketError)
-				}
-			}()
+			if socketError := recover(); socketError != nil {
+				log.Println("panic occurred:", socketError)
+			}
 
 		}
 
@@ -356,14 +350,13 @@ func UploadMultimedia(
 				Data:   videoUpdate,
 			}
 
-			defer func() {
-				websockets.Emit(socketEvent, employeeID)
-				websockets.Emit(socketEvent, clientID)
+			websockets.Emit(socketEvent, employeeID)
+			websockets.Emit(socketEvent, clientID)
 
-				if socketError := recover(); socketError != nil {
-					log.Println("panic occurred:", socketError)
-				}
-			}()
+			if socketError := recover(); socketError != nil {
+				log.Println("panic occurred:", socketError)
+			}
+		
 		}()
 
 		return err
