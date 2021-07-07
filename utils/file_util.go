@@ -26,9 +26,9 @@ import (
 
 
 //const FFMPEG_PATH = "/usr/bin/ffmpeg"
-const FFMPEG_PATH = "ffmpeg"
+//const FFMPEG_PATH = "ffmpeg"
 
-//const FFMPEG_PATH = "/usr/local/bin/ffmpeg"
+const FFMPEG_PATH = "/usr/local/bin/ffmpeg"
 
 /**
 Check if file exist and its size
