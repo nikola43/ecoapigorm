@@ -2,7 +2,9 @@ package routes
 
 import (
 	"github.com/gofiber/fiber/v2"
+	jwtware "github.com/gofiber/jwt/v2"
 	"github.com/nikola43/ecoapigorm/controllers"
+	"github.com/nikola43/ecoapigorm/utils"
 )
 
 func MultimediaClinicRoutes (multimediaRouter fiber.Router) {
@@ -10,8 +12,7 @@ func MultimediaClinicRoutes (multimediaRouter fiber.Router) {
 
 	// use middleware
 	// TODO hacer endpoints solo para clientes
-	//multimediaClinicRouter.Use(jwtware.New(jwtware.Config{SigningKey: []byte(utils.GetEnvVariable("JWT_EMPLOYEE_KEY"))}))
-
+	multimediaClinicRouter.Use(jwtware.New(jwtware.Config{SigningKey: []byte(utils.GetEnvVariable("JWT_EMPLOYEE_KEY"))}))
 
 	// /api/v1/multimedia/images/:id
 	multimediaRouter.Delete("/images/:id", controllers.DeleteImage)
