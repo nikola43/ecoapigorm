@@ -207,7 +207,7 @@ func UploadMultimedia(
 				//panic(e)
 			}
 
-			socketEvent := websockets.SocketEvent{
+			socketEvent = websockets.SocketEvent{
 				Type:   "image",
 				Action: "update",
 				Data:   imageUpdate,
