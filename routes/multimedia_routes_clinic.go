@@ -10,6 +10,18 @@ import (
 func MultimediaClinicRoutes (multimediaRouter fiber.Router) {
 	multimediaClinicRouter := multimediaRouter.Group("/clinic")
 
+
+	// /api/v1/multimedia/clinic/:clinic_id/:client_id/images
+	multimediaClinicRouter.Get("/:clinic_id/client/:client_id/images", controllers.GetAllImagesByClientAndClinicID)
+
+	multimediaClinicRouter.Get("/:clinic_id/client/:client_id/videos", controllers.GetAllVideosByClientAndClinicID)
+
+	multimediaClinicRouter.Get("/:clinic_id/client/:client_id/heartbeat", controllers.GetHeartbeatByClientAndClinicID)
+
+	multimediaClinicRouter.Get("/:clinic_id/client/:client_id/streamings", controllers.GetAllStreamingByClientANDClinicID)
+
+	multimediaClinicRouter.Get("/:clinic_id/client/:client_id/holographics", controllers.GetAllHolographicsByClientID)
+
 	// use middleware
 	// TODO hacer endpoints solo para clientes
 	multimediaClinicRouter.Use(jwtware.New(jwtware.Config{SigningKey: []byte(utils.GetEnvVariable("JWT_EMPLOYEE_KEY"))}))
@@ -31,15 +43,4 @@ func MultimediaClinicRoutes (multimediaRouter fiber.Router) {
 
 	// /api/v1/multimedia/clinic/:clinic_id/promo/:promo_id/upload
 	multimediaClinicRouter.Post("/:clinic_id/promo/:promo_id/upload", controllers.UploadPromoImage)
-
-	// /api/v1/multimedia/clinic/:clinic_id/:client_id/images
-	multimediaClinicRouter.Get("/:clinic_id/client/:client_id/images", controllers.GetAllImagesByClientAndClinicID)
-
-	multimediaClinicRouter.Get("/:clinic_id/client/:client_id/videos", controllers.GetAllVideosByClientAndClinicID)
-
-	multimediaClinicRouter.Get("/:clinic_id/client/:client_id/heartbeat", controllers.GetHeartbeatByClientAndClinicID)
-
-	multimediaClinicRouter.Get("/:clinic_id/client/:client_id/streamings", controllers.GetAllStreamingByClientANDClinicID)
-
-	multimediaClinicRouter.Get("/:clinic_id/client/:client_id/holographics", controllers.GetAllHolographicsByClientID)
 }
