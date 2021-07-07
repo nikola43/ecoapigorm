@@ -134,21 +134,6 @@ func UploadMultimedia(
 		insertedID = image.ID
 		fmt.Println(insertedID)
 
-		socketEvent := websockets.SocketEvent{
-			Type:   "image",
-			Action: "insert",
-			Data:   image,
-		}
-
-		defer func() {
-			websockets.Emit(socketEvent, employeeID)
-			websockets.Emit(socketEvent, clientID)
-
-			if socketError := recover(); socketError != nil {
-				log.Println("panic occurred:", socketError)
-			}
-		}()
-
 		go func() {
 			/*
 				err = utils.CompressImage("tempFiles/"+clinicName+"/"+clientIDString+"/"+cleanFilename, "tempFiles/"+clinicName+"/"+clientIDString+"/"+fileType+"/"+cleanFilename)
@@ -207,9 +192,9 @@ func UploadMultimedia(
 				//panic(e)
 			}
 
-			socketEvent = websockets.SocketEvent{
+			socketEvent := websockets.SocketEvent{
 				Type:   "image",
-				Action: "update",
+				Action: "insert",
 				Data:   imageUpdate,
 			}
 
@@ -356,7 +341,7 @@ func UploadMultimedia(
 			if socketError := recover(); socketError != nil {
 				log.Println("panic occurred:", socketError)
 			}
-		
+
 		}()
 
 		return err
