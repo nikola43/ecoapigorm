@@ -82,7 +82,9 @@ func UploadMultimedia(context *fiber.Ctx) error {
 	uploadMode, _ := strconv.ParseUint(context.Params("upload_mode"), 10, 64)
 	uploadedFile, err := context.FormFile("file")
 	if err != nil {
-		return context.SendStatus(fiber.StatusUnauthorized)
+		 return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+			"error": err.Error(),
+		})
 	}
 
 
