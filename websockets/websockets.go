@@ -18,13 +18,13 @@ var SocketInstance *ikisocket.Websocket
 var SocketClients map[string]string = make(map[string]string, 0)
 
 func  Emit(socketEvent SocketEvent, id uint) {
-	event, err := json.Marshal(socketEvent)
-	if err != nil {
-		fmt.Println(err)
-	}
-
 	var socketClientId = strconv.FormatUint(uint64(id), 10)
 	if uuid, found := SocketClients[socketClientId]; found {
+		event, err := json.Marshal(socketEvent)
+		if err != nil {
+			fmt.Println(err)
+		}
+
 		emitSocketErr := SocketInstance.EmitTo(uuid, event)
 		if emitSocketErr != nil {
 			fmt.Println(emitSocketErr)
