@@ -25,8 +25,8 @@ import (
 )
 
 
-const FFMPEG_PATH = "/usr/bin/ffmpeg"
-//const FFMPEG_PATH = "ffmpeg"
+//const FFMPEG_PATH = "/usr/bin/ffmpeg"
+const FFMPEG_PATH = "ffmpeg"
 
 //const FFMPEG_PATH = "/usr/local/bin/ffmpeg"
 
@@ -240,12 +240,19 @@ func ConvertAudioToMp4Aac(inFile, outFile string) error {
 		return errors.New("not such file")
 	}
 
-	// we can store the output of this in our out variable
-	// and catch any errors in err
-	//cmd := FFMPEG_PATH + " -i " + inFile +" -y " + outFile
-	//fmt.Println(cmd)
-	// 		//ffmpeg -i input.wav -ab 192k -acodec libfaac output.mp4
-	out, err := exec.Command(FFMPEG_PATH, "-i", inFile, "-ab", "192k", "-acodec", "libfaac", "-y", outFile).Output()
+	// ffmpeg -i sayyourprayers.wav -vn -ar 44100 -ac 2 -b:a 192k output-file.mp3
+	out, err := exec.Command(FFMPEG_PATH,
+		"-i",
+		inFile,
+		"-vn",
+		"-ar",
+		"44100",
+		"-ac",
+		"2",
+		"-b:a",
+		"192k",
+		"-y",
+		outFile).Output()
 
 	// if there is an error with our execution
 	// handle it here
