@@ -4,7 +4,6 @@ import (
 	"bytes"
 	crand "crypto/rand"
 	"encoding/binary"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/joho/godotenv"
@@ -23,7 +22,6 @@ import (
 	"strings"
 	"time"
 )
-
 
 //const FFMPEG_PATH = "/usr/bin/ffmpeg"
 //const FFMPEG_PATH = "ffmpeg"
@@ -131,7 +129,7 @@ func GenerateHologramVideo(inFile string) (string, error) {
 	return outFile, nil
 }
 
-func CompressMP4V2(inFile, outFile string, file interface{}) error {
+func CompressMP4V2(inFile, outFile string, file interface{}, employeeID, clientID uint) error {
 
 	a, err := ffmpeg.Probe(inFile)
 	if err != nil {
@@ -143,7 +141,7 @@ func CompressMP4V2(inFile, outFile string, file interface{}) error {
 
 	err = ffmpeg.Input(inFile).
 		Output(outFile, ffmpeg.KwArgs{"c:v": "libx264", "preset": "slow"}).
-		GlobalArgs("-progress", "unix://"+TempSock(totalDuration, file)).
+		GlobalArgs("-progress", "unix://"+TempSock(totalDuration, file, employeeID, clientID)).
 		OverWriteOutput().
 		Run()
 	if err != nil {
@@ -161,7 +159,7 @@ func RandomUint64() (v uint64) {
 	return v
 }
 
-func TempSock(totalDuration float64, file interface{}) string {
+func TempSock(totalDuration float64, file interface{}, employeeID, clientID uint) string {
 	// serve
 
 	// rand.Seed(time.Now().Unix())
@@ -218,8 +216,8 @@ func TempSock(totalDuration float64, file interface{}) string {
 					Data:   videoConversionProgress,
 				}
 
-				b, _ := json.Marshal(socketEvent)
-				websockets.SocketInstance.Emit(b)
+				websockets.Emit(socketEvent, employeeID)
+				websockets.Emit(socketEvent, clientID)
 
 				if socketError := recover(); socketError != nil {
 					log.Println("panic occurred:", socketError)

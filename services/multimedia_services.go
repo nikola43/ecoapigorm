@@ -271,6 +271,8 @@ func UploadMultimedia(
 			err = utils.CompressMP4V2("./tempFiles/"+clinicName+"/"+clientIDString+"/"+cleanFilename,
 				"./tempFiles/"+clinicName+"/"+clientIDString+"/"+fileType+"/"+cleanFilename,
 				video,
+				employeeID,
+				clientID,
 			)
 			if err != nil {
 				log.Fatal(err)
