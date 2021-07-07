@@ -37,9 +37,10 @@ func PassRecoveryClientService(request *recovery.PassRecoveryRequest) error {
 		ToEmail:               client.Email,
 		ToName:                client.Name,
 		RecoveryPasswordToken: apiTokenString,
+		Template:              "recovery_password.html",
+		Subject:               "Recuperar contraseña",
 	}
-
-	sendEmailManager.SendMail("recovery_password.html", "Recuperar contraseña")
+	sendEmailManager.SendMail()
 
 	return nil
 }
@@ -73,9 +74,10 @@ func PassRecoveryEmployeeService(request *recovery.PassRecoveryRequest) error {
 		ToEmail:               employee.Email,
 		ToName:                employee.Name,
 		RecoveryPasswordToken: apiTokenString,
+		Template:              "recovery_password.html",
+		Subject:               "Recuperar contraseña",
 	}
-
-	sendEmailManager.SendMail("recovery_password.html", "Recuperar contraseña")
+	sendEmailManager.SendMail()
 
 	return nil
 }

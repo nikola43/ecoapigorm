@@ -10,7 +10,7 @@ import (
 func PromoRoutes(router fiber.Router) {
 	promoRouter := router.Group("/promo")
 
-	promoRouter.Use(jwtware.New(jwtware.Config{SigningKey: []byte(utils.GetEnvVariable("JWT_CLIENT_KEY"))}))
+	promoRouter.Use(jwtware.New(jwtware.Config{SigningKey: []byte(utils.GetEnvVariable("JWT_EMPLOYEE_KEY"))}))
 
 	// /api/v1/promo/create
 	promoRouter.Post("/", controllers.CreatePromo)

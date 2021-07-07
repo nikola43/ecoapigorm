@@ -6,7 +6,6 @@ import (
 
 type Promo struct {
 	base.CustomGormModel
-	ClinicID uint   `gorm:"type:INTEGER not null" json:"clinic_id"`
 	Title    string `gorm:"type:varchar(64) not null" json:"title"`
 	Text     string `gorm:"type:varchar(256) not null" json:"text"`
 	ImageUrl string `gorm:"type:varchar(256) not null" json:"image_url"`

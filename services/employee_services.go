@@ -14,8 +14,6 @@ func CreateEmployeeFromPanel(createEmployeeRequest *modelsEmployees.CreateEmploy
 	// todo cambiar role por constantes
 	// create newEmployee on DB
 	newEmployee := models.Employee{
-		ParentEmployeeID: createEmployeeRequest.ParentEmployeeID,
-		CompanyID:        createEmployeeRequest.CompanyID,
 		ClinicID:         createEmployeeRequest.ClinicID,
 		Name:             createEmployeeRequest.Name,
 		Email:            createEmployeeRequest.Email,
@@ -74,12 +72,11 @@ func BuyCredits(sessionID string, clinicID uint) (*models.Payment, error) {
 }
 
 func Invite(employeeTokenClaims *models.EmployeeTokenClaims, employees []models.Employee) error {
-	// validation ---------------------------------------------------------------------
 	for _, employee := range employees {
-		temp := new(models.Employee)
-		utils.GetModelByField(temp, "email", employee.Email)
+		tempEmployee := new(models.Employee)
 
-		if temp.ClinicID > 0 {
+		utils.GetModelByField(tempEmployee, "email", employee.Email)
+		if tempEmployee.ClinicID > 0 {
 			return errors.New("employee already assigned")
 		}
 
@@ -102,20 +99,22 @@ func Invite(employeeTokenClaims *models.EmployeeTokenClaims, employees []models.
 			FromName:        employeeTokenClaims.Name,
 			ClinicName:      employeeTokenClaims.ClinicName,
 			InvitationToken: invitationToken,
+			Template:        "recovery_password.html",
 		}
 
 		database.GormDB.Create(invitation)
-		fmt.Println(invitation)
 
-		if temp.ID > 0 {
-			//text := employeeTokenClaims.Name + " de " + employeeTokenClaims.ClinicName + " te ha invitado a su clínica"
-			text := "Pablo te ha invitado a Mi Matrona"
-			sendEmailManager.SendMail("invite_to_clinic.html", text)
+		if tempEmployee.ID > 0 {
+			text := employeeTokenClaims.Name + " de " + employeeTokenClaims.ClinicName + " te ha invitado a su clínica"
+			sendEmailManager.Subject = text
+			sendEmailManager.Template = "invite_to_clinic.html"
 		} else {
-			//text := employeeTokenClaims.Name + " de " + employeeTokenClaims.ClinicName + " te ha invitado a registrarte"
-			text := "Pablo te ha invitado a Mi Matrona"
-			sendEmailManager.SendMail("invite_to_register.html", text)
+			text := employeeTokenClaims.Name + " de " + employeeTokenClaims.ClinicName + " te ha invitado a registrarte"
+			sendEmailManager.Subject = text
+			sendEmailManager.Template = "invite_to_clinic.html"
 		}
+
+		sendEmailManager.SendMail()
 	}
 
 	return nil
@@ -140,12 +139,6 @@ func DeleteEmployeeByEmployeeID(parentEmployeeID, deletedEmployeeID uint) error 
 		database.GormDB.Model(&deleteEmployeeClinic).Update("employee_id", parentEmployeeID)
 	}
 
-
-	// check if employee who make action has deleted employee parent
-	if deleteEmployee.ParentEmployeeID != parentEmployeeID {
-		// update clinic employee id with parent employee id
-		return errors.New("only parent employee can delete employee")
-	}
 
 	// delete employee
 	result := database.GormDB.Delete(deleteEmployee)

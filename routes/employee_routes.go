@@ -28,19 +28,19 @@ func EmployeeRoutes(router fiber.Router) {
 	employeeRouter.Get("/validate_invitation/:invitation_token", controllers.ValidateInvitation)
 
 	// use jwt
-	employeeRouter.Use(jwtware.New(jwtware.Config{SigningKey: []byte(utils.GetEnvVariable("JWT_CLIENT_KEY"))}))
+	employeeRouter.Use(jwtware.New(jwtware.Config{SigningKey: []byte(utils.GetEnvVariable("JWT_EMPLOYEE_KEY"))}))
 
 	// /api/v1/employee/invite
 	employeeRouter.Post("/invite", controllers.Invite)
 
-	// check Employee.Role == 'admin'
-	employeeRouter.Use(middleware.AdminEmployeeMiddleware)
+	// /api/v1/employee/:employee_id/companies
+	employeeRouter.Get("/:employee_id/companies", controllers.GetCompaniesByEmployeeID) //TODO revisar este servicio, no tiene sentido una lista de compañias
 
 	// /api/v1/employee/:parent_employee_id/employees
 	employeeRouter.Get("/:parent_employee_id/employees", controllers.GetEmployeesByParentEmployeeID)
 
-	// /api/v1/employee/:employee_id/companies
-	employeeRouter.Get("/:employee_id/companies", controllers.GetCompaniesByEmployeeID) //TODO revisar este servicio, no tiene sentido una lista de compañias
+	// check Employee.Role == 'admin'
+	employeeRouter.Use(middleware.AdminEmployeeMiddleware)
 
 	// /api/v1/employee/:employee_id
 	employeeRouter.Delete("/:employee_id", controllers.DeleteEmployeeByEmployeeID)

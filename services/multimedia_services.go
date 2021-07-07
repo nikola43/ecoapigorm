@@ -1,16 +1,14 @@
 package services
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/gofiber/fiber/v2"
 	database "github.com/nikola43/ecoapigorm/database"
 	"github.com/nikola43/ecoapigorm/models"
-	"github.com/nikola43/ecoapigorm/models/promos"
-	"github.com/nikola43/ecoapigorm/socketinstance"
 	"github.com/nikola43/ecoapigorm/utils"
 	"github.com/nikola43/ecoapigorm/wasabis3manager"
+	"github.com/nikola43/ecoapigorm/websockets"
 	"io/ioutil"
 	"log"
 	"mime/multipart"
@@ -25,7 +23,7 @@ func UploadPromoImage(
 	bucketName string,
 	uploadedFile *multipart.FileHeader,
 	clinicName string,
-	promo *promos.Promo,
+	promo *models.Promo,
 ) error {
 	// sanitize file name
 	reg, _ := regexp.Compile("[^a-zA-Z0-9-.]+")
@@ -68,7 +66,8 @@ func UploadMultimedia(
 	clientID uint,
 	uploadedFile *multipart.FileHeader,
 	uploadMode uint,
-	clinicId uint) error {
+	clinicId uint,
+	employeeID uint) error {
 
 	var insertedID uint
 
@@ -193,15 +192,15 @@ func UploadMultimedia(
 				//panic(e)
 			}
 
-			defer func() {
-				socketEvent := models.SocketEvent{
-					Type:   "image",
-					Action: "update",
-					Data:   imageUpdate,
-				}
+			socketEvent := websockets.SocketEvent{
+				Type:   "image",
+				Action: "update",
+				Data:   imageUpdate,
+			}
 
-				b, _ := json.Marshal(socketEvent)
-				socketinstance.SocketInstance.Emit(b)
+			defer func() {
+				websockets.Emit(socketEvent, employeeID)
+				websockets.Emit(socketEvent, clientID)
 
 				if socketError := recover(); socketError != nil {
 					log.Println("panic occurred:", socketError)
@@ -255,15 +254,15 @@ func UploadMultimedia(
 
 		if fileType == "holographic" {
 			/*
-			video = models.Holographic{
-				Filename:     cleanFilename,
-				ClientID:     clientID,
-				Url:          url,
-				ThumbnailUrl: thumbUrl,
-				Size:         uint(size + thumbSize),
-				ClinicID:     clinicId,
-			}
-			database.GormDB.Create(&video)
+				video = models.Holographic{
+					Filename:     cleanFilename,
+					ClientID:     clientID,
+					Url:          url,
+					ThumbnailUrl: thumbUrl,
+					Size:         uint(size + thumbSize),
+					ClinicID:     clinicId,
+				}
+				database.GormDB.Create(&video)
 			*/
 		}
 
@@ -317,15 +316,15 @@ func UploadMultimedia(
 				fmt.Println(e)
 			}
 
-			defer func() {
-				socketEvent := models.SocketEvent{
-					Type:   "video",
-					Action: "update",
-					Data:   videoUpdate,
-				}
+			socketEvent := websockets.SocketEvent{
+				Type:   "video",
+				Action: "update",
+				Data:   videoUpdate,
+			}
 
-				b, _ := json.Marshal(socketEvent)
-				socketinstance.SocketInstance.Emit(b)
+			defer func() {
+				websockets.Emit(socketEvent, employeeID)
+				websockets.Emit(socketEvent, clientID)
 
 				if socketError := recover(); socketError != nil {
 					log.Println("panic occurred:", socketError)
@@ -349,11 +348,17 @@ func UploadMultimedia(
 			log.Fatal(err)
 		}
 
+		err = utils.ConvertAudioToMp4Aac("tempFiles/"+clinicName+"/"+clientIDString+"/"+"heartbeat/"+cleanFilename, "tempFiles/"+clinicName+"/"+clientIDString+"/"+"heartbeat/"+cleanFilename+".mp3")
+		if err != nil {
+			log.Fatal(err)
+		}
+		//ffmpeg -i input.wav -ab 192k -acodec libfaac output.mp4
+
 		// holo
 		heartbeatUrl, hearbeatSize, storeInAmazonError := wasabis3manager.WasabiS3Client.UploadObject(
 			bucketName,
 			clinicName,
-			"tempFiles/"+clinicName+"/"+clientIDString+"/"+"heartbeat/"+cleanFilename,
+			"tempFiles/"+clinicName+"/"+clientIDString+"/"+"heartbeat/"+cleanFilename+".mp3",
 			strconv.FormatInt(int64(clientID), 10),
 			fileType)
 
@@ -366,6 +371,7 @@ func UploadMultimedia(
 
 		e := os.Remove(fmt.Sprintf("./tempFiles/%s/%s/%s/%s", clinicName, clientIDString, "heartbeat", cleanFilename))
 		e = os.Remove(fmt.Sprintf("./tempFiles/%s/%s/%s", clinicName, clientIDString, cleanFilename))
+		e = os.Remove(fmt.Sprintf("./tempFiles/%s/%s/%s", clinicName, clientIDString, cleanFilename+".mp3"))
 		if e != nil {
 			fmt.Println(e)
 		}
