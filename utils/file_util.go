@@ -25,6 +25,8 @@ import (
 )
 
 //const FFMPEG_PATH = "/usr/bin/ffmpeg"
+//const FFMPEG_PATH = "ffmpeg"
+
 const FFMPEG_PATH = "ffmpeg"
 
 //const FFMPEG_PATH = "/usr/local/bin/ffmpeg"
@@ -160,13 +162,10 @@ func RandomUint64() (v uint64) {
 	return v
 }
 
-
 func TempSock(totalDuration float64, file interface{}) string {
 	// serve
 
 	// rand.Seed(time.Now().Unix())
-
-
 
 	sockFileName := path.Join(os.TempDir(), fmt.Sprintf("%d_sock", RandomUint64()))
 	l, err := net.Listen("unix", sockFileName)
@@ -205,10 +204,9 @@ func TempSock(totalDuration float64, file interface{}) string {
 				progress = cp
 
 				type VideoConversionProgress struct {
-					ID   uint      `json:"id"`
-					Progress string      `json:"progress"`
+					ID       uint   `json:"id"`
+					Progress string `json:"progress"`
 				}
-
 
 				videoConversionProgress := VideoConversionProgress{
 					ID:       file.(models.Video).ID,
@@ -234,6 +232,44 @@ func TempSock(totalDuration float64, file interface{}) string {
 	}()
 
 	return sockFileName
+}
+
+func ConvertAudioToMp4Aac(inFile, outFile string) error {
+
+	// check if input file exists
+	if !CheckIfFileExists(inFile) {
+		return errors.New("not such file")
+	}
+
+	// we can store the output of this in our out variable
+	// and catch any errors in err
+	//cmd := FFMPEG_PATH + " -i " + inFile +" -y " + outFile
+	//fmt.Println(cmd)
+	// 		//ffmpeg -i input.wav -ab 192k -acodec libfaac output.mp4
+	out, err := exec.Command(FFMPEG_PATH, "-i", inFile, "-ab", "192k", "-acodec", "libfaac", "-y", outFile).Output()
+
+	// if there is an error with our execution
+	// handle it here
+	if err != nil {
+		fmt.Printf("%s", err)
+	}
+
+	fmt.Println("Command Successfully Executed")
+	output := string(out[:])
+	fmt.Println(output)
+
+	// extract audio from video using ffmpeg library
+	// ffmpeg -i input.mp4 -vcodec h264 -acodec aac output.mp4
+	//err = ExecuteSystemCommandVerbose(FFMPEG_PATH, "-y", "-i", inFile, "-vcodec", "h264", "-acodec", "aac", outFile)
+	// -y -preset veryfast -c:v libx264 -crf 30 -c:a aac tatiana.mp4
+	//err := ExecuteSystemCommandVerbose(FFMPEG_PATH, "-i", inFile, "-y", "-preset", "veryfast", "-c:v", "libx264", "-crf", "30", "-c:a", "aac", outFile)
+	//err := ExecuteSystemCommandVerbose(FFMPEG_PATH, "-i", inFile, "-y", outFile, " >>", outFile+".txt")
+
+	if err != nil {
+		return err
+	}
+
+	return err
 }
 
 func CompressMP4(inFile, outFile string) error {
@@ -316,7 +352,6 @@ func GetEnvVariable(key string) string {
 
 	return os.Getenv(key)
 }
-
 
 /*
 // use viper package to read .env file

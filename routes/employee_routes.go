@@ -33,14 +33,14 @@ func EmployeeRoutes(router fiber.Router) {
 	// /api/v1/employee/invite
 	employeeRouter.Post("/invite", controllers.Invite)
 
-	// check Employee.Role == 'admin'
-	employeeRouter.Use(middleware.AdminEmployeeMiddleware)
+	// /api/v1/employee/:employee_id/companies
+	employeeRouter.Get("/:employee_id/companies", controllers.GetCompaniesByEmployeeID) //TODO revisar este servicio, no tiene sentido una lista de compañias
 
 	// /api/v1/employee/:parent_employee_id/employees
 	employeeRouter.Get("/:parent_employee_id/employees", controllers.GetEmployeesByParentEmployeeID)
 
-	// /api/v1/employee/:employee_id/companies
-	employeeRouter.Get("/:employee_id/companies", controllers.GetCompaniesByEmployeeID) //TODO revisar este servicio, no tiene sentido una lista de compañias
+	// check Employee.Role == 'admin'
+	employeeRouter.Use(middleware.AdminEmployeeMiddleware)
 
 	// /api/v1/employee/:employee_id
 	employeeRouter.Delete("/:employee_id", controllers.DeleteEmployeeByEmployeeID)

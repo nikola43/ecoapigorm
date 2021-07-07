@@ -87,8 +87,6 @@ func UploadMultimedia(context *fiber.Ctx) error {
 		})
 	}
 
-
-
 	clinic := models.Clinic{}
 	database.GormDB.First(&clinic, clinicId)
 	if clinic.ID < 1 {

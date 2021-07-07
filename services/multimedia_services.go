@@ -254,15 +254,15 @@ func UploadMultimedia(
 
 		if fileType == "holographic" {
 			/*
-			video = models.Holographic{
-				Filename:     cleanFilename,
-				ClientID:     clientID,
-				Url:          url,
-				ThumbnailUrl: thumbUrl,
-				Size:         uint(size + thumbSize),
-				ClinicID:     clinicId,
-			}
-			database.GormDB.Create(&video)
+				video = models.Holographic{
+					Filename:     cleanFilename,
+					ClientID:     clientID,
+					Url:          url,
+					ThumbnailUrl: thumbUrl,
+					Size:         uint(size + thumbSize),
+					ClinicID:     clinicId,
+				}
+				database.GormDB.Create(&video)
 			*/
 		}
 
@@ -348,11 +348,17 @@ func UploadMultimedia(
 			log.Fatal(err)
 		}
 
+		err = utils.ConvertAudioToMp4Aac("tempFiles/"+clinicName+"/"+clientIDString+"/"+"heartbeat/"+cleanFilename, "tempFiles/"+clinicName+"/"+clientIDString+"/"+"heartbeat/"+cleanFilename+".mp3")
+		if err != nil {
+			log.Fatal(err)
+		}
+		//ffmpeg -i input.wav -ab 192k -acodec libfaac output.mp4
+
 		// holo
 		heartbeatUrl, hearbeatSize, storeInAmazonError := wasabis3manager.WasabiS3Client.UploadObject(
 			bucketName,
 			clinicName,
-			"tempFiles/"+clinicName+"/"+clientIDString+"/"+"heartbeat/"+cleanFilename,
+			"tempFiles/"+clinicName+"/"+clientIDString+"/"+"heartbeat/"+cleanFilename+".mp3",
 			strconv.FormatInt(int64(clientID), 10),
 			fileType)
 
@@ -365,6 +371,7 @@ func UploadMultimedia(
 
 		e := os.Remove(fmt.Sprintf("./tempFiles/%s/%s/%s/%s", clinicName, clientIDString, "heartbeat", cleanFilename))
 		e = os.Remove(fmt.Sprintf("./tempFiles/%s/%s/%s", clinicName, clientIDString, cleanFilename))
+		e = os.Remove(fmt.Sprintf("./tempFiles/%s/%s/%s", clinicName, clientIDString, cleanFilename+".mp3"))
 		if e != nil {
 			fmt.Println(e)
 		}
