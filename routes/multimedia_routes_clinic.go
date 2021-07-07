@@ -22,6 +22,18 @@ func MultimediaClinicRoutes (multimediaRouter fiber.Router) {
 
 	multimediaClinicRouter.Get("/:clinic_id/client/:client_id/holographics", controllers.GetAllHolographicsByClientID)
 
+	// use middleware
+	// TODO hacer endpoints solo para clientes
+	multimediaClinicRouter.Use(jwtware.New(jwtware.Config{SigningKey: []byte(utils.GetEnvVariable("JWT_EMPLOYEE_KEY"))}))
+
+	// /api/v1/multimedia/clinic/:clinic_id/client/:client_id/upload/:upload_mode
+	multimediaClinicRouter.Post("/:clinic_id/client/:client_id/upload/:upload_mode", controllers.UploadMultimedia)
+
+	// /api/v1/multimedia/clinic/:clinic_id/promo/:promo_id/upload
+	multimediaClinicRouter.Post("/:clinic_id/promo/:promo_id/upload", controllers.UploadPromoImage)
+
+	multimediaRouter.Use(jwtware.New(jwtware.Config{SigningKey: []byte(utils.GetEnvVariable("JWT_EMPLOYEE_KEY"))}))
+
 	// /api/v1/multimedia/images/:id
 	multimediaRouter.Delete("/images/:id", controllers.DeleteImage)
 
@@ -34,15 +46,4 @@ func MultimediaClinicRoutes (multimediaRouter fiber.Router) {
 	// /api/v1/multimedia/heartbeat/:id
 	multimediaRouter.Delete("/heartbeat/:id", controllers.DeleteHeartbeat)
 
-	// use middleware
-	// TODO hacer endpoints solo para clientes
-	multimediaClinicRouter.Use(jwtware.New(jwtware.Config{SigningKey: []byte(utils.GetEnvVariable("JWT_EMPLOYEE_KEY"))}))
-
-
-
-	// /api/v1/multimedia/clinic/:clinic_id/client/:client_id/upload/:upload_mode
-	multimediaClinicRouter.Post("/:clinic_id/client/:client_id/upload/:upload_mode", controllers.UploadMultimedia)
-
-	// /api/v1/multimedia/clinic/:clinic_id/promo/:promo_id/upload
-	multimediaClinicRouter.Post("/:clinic_id/promo/:promo_id/upload", controllers.UploadPromoImage)
 }
