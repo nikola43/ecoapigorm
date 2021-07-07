@@ -168,7 +168,7 @@ func UploadMultimedia(
 			imageUpdate := new(models.Image)
 			imageUpdate.ID = insertedID
 			imageUpdate.Filename = image.Filename
-			result := database.GormDB.Where("id = ?", imageUrl).Find(&imageUpdate)
+			result := database.GormDB.Where("url = ?", imageUrl).Find(&imageUpdate)
 			if result.Error != nil {
 				log.Fatal(result.Error)
 			}
