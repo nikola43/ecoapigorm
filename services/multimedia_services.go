@@ -308,14 +308,12 @@ func UploadMultimedia(
 			videoUpdate := new(models.Video)
 			videoUpdate.ID = insertedID
 			videoUpdate.Filename = video.Filename
-			result := database.GormDB.Where("id = ?", videoUrl).Find(&videoUpdate)
+			result := database.GormDB.Where("url = ?", videoUrl).Find(&videoUpdate)
 			if result.Error != nil {
 				log.Fatal(result.Error)
-
 			}
 
 			database.GormDB.Model(&videoUpdate).Where("id = ?", videoUpdate.ID).Update("available", true)
-			videoUpdate.Available = true
 
 			fmt.Println("fin")
 
