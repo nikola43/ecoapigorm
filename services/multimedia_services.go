@@ -177,6 +177,7 @@ func UploadMultimedia(
 
 			database.GormDB.Model(&imageUpdate).Where("id = ?", imageUpdate.ID).Update("available", true)
 			imageUpdate.Available = true
+			imageUpdate.Url = url
 			fmt.Println(imageUrl)
 			fmt.Println(imageSize)
 
@@ -194,7 +195,7 @@ func UploadMultimedia(
 
 			socketEvent := websockets.SocketEvent{
 				Type:   "image",
-				Action: "insert",
+				Action: "update",
 				Data:   imageUpdate,
 			}
 
@@ -299,7 +300,6 @@ func UploadMultimedia(
 			)
 			if storeInAmazonError != nil {
 				log.Fatal(storeInAmazonError)
-
 			}
 
 			fmt.Println(videoUrl)
@@ -314,7 +314,8 @@ func UploadMultimedia(
 			}
 
 			database.GormDB.Model(&videoUpdate).Where("id = ?", videoUpdate.ID).Update("available", true)
-
+			videoUpdate.Available = true
+			videoUpdate.Url = url
 			fmt.Println("fin")
 
 			e := os.Remove(fmt.Sprintf("./tempFiles/%s/%s/%s", clinicName, clientIDString, cleanFilename))
