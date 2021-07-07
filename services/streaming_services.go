@@ -3,7 +3,9 @@ package services
 import (
 	"errors"
 	database "github.com/nikola43/ecoapigorm/database"
+	"github.com/nikola43/ecoapigorm/models"
 	streamings "github.com/nikola43/ecoapigorm/models/streamings"
+	"github.com/nikola43/ecoapigorm/utils"
 	"math/rand"
 	"strings"
 	"time"
@@ -22,9 +24,15 @@ func GetStreamingByCodeService(code string) (*streamings.Streaming, error) {
 
 func CreateStreaming(createStreamingRequest *streamings.CreateStreamingRequest) (*streamings.Streaming, error) {
 	streaming := &streamings.Streaming{}
+	client := new(models.Client)
 	code := ""
 
-	err := database.GormDB.Where("url = ?", createStreamingRequest.Url).Find(&streaming).Error
+	err := database.GormDB.First(&client, createStreamingRequest.ClientID).Error
+	if err != nil {
+		return nil, err
+	}
+
+	err = database.GormDB.Where("url = ?", createStreamingRequest.Url).Find(&streaming).Error
 	if err != nil {
 		return nil, err
 	}
@@ -49,6 +57,14 @@ func CreateStreaming(createStreamingRequest *streamings.CreateStreamingRequest) 
 	if err != nil {
 		return streaming, err
 	}
+	
+	sendEmailManager := utils.SendEmailManager{
+		ToEmail:               client.Email,
+		ToName:                client.Name,
+		Template:              "streaming_email.html",
+		Subject:               "Nuevo streaming disponible en mimatrona",
+	}
+	sendEmailManager.SendMail()
 
 	return streaming, nil
 }

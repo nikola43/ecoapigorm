@@ -18,6 +18,8 @@ type SendEmailManager struct {
 	RecoveryToken         string
 	InvitationToken       string
 	RecoveryPasswordToken string
+	StreamingUrl string
+	StreamingCode string
 	Template string
 	Subject string
 }
