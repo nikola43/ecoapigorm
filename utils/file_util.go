@@ -24,10 +24,9 @@ import (
 	"time"
 )
 
-//const FFMPEG_PATH = "/usr/bin/ffmpeg"
-//const FFMPEG_PATH = "ffmpeg"
 
-const FFMPEG_PATH = "ffmpeg"
+const FFMPEG_PATH = "/usr/bin/ffmpeg"
+//const FFMPEG_PATH = "ffmpeg"
 
 //const FFMPEG_PATH = "/usr/local/bin/ffmpeg"
 
@@ -143,7 +142,7 @@ func CompressMP4V2(inFile, outFile string, file interface{}) error {
 	fmt.Println(totalDuration)
 
 	err = ffmpeg.Input(inFile).
-		Output(outFile, ffmpeg.KwArgs{"c:v": "libx264", "preset": "veryslow"}).
+		Output(outFile, ffmpeg.KwArgs{"c:v": "libx264", "preset": "slow"}).
 		GlobalArgs("-progress", "unix://"+TempSock(totalDuration, file)).
 		OverWriteOutput().
 		Run()
