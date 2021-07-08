@@ -13,6 +13,7 @@ import (
 	"github.com/nikola43/ecoapigorm/utils"
 	_ "github.com/nikola43/ecoapigorm/utils"
 	"gorm.io/gorm"
+	"sort"
 )
 
 func CreateClinic(createClinicRequest *clinicModels.CreateClinicRequest) (*clinicModels.CreateClinicResponse, error) {
@@ -84,7 +85,7 @@ func GetClientsByClinicID(id uint) ([]clients.ListClientResponse, error) {
 		return nil, errors.New("clinic_id not found")
 	}
 
-	database.GormDB.Order("created_at desc").Where("clinic_id = ?", id).Find(&listClinicClients)
+	database.GormDB.Where("clinic_id = ?", id).Find(&listClinicClients)
 
 	if len(listClinicClients) == 0 {
 		return list, nil
@@ -116,6 +117,10 @@ func GetClientsByClinicID(id uint) ([]clients.ListClientResponse, error) {
 			},
 		)
 	}
+
+	sort.Slice(list, func(i, j int) bool {
+		return list[j].CreatedAt.Before(list[i].CreatedAt)
+	})
 
 	return list, nil
 }
