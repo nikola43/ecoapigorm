@@ -4,7 +4,6 @@ import (
 	"github.com/gofiber/fiber/v2"
 	jwtware "github.com/gofiber/jwt/v2"
 	"github.com/nikola43/ecoapigorm/controllers"
-	"github.com/nikola43/ecoapigorm/middleware"
 	"github.com/nikola43/ecoapigorm/utils"
 )
 
@@ -59,7 +58,7 @@ func ClinicRoutes(router fiber.Router) {
 	clinicRouter.Get("/:clinic_id/credits", controllers.GetCreditsClinicById)
 
 	// check Employee.Role == 'admin'
-	clinicRouter.Use(middleware.AdminEmployeeMiddleware)
+	//clinicRouter.Use(middleware.AdminEmployeeMiddleware)
 
 	// /api/v1/clinic/create
 	clinicRouter.Post("/", controllers.CreateClinic)
