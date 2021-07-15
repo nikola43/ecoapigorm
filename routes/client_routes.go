@@ -29,19 +29,4 @@ func ClientRoutes(router fiber.Router) {
 
 	// /api/v1/clinic/refresh
 	clientRouter.Get("/:client_id/refresh", controllers.RefreshClient)
-
-	// use jwt
-	clientRouter.Use(jwtware.New(jwtware.Config{SigningKey: []byte(utils.GetEnvVariable("JWT_EMPLOYEE_KEY"))}))
-
-	// /api/v1/client | CREATE
-	clientRouter.Post("/", controllers.CreateClient)
-
-	// /api/v1/client | CREATE
-	clientRouter.Post("/notify", controllers.NotifyClient)
-
-	// /api/v1/client/:client_email | READ
-	clientRouter.Post("/:client_id/increment_disk_quote_level", controllers.IncrementDiskQuoteLevel)
-
-	// /api/v1/client/:client_id | UPDATE
-	clientRouter.Patch("/:client_id", controllers.UpdateClient)
 }
