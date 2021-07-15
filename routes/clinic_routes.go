@@ -15,8 +15,6 @@ func ClinicRoutes(router fiber.Router) {
 	// /api/v1/clinic
 	clientRouter := router.Group("/client")
 
-	// /api/v1/client | CREATE
-	clientRouter.Post("/", controllers.CreateClient)
 
 	// /api/v1/clinic/:clinic_id/streamings
 	clinicRouter.Get("/:clinic_id/streamings", controllers.GetAllStreamingByClinicID)

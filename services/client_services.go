@@ -131,7 +131,7 @@ func GetClientClinicIDByEmail(clinicID uint, clientEmail string) (*modelsClients
 		PregnancyDate:  client.PregnancyDate,
 		UsedSize:       totalSize,
 		DiskQuoteLevel: clinicClient.DiskQuoteLevel,
-		ProfileColor: client.ProfileColor,
+		ProfileColor:   client.ProfileColor,
 	}
 
 	return clientResponse, nil
@@ -170,7 +170,7 @@ func GetClientById(clinicID, clientID uint) (*modelsClients.ListClientResponse, 
 		PregnancyDate:  client.PregnancyDate,
 		UsedSize:       totalSize,
 		DiskQuoteLevel: clinicClient.DiskQuoteLevel,
-		ProfileColor: client.ProfileColor,
+		ProfileColor:   client.ProfileColor,
 	}
 
 	return clientResponse, nil
@@ -187,7 +187,7 @@ func GetAllImagesByClientID(clientID uint) ([]models.Image, error) {
 	return list, nil
 }
 
-func GetAllImagesByClientAndClinicID(clientID uint,clinicID uint) ([]models.Image, error) {
+func GetAllImagesByClientAndClinicID(clientID uint, clinicID uint) ([]models.Image, error) {
 	var list = make([]models.Image, 0)
 	if err := database.GormDB.
 		Where("client_id = ? AND clinic_id = ?", clientID, clinicID).
@@ -210,7 +210,7 @@ func GetAllVideosByClientID(clientID uint) ([]models.Video, error) {
 	return list, nil
 }
 
-func GetAllVideosByClientAndClinicID(clientID uint,clinicID uint) ([]models.Video, error) {
+func GetAllVideosByClientAndClinicID(clientID uint, clinicID uint) ([]models.Video, error) {
 	var list = make([]models.Video, 0)
 
 	if err := database.GormDB.
@@ -248,7 +248,7 @@ func GetAllStreamingByClientID(clientID string) ([]streamingModels.Streaming, er
 	return list, nil
 }
 
-func GetAllStreamingByClientANDClinicID(clientID string,clinicID string) ([]streamingModels.Streaming, error) {
+func GetAllStreamingByClientANDClinicID(clientID string, clinicID string) ([]streamingModels.Streaming, error) {
 	var list = make([]streamingModels.Streaming, 0)
 
 	if err := database.GormDB.
@@ -284,7 +284,7 @@ func RefreshClient(clientID uint) (*models.LoginClientResponse, error) {
 
 	err := database.GormDB.
 		Preload("Clinics").
-		First(&client,clientID).Error
+		First(&client, clientID).Error
 	if err != nil {
 		return nil, err
 	}
@@ -305,7 +305,7 @@ func RefreshClient(clientID uint) (*models.LoginClientResponse, error) {
 		Phone:         client.Phone,
 		LastName:      client.LastName,
 		Token:         token,
-		Clinics: client.Clinics,
+		Clinics:       client.Clinics,
 		PregnancyDate: client.PregnancyDate,
 	}
 

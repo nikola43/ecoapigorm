@@ -29,4 +29,8 @@ func ClientRoutes(router fiber.Router) {
 
 	// /api/v1/clinic/refresh
 	clientRouter.Get("/:client_id/refresh", controllers.RefreshClient)
+
+	// /api/v1/client | CREATE
+	clientRouter.Post("/", controllers.CreateClient)
+
 }
