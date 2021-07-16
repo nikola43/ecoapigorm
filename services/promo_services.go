@@ -27,12 +27,12 @@ func CreatePromoService(promoRequest *promos.CreatePromoRequest) (*promos.Promo,
 		EndAt:    promoRequest.EndAt,
 	}
 
-	err := database.GormDB.Create(&promo).Error
+	err := database.GormDB.Create(&newPromo).Error
 	if err != nil {
 		return nil, err
 	}
 
-	return promo, nil
+	return &newPromo, nil
 }
 
 func DeletePromoByID(id uint) error {

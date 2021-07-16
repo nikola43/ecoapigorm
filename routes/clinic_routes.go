@@ -13,7 +13,7 @@ func ClinicRoutes(router fiber.Router) {
 
 	// /api/v1/clinic
 	clientRouter := router.Group("/client")
- 
+
 	// /api/v1/client/:client_id | UPDATE
 	clientRouter.Patch("/:client_id", controllers.UpdateClient)
 
@@ -35,8 +35,7 @@ func ClinicRoutes(router fiber.Router) {
 	// /api/v1/clinic/:clinic_id/client/:client_email/exist | READ
 	clinicRouter.Get("/:clinic_id/client/:client_email/exist", controllers.GetClientClinicIDByEmail)
 
-
-
+	
 	// /api/v1/clinic/:clinic_id/promos
 	clinicRouter.Get("/:clinic_id/promos", controllers.GetAllPromosByClinicID)
 
