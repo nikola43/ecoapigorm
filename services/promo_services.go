@@ -29,10 +29,10 @@ func GetAllPromos() ([]promos.Promo, error) {
 
 func CreatePromoService(promoRequest *promos.CreatePromoRequest) (*promos.Promo, error) {
 	newPromo := promos.Promo{
-		ClinicID: promoRequest.ClinicID,
 		Title:    promoRequest.Title,
 		Text:     promoRequest.Text,
 		Week:     promoRequest.Week,
+		ImageUrl: promoRequest.ImageUrl,
 		StartAt:  promoRequest.StartAt,
 		EndAt:    promoRequest.EndAt,
 	}
