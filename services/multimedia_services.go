@@ -1,16 +1,14 @@
 package services
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/gofiber/fiber/v2"
 	database "github.com/nikola43/ecoapigorm/database"
 	"github.com/nikola43/ecoapigorm/models"
-	"github.com/nikola43/ecoapigorm/models/promos"
-	"github.com/nikola43/ecoapigorm/socketinstance"
 	"github.com/nikola43/ecoapigorm/utils"
 	"github.com/nikola43/ecoapigorm/wasabis3manager"
+	"github.com/nikola43/ecoapigorm/websockets"
 	"io/ioutil"
 	"log"
 	"mime/multipart"
@@ -25,7 +23,7 @@ func UploadPromoImage(
 	bucketName string,
 	uploadedFile *multipart.FileHeader,
 	clinicName string,
-	promo *promos.Promo,
+	promo *models.Promo,
 ) error {
 	// sanitize file name
 	reg, _ := regexp.Compile("[^a-zA-Z0-9-.]+")
@@ -68,7 +66,8 @@ func UploadMultimedia(
 	clientID uint,
 	uploadedFile *multipart.FileHeader,
 	uploadMode uint,
-	clinicId uint) error {
+	clinicId uint,
+	employeeID uint) error {
 
 	var insertedID uint
 
@@ -169,7 +168,7 @@ func UploadMultimedia(
 			imageUpdate := new(models.Image)
 			imageUpdate.ID = insertedID
 			imageUpdate.Filename = image.Filename
-			result := database.GormDB.Where("id = ?", imageUrl).Find(&imageUpdate)
+			result := database.GormDB.Where("url = ?", imageUrl).Find(&imageUpdate)
 			if result.Error != nil {
 				log.Fatal(result.Error)
 			}
@@ -178,6 +177,7 @@ func UploadMultimedia(
 
 			database.GormDB.Model(&imageUpdate).Where("id = ?", imageUpdate.ID).Update("available", true)
 			imageUpdate.Available = true
+			imageUpdate.Url = url
 			fmt.Println(imageUrl)
 			fmt.Println(imageSize)
 
@@ -193,20 +193,17 @@ func UploadMultimedia(
 				//panic(e)
 			}
 
-			defer func() {
-				socketEvent := models.SocketEvent{
-					Type:   "image",
-					Action: "update",
-					Data:   imageUpdate,
-				}
+			socketEvent := websockets.SocketEvent{
+				Type:   "image",
+				Action: "update",
+				Data:   imageUpdate,
+			}
 
-				b, _ := json.Marshal(socketEvent)
-				socketinstance.SocketInstance.Emit(b)
-
-				if socketError := recover(); socketError != nil {
-					log.Println("panic occurred:", socketError)
-				}
-			}()
+			websockets.Emit(socketEvent, employeeID)
+			websockets.Emit(socketEvent, clientID)
+			if socketError := recover(); socketError != nil {
+				log.Println("panic occurred:", socketError)
+			}
 		}()
 
 		return err
@@ -251,19 +248,33 @@ func UploadMultimedia(
 
 			insertedID = video.ID
 			fmt.Println(insertedID)
+
+			socketEvent := websockets.SocketEvent{
+				Type:   "video",
+				Action: "insert",
+				Data:   video,
+			}
+
+			websockets.Emit(socketEvent, employeeID)
+			websockets.Emit(socketEvent, clientID)
+
+			if socketError := recover(); socketError != nil {
+				log.Println("panic occurred:", socketError)
+			}
+
 		}
 
 		if fileType == "holographic" {
 			/*
-			video = models.Holographic{
-				Filename:     cleanFilename,
-				ClientID:     clientID,
-				Url:          url,
-				ThumbnailUrl: thumbUrl,
-				Size:         uint(size + thumbSize),
-				ClinicID:     clinicId,
-			}
-			database.GormDB.Create(&video)
+				video = models.Holographic{
+					Filename:     cleanFilename,
+					ClientID:     clientID,
+					Url:          url,
+					ThumbnailUrl: thumbUrl,
+					Size:         uint(size + thumbSize),
+					ClinicID:     clinicId,
+				}
+				database.GormDB.Create(&video)
 			*/
 		}
 
@@ -272,6 +283,8 @@ func UploadMultimedia(
 			err = utils.CompressMP4V2("./tempFiles/"+clinicName+"/"+clientIDString+"/"+cleanFilename,
 				"./tempFiles/"+clinicName+"/"+clientIDString+"/"+fileType+"/"+cleanFilename,
 				video,
+				employeeID,
+				clientID,
 			)
 			if err != nil {
 				log.Fatal(err)
@@ -287,7 +300,6 @@ func UploadMultimedia(
 			)
 			if storeInAmazonError != nil {
 				log.Fatal(storeInAmazonError)
-
 			}
 
 			fmt.Println(videoUrl)
@@ -296,15 +308,14 @@ func UploadMultimedia(
 			videoUpdate := new(models.Video)
 			videoUpdate.ID = insertedID
 			videoUpdate.Filename = video.Filename
-			result := database.GormDB.Where("id = ?", videoUrl).Find(&videoUpdate)
+			result := database.GormDB.Where("url = ?", videoUrl).Find(&videoUpdate)
 			if result.Error != nil {
 				log.Fatal(result.Error)
-
 			}
 
 			database.GormDB.Model(&videoUpdate).Where("id = ?", videoUpdate.ID).Update("available", true)
 			videoUpdate.Available = true
-
+			videoUpdate.Url = url
 			fmt.Println("fin")
 
 			e := os.Remove(fmt.Sprintf("./tempFiles/%s/%s/%s", clinicName, clientIDString, cleanFilename))
@@ -317,20 +328,19 @@ func UploadMultimedia(
 				fmt.Println(e)
 			}
 
-			defer func() {
-				socketEvent := models.SocketEvent{
-					Type:   "video",
-					Action: "update",
-					Data:   videoUpdate,
-				}
+			socketEvent := websockets.SocketEvent{
+				Type:   "video",
+				Action: "update",
+				Data:   videoUpdate,
+			}
 
-				b, _ := json.Marshal(socketEvent)
-				socketinstance.SocketInstance.Emit(b)
+			websockets.Emit(socketEvent, employeeID)
+			websockets.Emit(socketEvent, clientID)
 
-				if socketError := recover(); socketError != nil {
-					log.Println("panic occurred:", socketError)
-				}
-			}()
+			if socketError := recover(); socketError != nil {
+				log.Println("panic occurred:", socketError)
+			}
+
 		}()
 
 		return err
@@ -349,11 +359,17 @@ func UploadMultimedia(
 			log.Fatal(err)
 		}
 
+		err = utils.ConvertAudioToMp4Aac("tempFiles/"+clinicName+"/"+clientIDString+"/"+"heartbeat/"+cleanFilename, "tempFiles/"+clinicName+"/"+clientIDString+"/"+"heartbeat/"+cleanFilename+".mp3")
+		if err != nil {
+			log.Fatal(err)
+		}
+		//ffmpeg -i input.wav -ab 192k -acodec libfaac output.mp4
+
 		// holo
 		heartbeatUrl, hearbeatSize, storeInAmazonError := wasabis3manager.WasabiS3Client.UploadObject(
 			bucketName,
 			clinicName,
-			"tempFiles/"+clinicName+"/"+clientIDString+"/"+"heartbeat/"+cleanFilename,
+			"tempFiles/"+clinicName+"/"+clientIDString+"/"+"heartbeat/"+cleanFilename+".mp3",
 			strconv.FormatInt(int64(clientID), 10),
 			fileType)
 
@@ -366,6 +382,7 @@ func UploadMultimedia(
 
 		e := os.Remove(fmt.Sprintf("./tempFiles/%s/%s/%s/%s", clinicName, clientIDString, "heartbeat", cleanFilename))
 		e = os.Remove(fmt.Sprintf("./tempFiles/%s/%s/%s", clinicName, clientIDString, cleanFilename))
+		e = os.Remove(fmt.Sprintf("./tempFiles/%s/%s/%s", clinicName, clientIDString, cleanFilename+".mp3"))
 		if e != nil {
 			fmt.Println(e)
 		}

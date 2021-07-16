@@ -1,30 +1,20 @@
 package services
 
 import (
-	"errors"
-	"fmt"
 	database "github.com/nikola43/ecoapigorm/database"
+	"github.com/nikola43/ecoapigorm/models"
 	"github.com/nikola43/ecoapigorm/models/promos"
-	"github.com/nikola43/ecoapigorm/utils"
 )
 
-func GetPromoByID(id uint) (*promos.Promo, error) {
-	promo := new(promos.Promo)
+func GetPromoByID(id uint) (*models.Promo, error) {
+	promo := new(models.Promo)
 
-	queryResult := database.GormDB.Where("id = ?", id).First(&promo)
-
-	return promo, queryResult.Error
-}
-func GetAllPromos() ([]promos.Promo, error) {
-	var list = make([]promos.Promo, 0)
-	result := database.GormDB.
-		Find(&list)
-
-	if result.Error != nil {
-		return nil, result.Error
+	err := database.GormDB.First(&promo, id).Error
+	if err != nil {
+		return nil, err
 	}
 
-	return list, result.Error
+	return promo, nil
 }
 
 func CreatePromoService(promoRequest *promos.CreatePromoRequest) (*promos.Promo, error) {
@@ -37,28 +27,25 @@ func CreatePromoService(promoRequest *promos.CreatePromoRequest) (*promos.Promo,
 		EndAt:    promoRequest.EndAt,
 	}
 
-	fmt.Println("CreatePromoRequest")
-	fmt.Println(promoRequest)
-
-	result := database.GormDB.Create(&newPromo)
-	if result.Error != nil {
-		return nil, result.Error
+	err := database.GormDB.Create(&promo).Error
+	if err != nil {
+		return nil, err
 	}
 
-	return &newPromo, result.Error
+	return promo, nil
 }
 
-func DeletePromoByID(promoID uint) error {
-	deletePromo := new(promos.Promo)
+func DeletePromoByID(id uint) error {
+	promo := new(models.Promo)
 
-	utils.GetModelByField(deletePromo, "id", promoID)
-	if deletePromo.ID < 1 {
-		return errors.New("promo not found")
+	err := database.GormDB.First(&promo, id).Error
+	if err != nil {
+		return err
 	}
 
-	result := database.GormDB.Delete(deletePromo)
-	if result.Error != nil {
-		return result.Error
+	err = database.GormDB.Delete(promo).Error
+	if err != nil {
+		return err
 	}
 
 	return nil

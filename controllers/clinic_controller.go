@@ -2,16 +2,15 @@ package controllers
 
 import (
 	"errors"
-	"fmt"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	database "github.com/nikola43/ecoapigorm/database"
 	"github.com/nikola43/ecoapigorm/models"
 	"github.com/nikola43/ecoapigorm/models/clients"
 	clinicModels "github.com/nikola43/ecoapigorm/models/clinic"
-	"github.com/nikola43/ecoapigorm/models/promos"
 	streamingModels "github.com/nikola43/ecoapigorm/models/streamings"
 	"github.com/nikola43/ecoapigorm/services"
+	"github.com/nikola43/ecoapigorm/utils"
 	"strconv"
 )
 
@@ -98,19 +97,14 @@ func CreateClinic(context *fiber.Ctx) error {
 }
 
 func GetClientsByClinicID(context *fiber.Ctx) error {
-	clientsList := make([]clients.ListClientResponse, 0)
-	var err error
-
 	clinicID, _ := strconv.ParseUint(context.Params("clinic_id"), 10, 64)
-	fmt.Println(clinicID)
-	if clientsList, err = services.GetClientsByClinicID(uint(clinicID))
-		err != nil {
-		return context.Status(fiber.StatusNotFound).JSON(&fiber.Map{
-			"error": "clinic not found",
-		})
-	} else {
-		return context.JSON(clientsList)
+
+	clientsList, err := services.GetClientsByClinicID(uint(clinicID))
+	if err != nil {
+		return utils.ReturnErrorResponse(fiber.StatusBadRequest, err, context)
 	}
+
+	return context.Status(fiber.StatusOK).JSON(clientsList)
 }
 
 func CreateClientFromClinic(context *fiber.Ctx) error {
@@ -176,7 +170,7 @@ func GetAllStreamingByClinicID(context *fiber.Ctx) error {
 
 func GetAllPromosByClinicID(context *fiber.Ctx) error {
 	id := context.Params("clinic_id")
-	promos := make([]promos.Promo, 0)
+	promos := make([]models.Promo, 0)
 	var err error
 
 	if promos, err = services.GetAllPromosByClinicID(id); err != nil {
@@ -222,7 +216,6 @@ func UpdateClinicByID(context *fiber.Ctx) error {
 
 }
 
-
 func UpdateCredits(context *fiber.Ctx) error {
 	clinic := new(models.Clinic)
 
@@ -243,7 +236,6 @@ func UpdateCredits(context *fiber.Ctx) error {
 	return context.JSON(updatedClinic)
 
 }
-
 
 func LinkClient(context *fiber.Ctx) error {
 	clinicID, _ := strconv.ParseUint(context.Params("clinic_id"), 10, 64)

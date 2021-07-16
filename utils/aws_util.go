@@ -30,22 +30,25 @@ func (awsClient *WasabiS3Client) DownloadObject(filekey string, filepath string)
 	if err != nil {
 		fmt.Println(err)
 	}
-	defer file.Close()
+	defer func() {
+		closeFileErr := file.Close()
+		if closeFileErr != nil {
+			fmt.Println(closeFileErr)
+		}
+	}()
 
 	downloader := s3manager.NewDownloader(awsClient.s3Session)
-	bytes, err := downloader.Download(file,
-		&s3.GetObjectInput{
-			Bucket: aws.String(GetEnvVariable("AWS_BUCKET_NAME")),
-			Key:    aws.String(filekey),
-		})
-	if err != nil {
-		fmt.Println(err)
+	downloadedBytes, downloadFileErr := downloader.Download(file, &s3.GetObjectInput{
+		Bucket: aws.String(GetEnvVariable("AWS_BUCKET_NAME")),
+		Key:    aws.String(filekey),
+	})
+	if downloadFileErr != nil {
+		fmt.Println(downloadFileErr)
 	}
-	fmt.Println(bytes)
+	fmt.Println(downloadedBytes)
 	return nil
 }
 func (awsClient *WasabiS3Client) UploadObject(bucketName, clinicName, filepath string, clientID string, tipo string) (string, int64, error) {
-
 	file, err := os.Open("./" + filepath)
 	if err != nil {
 		fmt.Printf("err opening file: %s", err)
@@ -116,6 +119,7 @@ func (awsClient *WasabiS3Client) CreateBucket(bucketName string) error {
 		ACL:    aws.String("public-read"),
 	})
 	fmt.Println(result)
+	fmt.Println(err)
 	return err
 }
 
@@ -199,9 +203,14 @@ func New(accessKey, secretKey, endpoint, bucketRegion string) *WasabiS3Client {
 		Region:           aws.String(bucketRegion),
 		S3ForcePathStyle: aws.Bool(true),
 	}
-	s3Session := session.New(s3Config)
-	awsManager.s3Client = s3.New(s3Session)
+	s3Session, err := session.NewSession(s3Config)
+	if err != nil {
+		panic(err)
+	}
 
+
+
+	awsManager.s3Client = s3.New(s3Session, s3Config)
 	awsManager.s3Session = s3Session
 	awsManager.s3BucketRegion = bucketRegion
 

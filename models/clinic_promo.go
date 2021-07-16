@@ -6,8 +6,8 @@ import (
 )
 
 type ClinicPromo struct {
-	ClinicID  uint `gorm:"primaryKey"`
-	PromoID   uint `gorm:"primaryKey"`
-	CreatedAt time.Time
-	DeletedAt gorm.DeletedAt
+	ClinicID  uint           `gorm:"primaryKey" json:"clinic_id"`
+	PromoID   uint           `gorm:"primaryKey" json:"promo_id"`
+	CreatedAt time.Time      `json:"created_at"`
+	DeletedAt gorm.DeletedAt `gorm:"index" json:"deleted_at"`
 }

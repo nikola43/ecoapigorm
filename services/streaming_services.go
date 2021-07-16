@@ -2,8 +2,8 @@ package services
 
 import (
 	"errors"
-	"fmt"
 	database "github.com/nikola43/ecoapigorm/database"
+	"github.com/nikola43/ecoapigorm/models"
 	streamings "github.com/nikola43/ecoapigorm/models/streamings"
 	"github.com/nikola43/ecoapigorm/utils"
 	"math/rand"
@@ -11,13 +11,11 @@ import (
 	"time"
 )
 
-func GetStreamingByCodeService(code string) (streamings.Streaming, error) {
-	var streaming = streamings.Streaming{}
+func GetStreamingByCodeService(code string) (*streamings.Streaming, error) {
+	streaming := new(streamings.Streaming)
 
-	if err := database.GormDB.Where("code = ?", code).
-		First(&streaming).Error;
-
-		err != nil {
+	err := database.GormDB.Where("code = ?", code).First(&streaming).Error
+	if err != nil {
 		return streaming, err
 	}
 
@@ -26,48 +24,74 @@ func GetStreamingByCodeService(code string) (streamings.Streaming, error) {
 
 func CreateStreaming(createStreamingRequest *streamings.CreateStreamingRequest) (*streamings.Streaming, error) {
 	streaming := &streamings.Streaming{}
+	client := new(models.Client)
 	code := ""
-	fmt.Println(createStreamingRequest)
+
+	err := database.GormDB.First(&client, createStreamingRequest.ClientID).Error
+	if err != nil {
+		return nil, err
+	}
+
+	err = database.GormDB.Where("url = ?", createStreamingRequest.Url).Find(&streaming).Error
+	if err != nil {
+		return nil, err
+	}
+	if streaming.ID > 0 {
+		return nil, errors.New("streaming already exist")
+	}
+
 	for ok := true; ok; ok = streaming.ID > 0 {
 		code = GenerateRandomCode(4)
-		database.GormDB.Where("code = ?", code).Find(&streaming)
+		err = database.GormDB.Where("code = ?", code).Find(&streaming).Error
+		if err != nil {
+			return nil, err
+		}
 	}
-	fmt.Println(code)
+
 	streaming.Url = createStreamingRequest.Url
 	streaming.ClientID = createStreamingRequest.ClientID
 	streaming.ClinicID = createStreamingRequest.ClinicID
 	streaming.Code = code
 
-	database.GormDB.Create(&streaming)
+	err = database.GormDB.Create(&streaming).Error
+	if err != nil {
+		return streaming, err
+	}
+	
+	sendEmailManager := utils.SendEmailManager{
+		ToEmail:               client.Email,
+		ToName:                client.Name,
+		Template:              "streaming_email.html",
+		Subject:               "Nuevo streaming disponible en mimatrona",
+	}
+	sendEmailManager.SendMail()
 
 	return streaming, nil
 }
 
 func GenerateRandomCode(length int) string {
-	var seededRand = rand.New(
-		rand.NewSource(time.Now().UnixNano()))
+	var seededRand = rand.New(rand.NewSource(time.Now().UnixNano()))
 	const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 	code := make([]byte, length)
+
 	for i := range code {
 		code[i] = charset[seededRand.Intn(len(charset))]
 	}
+
 	return strings.ToUpper(string(code))
 }
 
 func DeleteStreamingByID(streamingID uint) error {
-	deleteStreaming := new(streamings.Streaming)
+	streaming := new(streamings.Streaming)
 
-	// todo check clinic is who make action
-	// check if employee exist
-	utils.GetModelByField(deleteStreaming, "id", streamingID)
-	if deleteStreaming.ID < 1 {
-		return errors.New("streaming not found")
+	err := database.GormDB.First(&streaming, streamingID).Error
+	if err != nil {
+		return err
 	}
 
-	// delete employee
-	result := database.GormDB.Delete(deleteStreaming)
-	if result.Error != nil {
-		return result.Error
+	err = database.GormDB.Delete(streaming).Error
+	if err != nil {
+		return err
 	}
 
 	return nil
@@ -76,11 +100,15 @@ func DeleteStreamingByID(streamingID uint) error {
 func UpdateStreaming(updateStreaming *streamings.Streaming) (*streamings.Streaming, error) {
 	streaming := new(streamings.Streaming)
 
-	utils.GetModelByField(streaming, "id", updateStreaming.ID)
-	if streaming.ID < 1 {
-		return nil, errors.New("streaming not found")
+	err := database.GormDB.First(&streaming, updateStreaming.ID).Error
+	if err != nil {
+		return nil, err
 	}
 
-	database.GormDB.Model(&streaming).Update("url", updateStreaming.Url)
+	err = database.GormDB.Model(&streaming).Update("url", updateStreaming.Url).Error
+	if err != nil {
+		return nil, err
+	}
+
 	return streaming, nil
 }

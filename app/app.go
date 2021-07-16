@@ -6,45 +6,88 @@ import (
 	"github.com/antoniodipinto/ikisocket"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/joho/godotenv"
 	database "github.com/nikola43/ecoapigorm/database"
 	middlewares "github.com/nikola43/ecoapigorm/middleware"
 	"github.com/nikola43/ecoapigorm/routes"
-	"github.com/nikola43/ecoapigorm/socketinstance"
 	"github.com/nikola43/ecoapigorm/utils"
+	"github.com/nikola43/ecoapigorm/wasabis3manager"
+	"github.com/nikola43/ecoapigorm/websockets"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 	"log"
+	"os"
 )
 
 var httpServer *fiber.App
-var clients map[string]string
-
 
 type App struct {
 }
 
 func (a *App) Initialize(port string) {
+	// load .env file
+	err := godotenv.Load(".env")
+	if err != nil {
+		log.Fatalf("Error loading .env file")
+	}
+	PROD := os.Getenv("PROD")
+
+	MYSQL_USER := os.Getenv("MYSQL_USER")
+	MYSQL_PASSWORD := os.Getenv("MYSQL_PASSWORD")
+	MYSQL_DATABASE := os.Getenv("MYSQL_DATABASE")
+
+	S3_ACCESS_KEY := os.Getenv("S3_ACCESS_KEY")
+	S3_SECRET_KEY := os.Getenv("S3_SECRET_KEY")
+	S3_ENDPOINT := os.Getenv("S3_ENDPOINT")
+	S3_BUCKET_NAME := os.Getenv("S3_BUCKET_NAME")
+	S3_BUCKET_REGION := os.Getenv("S3_BUCKET_REGION")
+
+	X_API_KEY := os.Getenv("X_API_KEY")
+	FROM_EMAIL := os.Getenv("FROM_EMAIL")
+	FROM_EMAIL_PASSWORD := os.Getenv("FROM_EMAIL_PASSWORD")
+
+	if PROD == "1" {
+		MYSQL_USER = os.Getenv("MYSQL_USER_DEV")
+		MYSQL_PASSWORD = os.Getenv("MYSQL_PASSWORD_DEV")
+		MYSQL_DATABASE = os.Getenv("MYSQL_DATABASE_DEV")
+
+		S3_ACCESS_KEY = os.Getenv("S3_ACCESS_KEY_DEV")
+		S3_SECRET_KEY = os.Getenv("S3_SECRET_KEY_DEV")
+		S3_ENDPOINT = os.Getenv("S3_ENDPOINT_DEV")
+		S3_BUCKET_NAME = os.Getenv("S3_BUCKET_NAME_DEV")
+		S3_BUCKET_REGION = os.Getenv("S3_BUCKET_REGION_DEV")
+
+		X_API_KEY = os.Getenv("X_API_KEY_DEV")
+		FROM_EMAIL = os.Getenv("FROM_EMAIL_DEV")
+		FROM_EMAIL_PASSWORD = os.Getenv("FROM_EMAIL_PASSWORD_DEV")
+	}
+
+	fmt.Println(S3_ACCESS_KEY)
+	fmt.Println(S3_SECRET_KEY)
+	fmt.Println(S3_ENDPOINT)
+	fmt.Println(S3_BUCKET_NAME)
+	fmt.Println(S3_BUCKET_REGION)
+	fmt.Println(MYSQL_USER)
+	fmt.Println(MYSQL_PASSWORD)
+	fmt.Println(MYSQL_DATABASE)
+	fmt.Println(X_API_KEY)
+	fmt.Println(FROM_EMAIL)
+	fmt.Println(FROM_EMAIL_PASSWORD)
 
 	InitializeDatabase(
-		utils.GetEnvVariable("MYSQL_USER"),
-		utils.GetEnvVariable("MYSQL_PASSWORD"),
-		utils.GetEnvVariable("MYSQL_DATABASE"))
+		MYSQL_USER,
+		MYSQL_PASSWORD,
+		MYSQL_DATABASE)
 
-	//database.Migrate()
+	// database.Migrate()
 	//fakedatabase.CreateFakeData()
 
-	fmt.Println(utils.GetEnvVariable("AWS_ACCESS_KEY"))
-	fmt.Println(utils.GetEnvVariable("AWS_SECRET_KEY"))
-	fmt.Println(utils.GetEnvVariable("AWS_ENDPOINT"))
-	fmt.Println(utils.GetEnvVariable("AWS_BUCKET_NAME"))
-	fmt.Println(utils.GetEnvVariable("AWS_BUCKET_REGION"))
-	fmt.Println(utils.GetEnvVariable("MYSQL_USER"))
-	fmt.Println(utils.GetEnvVariable("MYSQL_PASSWORD"))
-	fmt.Println(utils.GetEnvVariable("MYSQL_DATABASE"))
-	fmt.Println(utils.GetEnvVariable("X_API_KEY"))
-	fmt.Println(utils.GetEnvVariable("FROM_EMAIL"))
-	fmt.Println(utils.GetEnvVariable("FROM_EMAIL_PASSWORD"))
+	wasabis3manager.WasabiS3Client = utils.New(
+		S3_ACCESS_KEY,
+		S3_SECRET_KEY,
+		S3_ENDPOINT,
+		S3_BUCKET_REGION)
 
 	InitializeHttpServer(port)
 }
@@ -62,7 +105,9 @@ func HandleRoutes(api fiber.Router) {
 	routes.CompanyRoutes(api)
 	routes.PromoRoutes(api)
 	routes.StreamingRoutes(api)
-	routes.MultimediaRoutes(api)
+	multimedia := api.Group("/multimedia")
+	routes.MultimediaClinicRoutes(multimedia)
+	routes.MultimediaClientRoutes(api)
 	routes.PaymentRoutes(api)
 }
 
@@ -73,7 +118,7 @@ func InitializeHttpServer(port string) {
 	httpServer.Use(middlewares.XApiKeyMiddleware)
 	httpServer.Use(cors.New(cors.Config{}))
 
-	ws := httpServer.Group("/ws")          // /api/v1
+	ws := httpServer.Group("/ws")
 
 	// Setup the middleware to retrieve the data sent in first GET request
 	ws.Use(middlewares.WebSocketUpgradeMiddleware)
@@ -83,7 +128,7 @@ func InitializeHttpServer(port string) {
 	setupSocketListeners()
 
 	ws.Get("/:id", ikisocket.New(func(kws *ikisocket.Websocket) {
-		socketinstance.SocketInstance = kws
+		websockets.SocketInstance = kws
 
 		// Retrieve the user id from endpoint
 		userId := kws.Params("id")
@@ -91,9 +136,7 @@ func InitializeHttpServer(port string) {
 		// Add the connection to the list of the connected clients
 		// The UUID is generated randomly and is the key that allow
 		// ikisocket to manage Emit/EmitTo/Broadcast
-		clients[userId] = kws.UUID
-
-		fmt.Println(clients[userId])
+		websockets.SocketClients[userId] = kws.UUID
 
 		// Every websocket connection has an optional session key => value storage
 		kws.SetAttribute("user_id", userId)
@@ -103,7 +146,6 @@ func InitializeHttpServer(port string) {
 		//Write welcome message
 		kws.Emit([]byte(fmt.Sprintf("Socket connected")))
 	}))
-
 
 	api := httpServer.Group("/api") // /api
 	v1 := api.Group("/v1")          // /api/v1
@@ -138,24 +180,20 @@ func InitializeDatabase(user, password, database_name string) {
 // pulled out main function
 func setupSocketListeners() {
 
-	// The key for the map is message.to
-	clients = make(map[string]string)
-
-
 	// Multiple event handling supported
 	ikisocket.On(ikisocket.EventConnect, func(ep *ikisocket.EventPayload) {
-		fmt.Println(fmt.Sprintf("Connection event 1 - User: %s", ep.Kws.GetStringAttribute("user_id")))
+		fmt.Println(fmt.Sprintf("Connection socket event - User: %s", ep.Kws.GetStringAttribute("user_id")))
 	})
 
 	// On message event
 	ikisocket.On(ikisocket.EventMessage, func(ep *ikisocket.EventPayload) {
-
+		fmt.Println(fmt.Sprintf("Message socket event - User: %s", ep.Kws.GetStringAttribute("user_id")))
 	})
 
 	// On disconnect event
 	ikisocket.On(ikisocket.EventDisconnect, func(ep *ikisocket.EventPayload) {
 		// Remove the user from the local clients
-		delete(clients, ep.Kws.GetStringAttribute("user_id"))
+		delete(websockets.SocketClients, ep.Kws.GetStringAttribute("user_id"))
 		fmt.Println(fmt.Sprintf("Disconnection event - User: %s", ep.Kws.GetStringAttribute("user_id")))
 	})
 
@@ -163,7 +201,7 @@ func setupSocketListeners() {
 	// This event is called when the server disconnects the user actively with .Close() method
 	ikisocket.On(ikisocket.EventClose, func(ep *ikisocket.EventPayload) {
 		// Remove the user from the local clients
-		delete(clients, ep.Kws.GetStringAttribute("user_id"))
+		delete(websockets.SocketClients, ep.Kws.GetStringAttribute("user_id"))
 		fmt.Println(fmt.Sprintf("Close event - User: %s", ep.Kws.GetStringAttribute("user_id")))
 	})
 

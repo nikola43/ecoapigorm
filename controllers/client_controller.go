@@ -3,8 +3,7 @@ package controllers
 import (
 	streamingModels "github.com/nikola43/ecoapigorm/models/streamings"
 	"github.com/nikola43/ecoapigorm/utils"
-	//"fmt"
-	"github.com/go-playground/validator/v10"
+
 	"github.com/gofiber/fiber/v2"
 
 	"github.com/nikola43/ecoapigorm/models"
@@ -13,6 +12,7 @@ import (
 	"strconv"
 	//"strings"
 )
+
 
 func NotifyClient(context *fiber.Ctx) error {
 	client := new(models.Client)
@@ -27,10 +27,11 @@ func NotifyClient(context *fiber.Ctx) error {
 	}
 
 	sendEmailManager := utils.SendEmailManager{
-		ToEmail:         client.Email,
+		ToEmail: client.Email,
+		Template: "notify.html",
+		Subject:  "Nuevo contenido disponible",
 	}
-
-	sendEmailManager.SendMail("notify.html", "Nuevo contenido disponible")
+	sendEmailManager.SendMail()
 
 	return context.Status(fiber.StatusOK).JSON(&fiber.Map{
 		"success": true,
@@ -170,43 +171,30 @@ func GetHeartbeatByClientAndClinicID(context *fiber.Ctx) error {
 
 func CreateClient(context *fiber.Ctx) error {
 	createClientFromAppRequest := new(modelsClient.CreateClientFromAppRequest)
-	createClientResponse := new(modelsClient.CreateClientResponse)
-	var err error
 
-	// parse request
-	if err = context.BodyParser(createClientFromAppRequest);
-		err != nil {
-		return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-			"error": err.Error(),
-		})
-	}
-
-	// validation ---------------------------------------------------------------------
-	v := validator.New()
-	err = v.Struct(createClientFromAppRequest)
+	err := utils.ParseAndValidate(context, createClientFromAppRequest)
 	if err != nil {
-		for _, e := range err.(validator.ValidationErrors) {
-			if e != nil {
-				return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-					"error": "validation_error: " + e.Field(),
-				})
-			}
-		}
-	}
-
-	// create and response
-	if createClientResponse, err = services.CreateClientFromApp(createClientFromAppRequest);
-		err != nil {
 		return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 			"error": err.Error(),
 		})
-	} else {
-		welcomeEmail := utils.SendEmailManager{ToEmail: createClientFromAppRequest.Email,
-			ToName: createClientFromAppRequest.Name,
-		}
-		welcomeEmail.SendMail("welcome.html", "Bienvenido "+createClientFromAppRequest.Name)
-		return context.JSON(createClientResponse)
 	}
+
+	createClientResponse, createClientFromAppErr := services.CreateClientFromApp(createClientFromAppRequest)
+	if createClientFromAppErr != nil {
+		return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+			"error": createClientFromAppErr.Error(),
+		})
+	}
+
+	welcomeEmail := utils.SendEmailManager{
+		ToEmail:  createClientFromAppRequest.Email,
+		ToName:   createClientFromAppRequest.Name,
+		Template: "welcome.html",
+		Subject:  "Bienvenido " + createClientFromAppRequest.Name,
+	}
+	welcomeEmail.SendMail()
+
+	return context.JSON(createClientResponse)
 }
 
 func IncrementDiskQuoteLevel(context *fiber.Ctx) error {

@@ -18,16 +18,20 @@ type SendEmailManager struct {
 	RecoveryToken         string
 	InvitationToken       string
 	RecoveryPasswordToken string
+	StreamingUrl string
+	StreamingCode string
+	Template string
+	Subject string
 }
 
-func (i SendEmailManager) SendMail(htmlTemplate string, subject string) {
+func (i SendEmailManager) SendMail() {
 	senderEmail := "mimatrona@stelast.com"
 	// senderEmail := GetEnvVariable("FROM_EMAIL")
 	// fromEmailPassword := GetEnvVariable("FROM_EMAIL")
 
-	t := template.New(htmlTemplate)
+	t := template.New(i.Template)
 	var err error
-	t, err = t.ParseFiles(htmlTemplate)
+	t, err = t.ParseFiles(i.Template)
 	if err != nil {
 		log.Println(err)
 	}
@@ -41,7 +45,7 @@ func (i SendEmailManager) SendMail(htmlTemplate string, subject string) {
 	m := gomail.NewMessage()
 	m.SetHeader("From", senderEmail)
 	m.SetHeader("To", i.ToEmail)
-	m.SetHeader("Subject", subject)
+	m.SetHeader("Subject", i.Subject)
 	m.SetBody("text/html", result)
 	//m.Attach("template.html")// attach whatever you want
 

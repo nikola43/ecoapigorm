@@ -21,6 +21,7 @@ func (n *CustomNullTime) UnmarshalJSON(b []byte) error {
 		n.Valid = false
 		return nil
 	}
+
 	err := json.Unmarshal(b, &n.Time)
 	if err == nil {
 		n.Valid = true

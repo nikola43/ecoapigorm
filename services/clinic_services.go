@@ -9,11 +9,11 @@ import (
 	"github.com/nikola43/ecoapigorm/models/clients"
 	clinicModels "github.com/nikola43/ecoapigorm/models/clinic"
 	_ "github.com/nikola43/ecoapigorm/models/employee"
-	"github.com/nikola43/ecoapigorm/models/promos"
 	streamingModels "github.com/nikola43/ecoapigorm/models/streamings"
 	"github.com/nikola43/ecoapigorm/utils"
 	_ "github.com/nikola43/ecoapigorm/utils"
 	"gorm.io/gorm"
+	"sort"
 )
 
 func CreateClinic(createClinicRequest *clinicModels.CreateClinicRequest) (*clinicModels.CreateClinicResponse, error) {
@@ -118,6 +118,10 @@ func GetClientsByClinicID(id uint) ([]clients.ListClientResponse, error) {
 		)
 	}
 
+	sort.Slice(list, func(i, j int) bool {
+		return list[j].CreatedAt.Before(list[i].CreatedAt)
+	})
+
 	return list, nil
 }
 
@@ -180,8 +184,8 @@ func CreateClientFromClinic(createClientRequest *clients.CreateClientRequest) (*
 	return listClientResponse, result.Error
 }
 
-func GetAllPromosByClinicID(clinicID string) ([]promos.Promo, error) {
-	promosList := make([]promos.Promo, 0)
+func GetAllPromosByClinicID(clinicID string) ([]models.Promo, error) {
+	promosList := make([]models.Promo, 0)
 
 	err := database.GormDB.Where("clinic_id = ?", clinicID).Find(&promosList)
 	if err.Error != nil {
@@ -191,8 +195,8 @@ func GetAllPromosByClinicID(clinicID string) ([]promos.Promo, error) {
 	return promosList, nil
 }
 
-func GetAllPromosForClient(clientId uint, clinicId uint) ([]promos.Promo, error) {
-	var promos = make([]promos.Promo, 0)
+func GetAllPromosForClient(clientId uint, clinicId uint) ([]models.Promo, error) {
+	var promos = make([]models.Promo, 0)
 	clinicClient := make([]models.ClinicClient, 0)
 
 	err := database.GormDB.
@@ -353,8 +357,8 @@ func DeleteClinicByID(clinicID uint) error {
 	return nil
 }
 
-func GetPromosByWeekAndClinicID(week, clinicID uint) ([]promos.Promo, error) {
-	var list = make([]promos.Promo, 0)
+func GetPromosByWeekAndClinicID(week, clinicID uint) ([]models.Promo, error) {
+	var list = make([]models.Promo, 0)
 	var result *gorm.DB
 
 	if week >= 1 && week <= 22 {

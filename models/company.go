@@ -9,5 +9,5 @@ type Company struct {
 	EmployeeID uint       `json:"employee_id"`
 	Name       string     `gorm:"type:varchar(32)" json:"name"`
 	Employees  []Employee `json:"employees"`
-	Clinics    []Clinic   `json:"clinics"`
+	Clinics  []Clinic `json:"clinics"`
 }

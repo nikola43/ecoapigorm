@@ -15,6 +15,6 @@ type ListClientResponse struct {
 	CreatedAt      time.Time           `json:"created_at" xml:"created_at" form:"created_at"`
 	PregnancyDate  base.CustomNullTime `json:"pregnancy_date" xml:"pregnancy_date"`
 	UsedSize       uint                `json:"used_size" xml:"used_size" form:"used_size"`
-	DiskQuoteLevel uint                `gorm:"type:INTEGER not null; DEFAULT:1" json:"disk_quote_level"`
-	ProfileColor          string      `json:"profile_color" xml:"profile_color" form:"profile_color"`
+	DiskQuoteLevel uint                `json:"disk_quote_level"`
+	ProfileColor   string              `json:"profile_color" xml:"profile_color" form:"profile_color"`
 }

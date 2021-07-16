@@ -4,7 +4,6 @@ import (
 	"github.com/gofiber/fiber/v2"
 	jwtware "github.com/gofiber/jwt/v2"
 	"github.com/nikola43/ecoapigorm/controllers"
-	"github.com/nikola43/ecoapigorm/middleware"
 	"github.com/nikola43/ecoapigorm/utils"
 )
 
@@ -12,8 +11,15 @@ func ClinicRoutes(router fiber.Router) {
 	// /api/v1/clinic
 	clinicRouter := router.Group("/clinic")
 
+	// /api/v1/clinic
+	clientRouter := router.Group("/client")
+
+
+	// /api/v1/clinic/:clinic_id/streamings
+	clinicRouter.Get("/:clinic_id/streamings", controllers.GetAllStreamingByClinicID)
+
 	// use jwt
-	clinicRouter.Use(jwtware.New(jwtware.Config{SigningKey: []byte(utils.GetEnvVariable("JWT_CLIENT_KEY"))}))
+	clinicRouter.Use(jwtware.New(jwtware.Config{SigningKey: []byte(utils.GetEnvVariable("JWT_EMPLOYEE_KEY"))}))
 
 	// /api/v1/clinic/:clinic_id/clients
 	clinicRouter.Get("/:clinic_id/clients", controllers.GetClientsByClinicID)
@@ -27,8 +33,7 @@ func ClinicRoutes(router fiber.Router) {
 	// /api/v1/clinic/:clinic_id/client/:client_email/exist | READ
 	clinicRouter.Get("/:clinic_id/client/:client_email/exist", controllers.GetClientClinicIDByEmail)
 
-	// /api/v1/clinic/:clinic_id/streamings
-	clinicRouter.Get("/:clinic_id/streamings", controllers.GetAllStreamingByClinicID)
+
 
 	// /api/v1/clinic/:clinic_id/promos
 	clinicRouter.Get("/:clinic_id/promos", controllers.GetAllPromosByClinicID)
@@ -53,7 +58,7 @@ func ClinicRoutes(router fiber.Router) {
 	clinicRouter.Get("/:clinic_id/credits", controllers.GetCreditsClinicById)
 
 	// check Employee.Role == 'admin'
-	clinicRouter.Use(middleware.AdminEmployeeMiddleware)
+	//clinicRouter.Use(middleware.AdminEmployeeMiddleware)
 
 	// /api/v1/clinic/create
 	clinicRouter.Post("/", controllers.CreateClinic)
@@ -69,4 +74,13 @@ func ClinicRoutes(router fiber.Router) {
 
 	// /api/v1/clinic/:clinic_id/:client_id/unassign
 	clinicRouter.Delete("/:clinic_id/:client_id/unassign", controllers.UnassignClientByID)
+
+	// /api/v1/client | CREATE
+	clientRouter.Post("/notify", controllers.NotifyClient)
+
+	// /api/v1/client/:client_email | READ
+	clientRouter.Post("/:client_id/increment_disk_quote_level", controllers.IncrementDiskQuoteLevel)
+
+	// /api/v1/client/:client_id | UPDATE
+	clientRouter.Patch("/:client_id", controllers.UpdateClient)
 }

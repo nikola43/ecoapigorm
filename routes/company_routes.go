@@ -10,25 +10,24 @@ import (
 
 func CompanyRoutes (router fiber.Router) {
 	// /api/v1/company
-	clinicRouter := router.Group("/company")
+	companyRouter := router.Group("/company")
 
-	clinicRouter.Get("/", controllers.GetCompanies)
 
 	// use jwt
-	clinicRouter.Use(jwtware.New(jwtware.Config{SigningKey: []byte(utils.GetEnvVariable("JWT_CLIENT_KEY"))}))
-
-	// /api/v1/company/:company_id/employees
-	clinicRouter.Get("/:company_id/employees", controllers.GetEmployeesByCompanyID)
+	companyRouter.Use(jwtware.New(jwtware.Config{SigningKey: []byte(utils.GetEnvVariable("JWT_EMPLOYEE_KEY"))}))
 
 	// check Employee.Role == 'admin'
-	clinicRouter.Use(middleware.AdminEmployeeMiddleware)
+	companyRouter.Use(middleware.AdminEmployeeMiddleware)
+
+	// /api/v1/company/:company_id/employees
+	companyRouter.Get("/:company_id/employees", controllers.GetEmployeesByCompanyID)
 
 	// /api/v1/company/create
-	clinicRouter.Post("/", controllers.CreateCompany)
+	companyRouter.Post("/", controllers.CreateCompany)
 
 	// /api/v1/company/:company_id
-	clinicRouter.Get("/:company_id", controllers.GetCompanyById)
+	companyRouter.Get("/:company_id", controllers.GetCompanyById)
 
 	// /api/v1/company/:company_id/clinics
-	clinicRouter.Get("/:company_id/clinics", controllers.GetClinicsByCompanyID)
+	companyRouter.Get("/:company_id/clinics", controllers.GetClinicsByCompanyID)
 }
