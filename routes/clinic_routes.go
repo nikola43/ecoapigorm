@@ -13,7 +13,7 @@ func ClinicRoutes(router fiber.Router) {
 
 	// /api/v1/clinic
 	clientRouter := router.Group("/client")
-
+ 
 	// /api/v1/client/:client_id | UPDATE
 	clientRouter.Patch("/:client_id", controllers.UpdateClient)
 
