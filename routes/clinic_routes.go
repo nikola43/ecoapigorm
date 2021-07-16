@@ -10,7 +10,7 @@ import (
 func ClinicRoutes(router fiber.Router) {
 	// /api/v1/clinic
 	clinicRouter := router.Group("/clinic")
-	
+
 	// /api/v1/clinic/:clinic_id/streamings
 	clinicRouter.Get("/:clinic_id/streamings", controllers.GetAllStreamingByClinicID)
 
@@ -69,10 +69,4 @@ func ClinicRoutes(router fiber.Router) {
 
 	// /api/v1/clinic/:clinic_id/:client_id/unassign
 	clinicRouter.Delete("/:clinic_id/:client_id/unassign", controllers.UnassignClientByID)
-
-	// /api/v1/client | CREATE
-	clientRouter.Post("/notify", controllers.NotifyClient)
-
-	// /api/v1/client/:client_email | READ
-	clientRouter.Post("/:client_id/increment_disk_quote_level", controllers.IncrementDiskQuoteLevel)
 }
