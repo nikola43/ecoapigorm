@@ -14,6 +14,9 @@ func ClinicRoutes(router fiber.Router) {
 	// /api/v1/clinic/:clinic_id/streamings
 	clinicRouter.Get("/:clinic_id/streamings", controllers.GetAllStreamingByClinicID)
 
+	// /api/v1/clinic/:clinic_id/promos/:week
+	clinicRouter.Get("/:clinic_id/promos/:week", controllers.GetPromosByWeekAndClinicID)
+
 	// use jwt
 	clinicRouter.Use(jwtware.New(jwtware.Config{SigningKey: []byte(utils.GetEnvVariable("JWT_EMPLOYEE_KEY"))}))
 
@@ -41,9 +44,6 @@ func ClinicRoutes(router fiber.Router) {
 
 	// /api/v1/clinic/:clinic_id/
 	clinicRouter.Delete("/:clinic_id", controllers.DeleteClinicByID)
-
-	// /api/v1/clinic/:clinic_id/promos/:week
-	clinicRouter.Get("/:clinic_id/promos/:week", controllers.GetPromosByWeekAndClinicID)
 
 	// /api/v1/clinic/:clinic_id/employees
 	clinicRouter.Get("/:clinic_id/employees", controllers.GetEmployeesByClinicID)
