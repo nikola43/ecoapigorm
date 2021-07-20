@@ -1,7 +1,7 @@
 package services
 
 import (
-	"errors"
+	errors "errors"
 	"fmt"
 	linq "github.com/ahmetb/go-linq/v3"
 	database "github.com/nikola43/ecoapigorm/database"
@@ -185,14 +185,17 @@ func CreateClientFromClinic(createClientRequest *clients.CreateClientRequest) (*
 }
 
 func GetAllPromosByClinicID(clinicID string) ([]models.Promo, error) {
-	promosList := make([]models.Promo, 0)
+	clinic := new(models.Clinic)
 
-	err := database.GormDB.Where("clinic_id = ?", clinicID).Find(&promosList)
-	if err.Error != nil {
-		return nil, err.Error
+	err := database.GormDB.
+		Preload("Promos").
+		First(&clinic, clinicID).Error
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
 	}
 
-	return promosList, nil
+	return clinic.Promos, nil
 }
 
 func GetAllPromosForClient(clientId uint, clinicId uint) ([]models.Promo, error) {

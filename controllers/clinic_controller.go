@@ -174,7 +174,7 @@ func GetAllPromosByClinicID(context *fiber.Ctx) error {
 	var err error
 
 	if promos, err = services.GetAllPromosByClinicID(id); err != nil {
-		return context.SendStatus(fiber.StatusInternalServerError)
+		return utils.ReturnErrorResponse(fiber.StatusNotFound, err, context)
 	}
 
 	return context.Status(fiber.StatusOK).JSON(promos)

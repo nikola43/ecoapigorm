@@ -31,6 +31,15 @@ func CreatePromoService(createPromoRequest *promos.CreatePromoRequest) (*models.
 		return nil, err
 	}
 
+	clinicPromo := new(models.ClinicPromo)
+	clinicPromo.PromoID = promo.ID
+	clinicPromo.ClinicID = createPromoRequest.ClinicID
+
+	err = database.GormDB.Create(&clinicPromo).Error
+	if err != nil {
+		return nil, err
+	}
+
 	return promo, nil
 }
 
