@@ -11,13 +11,6 @@ func ClinicRoutes(router fiber.Router) {
 	// /api/v1/clinic
 	clinicRouter := router.Group("/clinic")
 
-	// /api/v1/clinic
-	clientRouter := router.Group("/client")
-
-
-	// /api/v1/client/:client_id | UPDATE
-	clientRouter.Patch("/:client_id", controllers.UpdateClient)
-
 	// /api/v1/clinic/:clinic_id/streamings
 	clinicRouter.Get("/:clinic_id/streamings", controllers.GetAllStreamingByClinicID)
 
@@ -36,8 +29,7 @@ func ClinicRoutes(router fiber.Router) {
 	// /api/v1/clinic/:clinic_id/client/:client_email/exist | READ
 	clinicRouter.Get("/:clinic_id/client/:client_email/exist", controllers.GetClientClinicIDByEmail)
 
-
-
+	
 	// /api/v1/clinic/:clinic_id/promos
 	clinicRouter.Get("/:clinic_id/promos", controllers.GetAllPromosByClinicID)
 
@@ -77,11 +69,4 @@ func ClinicRoutes(router fiber.Router) {
 
 	// /api/v1/clinic/:clinic_id/:client_id/unassign
 	clinicRouter.Delete("/:clinic_id/:client_id/unassign", controllers.UnassignClientByID)
-
-	// /api/v1/client | CREATE
-	clientRouter.Post("/notify", controllers.NotifyClient)
-
-	// /api/v1/client/:client_email | READ
-	clientRouter.Post("/:client_id/increment_disk_quote_level", controllers.IncrementDiskQuoteLevel)
-
 }

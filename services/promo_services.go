@@ -17,20 +17,22 @@ func GetPromoByID(id uint) (*models.Promo, error) {
 	return promo, nil
 }
 
-func CreatePromoService(createPromoRequest *promos.CreatePromoRequest) (*models.Promo, error) {
-	promo := &models.Promo{
-		Title:    createPromoRequest.Title,
-		Text:     createPromoRequest.Text,
-		Week:     createPromoRequest.Week,
-		StartAt:  createPromoRequest.StartAt,
-		EndAt:    createPromoRequest.EndAt,
+func CreatePromoService(promoRequest *promos.CreatePromoRequest) (*promos.Promo, error) {
+	newPromo := promos.Promo{
+		Title:    promoRequest.Title,
+		Text:     promoRequest.Text,
+		Week:     promoRequest.Week,
+		ImageUrl: promoRequest.ImageUrl,
+		StartAt:  promoRequest.StartAt,
+		EndAt:    promoRequest.EndAt,
 	}
 
-	err := database.GormDB.Create(&promo).Error
+	err := database.GormDB.Create(&newPromo).Error
 	if err != nil {
 		return nil, err
 	}
 
+	return &newPromo, nil
 	clinicPromo := new(models.ClinicPromo)
 	clinicPromo.PromoID = promo.ID
 	clinicPromo.ClinicID = createPromoRequest.ClinicID
