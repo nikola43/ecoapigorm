@@ -18,7 +18,7 @@ func GetPromoByID(id uint) (*models.Promo, error) {
 }
 
 func CreatePromoService(promoRequest *promos.CreatePromoRequest) (*promos.Promo, error) {
-	newPromo := promos.Promo{
+	newPromo := &promos.Promo{
 		Title:    promoRequest.Title,
 		Text:     promoRequest.Text,
 		Week:     promoRequest.Week,
@@ -32,17 +32,17 @@ func CreatePromoService(promoRequest *promos.CreatePromoRequest) (*promos.Promo,
 		return nil, err
 	}
 
-	return &newPromo, nil
+
 	clinicPromo := new(models.ClinicPromo)
-	clinicPromo.PromoID = promo.ID
-	clinicPromo.ClinicID = createPromoRequest.ClinicID
+	clinicPromo.PromoID = newPromo.ID
+	clinicPromo.ClinicID = promoRequest.ClinicID
 
 	err = database.GormDB.Create(&clinicPromo).Error
 	if err != nil {
 		return nil, err
 	}
 
-	return promo, nil
+	return newPromo, nil
 }
 
 func DeletePromoByID(id uint) error {
