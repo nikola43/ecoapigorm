@@ -197,6 +197,8 @@ func GetAllPromosByClinicID(clinicID string) ([]models.Promo, error) {
 
 func GetAllPromosForClient(clientId uint, clinicId uint) ([]models.Promo, error) {
 	var promos = make([]models.Promo, 0)
+
+	/*
 	clinicClient := make([]models.ClinicClient, 0)
 
 	err := database.GormDB.
@@ -212,7 +214,9 @@ func GetAllPromosForClient(clientId uint, clinicId uint) ([]models.Promo, error)
 
 	// TODO Añadir week
 
-	err = database.GormDB.
+	*/
+
+	err := database.GormDB.
 		Where("clinic_id = ?", clinicId).
 		Find(&promos)
 	if err.Error != nil {

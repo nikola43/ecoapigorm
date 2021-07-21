@@ -21,6 +21,8 @@ func LoginClient(email, password string) (*models.LoginClientResponse, error) {
 		return nil, err
 	}
 
+	fmt.Println(client)
+
 	if !utils.ComparePasswords(client.Password, []byte(password)) {
 		return nil, errors.New("not found")
 	}

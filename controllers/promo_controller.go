@@ -39,14 +39,16 @@ func CreatePromo(context *fiber.Ctx) error {
 }
 func GetPromosForClientController(context *fiber.Ctx) error {
 	clinicID, _ := strconv.ParseUint(context.Params("clinic_id"), 10, 64)
+	/*
 	clientTokenClaims, err := utils.GetClientTokenClaims(context)
 	if err != nil {
 		return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 			"error": err.Error(),
 		})
 	}
+	*/
 
-	promos, err := services.GetAllPromosForClient(clientTokenClaims.ID, uint(clinicID))
+	promos, err := services.GetAllPromosForClient(0, uint(clinicID))
 	if err != nil {
 		return context.SendStatus(fiber.StatusInternalServerError)
 	}
