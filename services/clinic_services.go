@@ -199,7 +199,7 @@ func GetAllPromosByClinicID(clinicID string) ([]models.Promo, error) {
 }
 
 func GetAllPromosForClient(clientId uint, clinicId uint) ([]models.Promo, error) {
-	var promos = make([]models.Promo, 0)
+	clinic := new(models.Clinic)
 
 	/*
 	clinicClient := make([]models.ClinicClient, 0)
@@ -220,13 +220,13 @@ func GetAllPromosForClient(clientId uint, clinicId uint) ([]models.Promo, error)
 	*/
 
 	err := database.GormDB.
-		Where("clinic_id = ?", clinicId).
-		Find(&promos)
+		First(clinic, clinicId).
+		Preload("Promos")
 	if err.Error != nil {
 		return nil, err.Error
 	}
 
-	return promos, nil
+	return clinic.Promos, nil
 }
 
 func GetAllStreamingByClinicID(clinicID string) ([]streamingModels.Streaming, error) {
