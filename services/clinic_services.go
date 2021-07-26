@@ -113,7 +113,7 @@ func GetClientsByClinicID(id uint) ([]clients.ListClientResponse, error) {
 				PregnancyDate:  client.PregnancyDate,
 				UsedSize:       totalSize,
 				DiskQuoteLevel: listClinicClients[i].DiskQuoteLevel,
-				ProfileColor: client.ProfileColor,
+				ProfileColor:   client.ProfileColor,
 			},
 		)
 	}
@@ -184,7 +184,7 @@ func CreateClientFromClinic(createClientRequest *clients.CreateClientRequest) (*
 	return listClientResponse, result.Error
 }
 
-func GetAllPromosByClinicID(clinicID string) ([]models.Promo, error) {
+func GetAllPromosByClinicID(clinicID string) ([]*models.Promo, error) {
 	clinic := new(models.Clinic)
 
 	err := database.GormDB.
@@ -198,30 +198,30 @@ func GetAllPromosByClinicID(clinicID string) ([]models.Promo, error) {
 	return clinic.Promos, nil
 }
 
-func GetAllPromosForClient(clientId uint, clinicId uint) ([]models.Promo, error) {
+func GetAllPromosForClient(clientId uint, clinicId uint) ([]*models.Promo, error) {
 	clinic := new(models.Clinic)
 
 	/*
-	clinicClient := make([]models.ClinicClient, 0)
+		clinicClient := make([]models.ClinicClient, 0)
 
-	err := database.GormDB.
-		Where("client_id = ? AND clinic_id = ?", clientId, clinicId).
-		Find(&clinicClient)
-	if err.Error != nil {
-		return nil, err.Error
-	}
+		err := database.GormDB.
+			Where("client_id = ? AND clinic_id = ?", clientId, clinicId).
+			Find(&clinicClient)
+		if err.Error != nil {
+			return nil, err.Error
+		}
 
-	if len(clinicClient) == 0 {
-		return promos, nil
-	}
+		if len(clinicClient) == 0 {
+			return promos, nil
+		}
 
-	// TODO Añadir week
+		// TODO Añadir week
 
 	*/
 
 	err := database.GormDB.
-		First(clinic, clinicId).
-		Preload("Promos")
+		Preload("Promos").
+		First(clinic, clinicId)
 	if err.Error != nil {
 		return nil, err.Error
 	}

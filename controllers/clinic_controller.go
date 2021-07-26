@@ -170,10 +170,9 @@ func GetAllStreamingByClinicID(context *fiber.Ctx) error {
 
 func GetAllPromosByClinicID(context *fiber.Ctx) error {
 	id := context.Params("clinic_id")
-	promos := make([]models.Promo, 0)
-	var err error
 
-	if promos, err = services.GetAllPromosByClinicID(id); err != nil {
+	promos, err := services.GetAllPromosByClinicID(id)
+	if err != nil {
 		return utils.ReturnErrorResponse(fiber.StatusNotFound, err, context)
 	}
 

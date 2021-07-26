@@ -12,5 +12,5 @@ type Promo struct {
 	Week     uint     `json:"week"`
 	StartAt  string   `gorm:"type:varchar(128) not null" json:"start_at"`
 	EndAt    string   `gorm:"type:varchar(128) not null" json:"end_at"`
-	Clinics  []Clinic `gorm:"many2many:clinic_promos;" json:"clinics"`
+	Clinics  []*Clinic `gorm:"many2many:clinic_promos;" json:"clinics"`
 }

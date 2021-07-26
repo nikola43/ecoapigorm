@@ -16,7 +16,7 @@ type Clinic struct {
 	//ExtendCredits    bool              `gorm:"type:INTEGER not null; DEFAULT:0" json:"extent_credits"`
 	AvailableCredits uint       `gorm:"type:INTEGER not null; DEFAULT:0" json:"available_credits"`
 	UsedCredits      uint       `gorm:"type:INTEGER not null; DEFAULT:0" json:"used_credits"`
-	Clients          []Client   `gorm:"many2many:clinic_clients;" json:"clinic_clients"`
-	Promos           []Promo    `gorm:"many2many:clinic_promos;" json:"promos"`
+	Clients          []*Client   `gorm:"many2many:clinic_clients;" json:"clinic_clients"`
+	Promos           []*Promo    `gorm:"many2many:clinic_promos;" json:"promos"`
 	Employees        []Employee `json:"employees"`
 }

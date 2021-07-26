@@ -17,8 +17,8 @@ func GetPromoByID(id uint) (*models.Promo, error) {
 	return promo, nil
 }
 
-func CreatePromoService(promoRequest *promos.CreatePromoRequest) (*promos.Promo, error) {
-	newPromo := &promos.Promo{
+func CreatePromoService(promoRequest *promos.CreatePromoRequest) (*models.Promo, error) {
+	newPromo := &models.Promo{
 		Title:    promoRequest.Title,
 		Text:     promoRequest.Text,
 		Week:     promoRequest.Week,
