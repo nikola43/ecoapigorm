@@ -400,19 +400,27 @@ func GetFileType(file string, uploadMode uint) string {
 	extension := filepath.Ext(file)
 
 	if extension == ".jpg" ||
+		extension == ".JPG" ||
 		extension == ".jpeg" ||
-		extension == ".png" {
+		extension == ".JPEG" ||
+		extension == ".png" ||
+		extension == ".PNG" {
 		fileType = "image"
 	} else if extension == ".mp4" ||
+		extension == ".MP4" ||
 		extension == ".avi" ||
-		extension == ".mpg" {
+		extension == ".AVI" ||
+		extension == ".mpg" ||
+		extension == ".MPG" {
 		fileType = "video"
 
 		if uploadMode == 2 {
 			fileType = "holographic"
 		}
 	} else if extension == ".mp3" ||
-		extension == ".wav" {
+		extension == ".MP3" ||
+		extension == ".wav" ||
+		extension == ".WAV" {
 		fileType = "heartbeat"
 	} else {
 		fileType = ""
