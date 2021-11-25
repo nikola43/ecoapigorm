@@ -28,6 +28,14 @@ func CreateClientFromApp(createClientRequest *modelsClients.CreateClientFromAppR
 	}
 	result := database.GormDB.Create(&client)
 
+	// link to clinic if has clinic id on create request
+	if createClientRequest.ClinicID > 0 {
+		err := LinkClient(client.ID, createClientRequest.ClinicID)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	if result.Error != nil {
 		return nil, result.Error
 	}
@@ -227,8 +235,7 @@ func GetAllHolographicsByClientID(clientID string) ([]models.Holographic, error)
 
 	if err := database.GormDB.
 		Where("client_id = ?", clientID).
-		Find(&list).Error;
-		err != nil {
+		Find(&list).Error; err != nil {
 		return nil, err
 	}
 
@@ -240,8 +247,7 @@ func GetAllStreamingByClientID(clientID string) ([]streamingModels.Streaming, er
 
 	if err := database.GormDB.
 		Where("client_id = ?", clientID).
-		Find(&list).Error;
-		err != nil {
+		Find(&list).Error; err != nil {
 		return nil, err
 	}
 
@@ -253,8 +259,7 @@ func GetAllStreamingByClientANDClinicID(clientID string, clinicID string) ([]str
 
 	if err := database.GormDB.
 		Where("client_id = ? AND clinic_id = ?", clientID, clinicID).
-		Find(&list).Error;
-		err != nil {
+		Find(&list).Error; err != nil {
 		return nil, err
 	}
 
