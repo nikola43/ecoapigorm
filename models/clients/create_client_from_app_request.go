@@ -4,8 +4,10 @@ import (
 	"github.com/nikola43/ecoapigorm/models/base"
 )
 
+
 type CreateClientFromAppRequest struct {
 	Name          string              `json:"name" validate:"required"`
+	ClinicID      uint                `json:"clinic_id"`
 	LastName      string              `json:"last_name" validate:"required"`
 	Email         string              `json:"email" xml:"email" form:"email" validate:"required,email"`
 	Password      string              `json:"password" xml:"password" form:"password" validate:"required"`
