@@ -115,7 +115,7 @@ func InitializeHttpServer(port string) {
 	httpServer = fiber.New(fiber.Config{
 		BodyLimit: 2000 * 1024 * 1024, // this is the default limit of 4MB
 	})
-	httpServer.Use(middlewares.XApiKeyMiddleware)
+	//httpServer.Use(middlewares.XApiKeyMiddleware)
 	httpServer.Use(cors.New(cors.Config{}))
 
 	ws := httpServer.Group("/ws")
