@@ -21,8 +21,8 @@ func WebSocketUpgradeMiddleware(context *fiber.Ctx) error {
 }
 
 func XApiKeyMiddleware(context *fiber.Ctx) error {
-	requestApiKey := context.Get("X-API-KEY")
-	serverApiKey := utils.GetEnvVariable("X_API_KEY")
+	requestApiKey := context.Get("XAPIKEY")
+	serverApiKey := utils.GetEnvVariable("XAPIKEY")
 	fmt.Println("requestApiKey")
 	fmt.Println(requestApiKey)
 	fmt.Println("serverApiKey")

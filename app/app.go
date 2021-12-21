@@ -43,7 +43,7 @@ func (a *App) Initialize(port string) {
 	S3_BUCKET_NAME := os.Getenv("S3_BUCKET_NAME")
 	S3_BUCKET_REGION := os.Getenv("S3_BUCKET_REGION")
 
-	X_API_KEY := os.Getenv("X_API_KEY")
+	XAPIKEY := os.Getenv("XAPIKEY")
 	FROM_EMAIL := os.Getenv("FROM_EMAIL")
 	FROM_EMAIL_PASSWORD := os.Getenv("FROM_EMAIL_PASSWORD")
 
@@ -58,7 +58,7 @@ func (a *App) Initialize(port string) {
 		S3_BUCKET_NAME = os.Getenv("S3_BUCKET_NAME_DEV")
 		S3_BUCKET_REGION = os.Getenv("S3_BUCKET_REGION_DEV")
 
-		X_API_KEY = os.Getenv("X_API_KEY_DEV")
+		XAPIKEY = os.Getenv("XAPIKEYDEV")
 		FROM_EMAIL = os.Getenv("FROM_EMAIL_DEV")
 		FROM_EMAIL_PASSWORD = os.Getenv("FROM_EMAIL_PASSWORD_DEV")
 	}
@@ -71,7 +71,7 @@ func (a *App) Initialize(port string) {
 	fmt.Println(MYSQL_USER)
 	fmt.Println(MYSQL_PASSWORD)
 	fmt.Println(MYSQL_DATABASE)
-	fmt.Println(X_API_KEY)
+	fmt.Println(XAPIKEY)
 	fmt.Println(FROM_EMAIL)
 	fmt.Println(FROM_EMAIL_PASSWORD)
 
