@@ -2,16 +2,19 @@ package routes
 
 import (
 	"github.com/gofiber/fiber/v2"
-	jwtware "github.com/gofiber/jwt/v2"
+	jwtware "github.com/gofiber/jwt/v3"
 	"github.com/nikola43/ecoapigorm/controllers"
 	"github.com/nikola43/ecoapigorm/middleware"
 	"github.com/nikola43/ecoapigorm/utils"
 )
 
-func CompanyRoutes (router fiber.Router) {
+func CompanyRoutes(router fiber.Router) {
 	// /api/v1/company
 	companyRouter := router.Group("/company")
 
+	// todo review
+	// /api/v1/company/:company_id/clinics
+	companyRouter.Get("/:company_id/clinics", controllers.GetClinicsByCompanyID)
 
 	// use jwt
 	companyRouter.Use(jwtware.New(jwtware.Config{SigningKey: []byte(utils.GetEnvVariable("JWT_EMPLOYEE_KEY"))}))
@@ -29,5 +32,5 @@ func CompanyRoutes (router fiber.Router) {
 	companyRouter.Get("/:company_id", controllers.GetCompanyById)
 
 	// /api/v1/company/:company_id/clinics
-	companyRouter.Get("/:company_id/clinics", controllers.GetClinicsByCompanyID)
+	//companyRouter.Get("/:company_id/clinics", controllers.GetClinicsByCompanyID)
 }
