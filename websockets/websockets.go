@@ -13,11 +13,10 @@ type SocketEvent struct {
 	Data   interface{} `json:"data"`
 }
 
-
 var SocketInstance *ikisocket.Websocket
-var SocketClients map[string]string = make(map[string]string, 0)
+var SocketClients = make(map[string]string, 0)
 
-func  Emit(socketEvent SocketEvent, id uint) {
+func Emit(socketEvent SocketEvent, id uint) {
 	var socketClientId = strconv.FormatUint(uint64(id), 10)
 	if uuid, found := SocketClients[socketClientId]; found {
 		event, err := json.Marshal(socketEvent)

@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"errors"
+	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/websocket/v2"
 	"github.com/nikola43/ecoapigorm/models"
@@ -18,23 +19,21 @@ func WebSocketUpgradeMiddleware(context *fiber.Ctx) error {
 
 	return fiber.ErrUpgradeRequired
 }
-func XApiKeyMiddleware(context *fiber.Ctx) error {
-	// todo investigar por que no llega X_API_KEY
-	/*
-		requestApiKey := context.Get("X_API_KEY")
-		serverApiKey := utils.GetEnvVariable("X_API_KEY")
-		fmt.Println("requestApiKey")
-		fmt.Println(requestApiKey)
-		fmt.Println("serverApiKey")
-		fmt.Println(serverApiKey)
-		// context.h
 
-		if requestApiKey != serverApiKey {
-			return context.Status(fiber.StatusUnauthorized).JSON(&fiber.Map{
-				"error": "unauthorized",
-			})
-		}
-	*/
+func XApiKeyMiddleware(context *fiber.Ctx) error {
+	requestApiKey := context.Get("X-API-KEY")
+	serverApiKey := utils.GetEnvVariable("X_API_KEY")
+	fmt.Println("requestApiKey")
+	fmt.Println(requestApiKey)
+	fmt.Println("serverApiKey")
+	fmt.Println(serverApiKey)
+	// context.h
+
+	if requestApiKey != serverApiKey {
+		return context.Status(fiber.StatusUnauthorized).JSON(&fiber.Map{
+			"error": "unauthorized",
+		})
+	}
 
 	return context.Next()
 }
