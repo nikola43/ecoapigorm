@@ -116,7 +116,9 @@ func InitializeHttpServer(port string) {
 		BodyLimit: 2000 * 1024 * 1024, // this is the default limit of 4MB
 	})
 	//httpServer.Use(middlewares.XApiKeyMiddleware)
-	httpServer.Use(cors.New(cors.Config{}))
+	httpServer.Use(cors.New(cors.Config{
+		AllowOrigins: "https://panel.ecox.stelast.com",
+	}))
 
 	ws := httpServer.Group("/ws")
 
