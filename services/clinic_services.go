@@ -150,7 +150,7 @@ func CreateClientFromClinic(createClientRequest *clients.CreateClientRequest) (*
 
 	client = models.Client{
 		Email:         createClientRequest.Email,
-		Password:      utils.HashPassword([]byte("mimatrona")),
+		Password:      utils.HashPassword([]byte("ecox5d")),
 		Name:          createClientRequest.Name,
 		LastName:      createClientRequest.LastName,
 		PregnancyDate: createClientRequest.PregnancyDate,

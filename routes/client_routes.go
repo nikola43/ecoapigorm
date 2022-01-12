@@ -27,8 +27,12 @@ func ClientRoutes(router fiber.Router) {
 	// /api/v1/client | CREATE
 	clientRouter.Post("/notify", controllers.NotifyClient)
 
+	// todo mover a employee con token
 	// /api/v1/client/:client_email | READ
 	clientRouter.Post("/:client_id/increment_disk_quote_level", controllers.IncrementDiskQuoteLevel)
+
+	// /api/v1/client | CREATE
+	clientRouter.Post("/", controllers.CreateClient)
 
 	// use jwt
 	clientRouter.Use(jwtware.New(jwtware.Config{SigningKey: []byte(utils.GetEnvVariable("JWT_CLIENT_KEY"))}))
@@ -39,8 +43,4 @@ func ClientRoutes(router fiber.Router) {
 
 	// /api/v1/clinic/refresh
 	clientRouter.Get("/:client_id/refresh", controllers.RefreshClient)
-
-	// /api/v1/client | CREATE
-	clientRouter.Post("/", controllers.CreateClient)
-
 }
