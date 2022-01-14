@@ -8,7 +8,12 @@ import (
 	"github.com/nikola43/ecoapigorm/models"
 	"math"
 	"time"
+	"unicode"
 )
+
+func IsMn(r rune) bool {
+	return unicode.Is(unicode.Mn, r) // Mn: nonspacing marks
+}
 
 func GenerateClientToken(email string, clientId uint) (string, error) {
 	// Create token

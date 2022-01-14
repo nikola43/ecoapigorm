@@ -40,12 +40,15 @@ func (a *App) Initialize(port string) {
 	S3_ACCESS_KEY := os.Getenv("S3_ACCESS_KEY")
 	S3_SECRET_KEY := os.Getenv("S3_SECRET_KEY")
 	S3_ENDPOINT := os.Getenv("S3_ENDPOINT")
-	S3_BUCKET_NAME := os.Getenv("S3_BUCKET_NAME")
 	S3_BUCKET_REGION := os.Getenv("S3_BUCKET_REGION")
 
 	XAPIKEY := os.Getenv("XAPIKEY")
 	FROM_EMAIL := os.Getenv("FROM_EMAIL")
 	FROM_EMAIL_PASSWORD := os.Getenv("FROM_EMAIL_PASSWORD")
+
+	_ = XAPIKEY
+	_ = FROM_EMAIL
+	_ = FROM_EMAIL_PASSWORD
 
 	if PROD == "1" {
 		MYSQL_USER = os.Getenv("MYSQL_USER_DEV")
@@ -55,25 +58,12 @@ func (a *App) Initialize(port string) {
 		S3_ACCESS_KEY = os.Getenv("S3_ACCESS_KEY_DEV")
 		S3_SECRET_KEY = os.Getenv("S3_SECRET_KEY_DEV")
 		S3_ENDPOINT = os.Getenv("S3_ENDPOINT_DEV")
-		S3_BUCKET_NAME = os.Getenv("S3_BUCKET_NAME_DEV")
 		S3_BUCKET_REGION = os.Getenv("S3_BUCKET_REGION_DEV")
 
 		XAPIKEY = os.Getenv("XAPIKEYDEV")
 		FROM_EMAIL = os.Getenv("FROM_EMAIL_DEV")
 		FROM_EMAIL_PASSWORD = os.Getenv("FROM_EMAIL_PASSWORD_DEV")
 	}
-
-	fmt.Println(S3_ACCESS_KEY)
-	fmt.Println(S3_SECRET_KEY)
-	fmt.Println(S3_ENDPOINT)
-	fmt.Println(S3_BUCKET_NAME)
-	fmt.Println(S3_BUCKET_REGION)
-	fmt.Println(MYSQL_USER)
-	fmt.Println(MYSQL_PASSWORD)
-	fmt.Println(MYSQL_DATABASE)
-	fmt.Println(XAPIKEY)
-	fmt.Println(FROM_EMAIL)
-	fmt.Println(FROM_EMAIL_PASSWORD)
 
 	InitializeDatabase(
 		MYSQL_USER,
@@ -93,7 +83,7 @@ func (a *App) Initialize(port string) {
 }
 
 func HandleRoutes(api fiber.Router) {
-	//app.Use(middleware.Logger())
+	//api.Use(middleware.Logger())
 
 	routes.ClientRoutes(api)
 	routes.ClinicRoutes(api)
@@ -115,9 +105,15 @@ func InitializeHttpServer(port string) {
 	httpServer = fiber.New(fiber.Config{
 		BodyLimit: 2000 * 1024 * 1024, // this is the default limit of 4MB
 	})
+	/*
 	//httpServer.Use(middlewares.XApiKeyMiddleware)
 	httpServer.Use(cors.New(cors.Config{
 		AllowOrigins: "https://panel.ecox.stelast.com",
+	}))
+	*/
+
+	httpServer.Use(cors.New(cors.Config{
+		AllowOrigins: "*",
 	}))
 
 	ws := httpServer.Group("/ws")

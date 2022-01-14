@@ -8,6 +8,8 @@ import (
 	"github.com/nikola43/ecoapigorm/services"
 	"github.com/nikola43/ecoapigorm/utils"
 	"github.com/nikola43/ecoapigorm/wasabis3manager"
+	"golang.org/x/text/transform"
+	"golang.org/x/text/unicode/norm"
 	"os"
 	"strconv"
 	"strings"
@@ -104,6 +106,14 @@ func UploadMultimedia(context *fiber.Ctx) error {
 	}
 
 	bucketName := strings.ToLower(strings.ReplaceAll(company.Name, " ", ""))
+	b := make([]byte, len(bucketName))
+	t := transform.Chain(norm.NFD, transform.RemoveFunc(utils.IsMn), norm.NFC)
+	nDst, _, e := t.Transform(b, []byte(bucketName), true)
+	if e != nil {
+		fmt.Println(e)
+	}
+
+	bucketName = string(b[:nDst])
 
 	err = services.UploadMultimedia(
 		context,
