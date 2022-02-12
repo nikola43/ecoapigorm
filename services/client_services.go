@@ -2,6 +2,7 @@ package services
 
 import (
 	"errors"
+
 	database "github.com/nikola43/ecoapigorm/database"
 	"github.com/nikola43/ecoapigorm/models"
 	modelsClients "github.com/nikola43/ecoapigorm/models/clients"
@@ -53,6 +54,7 @@ func CreateClientFromApp(createClientRequest *modelsClients.CreateClientFromAppR
 		Phone:         client.Phone,
 		PregnancyDate: client.PregnancyDate,
 		Token:         token,
+		ClinicID:      createClientRequest.ClinicID,
 	}
 
 	return &createClientResponse, result.Error
