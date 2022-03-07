@@ -3,12 +3,6 @@ package services
 import (
 	"errors"
 	"fmt"
-	"github.com/gofiber/fiber/v2"
-	database "github.com/nikola43/ecoapigorm/database"
-	"github.com/nikola43/ecoapigorm/models"
-	"github.com/nikola43/ecoapigorm/utils"
-	"github.com/nikola43/ecoapigorm/wasabis3manager"
-	"github.com/nikola43/ecoapigorm/websockets"
 	"io/ioutil"
 	"log"
 	"mime/multipart"
@@ -16,6 +10,13 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/gofiber/fiber/v2"
+	database "github.com/nikola43/ecoapigorm/database"
+	"github.com/nikola43/ecoapigorm/models"
+	"github.com/nikola43/ecoapigorm/utils"
+	"github.com/nikola43/ecoapigorm/wasabis3manager"
+	"github.com/nikola43/ecoapigorm/websockets"
 )
 
 func UploadPromoImage(
@@ -88,7 +89,7 @@ func UploadMultimedia(
 		cleanFilename = cleanFilename + ".mp4"
 	}
 
-	url := "https://s3.eu-central-1.wasabisys.com/steleros/" + clinicName + "/" + clientIDString + "/" + fileType + "/" + cleanFilename
+	url := "https://s3.eu-central-1.wasabisys.com/ecoxespanha/" + clinicName + "/" + clientIDString + "/" + fileType + "/" + cleanFilename
 
 	//uploadedFilePath := ""
 	clientFolder := "./tempFiles/" + clinicName + "/" + clientIDString
