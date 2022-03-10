@@ -70,6 +70,15 @@ func UploadMultimedia(
 	clinicId uint,
 	employeeID uint) error {
 
+	fmt.Println(bucketName, "bucketName")	
+	fmt.Println(clinicName, "clinicName")
+	fmt.Println(clientID, "clientID")
+	fmt.Println(uploadedFile, "uploadedFile")
+	fmt.Println(uploadMode, "uploadMode")
+	fmt.Println(clinicId, "clinicId")
+	fmt.Println(bucketName, "bucketName")
+	fmt.Println(employeeID, "employeeID")
+
 	var insertedID uint
 
 	// sanitize file name
