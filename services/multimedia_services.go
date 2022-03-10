@@ -89,7 +89,7 @@ func UploadMultimedia(
 		cleanFilename = cleanFilename + ".mp4"
 	}
 
-	url := "https://s3.eu-central-1.wasabisys.com/ecoxportugal/" + clinicName + "/" + clientIDString + "/" + fileType + "/" + cleanFilename
+	url := "https://s3.eu-central-1.wasabisys.com/"+bucketName+"/" + clinicName + "/" + clientIDString + "/" + fileType + "/" + cleanFilename
 	fmt.Println(url)
 	//uploadedFilePath := ""
 	clientFolder := "./tempFiles/" + clinicName + "/" + clientIDString

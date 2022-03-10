@@ -48,6 +48,7 @@ func (awsClient *WasabiS3Client) DownloadObject(filekey string, filepath string)
 	fmt.Println(downloadedBytes)
 	return nil
 }
+
 func (awsClient *WasabiS3Client) UploadObject(bucketName, clinicName, filepath string, clientID string, tipo string) (string, int64, error) {
 	file, err := os.Open("./" + filepath)
 	if err != nil {
