@@ -2,7 +2,8 @@ package routes
 
 import (
 	"github.com/gofiber/fiber/v2"
-	jwtware "github.com/gofiber/jwt/v2"
+	jwtware "github.com/gofiber/jwt/v3"
+
 	"github.com/nikola43/ecoapigorm/controllers"
 	"github.com/nikola43/ecoapigorm/utils"
 )

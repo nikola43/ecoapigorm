@@ -98,10 +98,12 @@ func HandleRoutes(api fiber.Router) {
 	routes.StreamingRoutes(api)
 	multimedia := api.Group("/multimedia")
 
+	/*
 	multimedia.Use(cors.New(cors.Config{
 		AllowOrigins: "https://panel.ecox.stelast.com/dashboard, https://panel.ecox.stelast.com, https://panel.ecox.stelast.com/login, https://panel.ecox.stelast.com/forgot-password",
 		AllowHeaders:  "Origin, Content-Type, Accept, Authorization",
 	}))
+	*/
 
 	routes.MultimediaClinicRoutes(multimedia)
 	routes.MultimediaClientRoutes(api)
@@ -120,10 +122,9 @@ func InitializeHttpServer(port string) {
 	*/
 
 	httpServer.Use(jwtlogger.New())
-	httpServer.Use(cors.New(cors.Config{
-		AllowOrigins: "https://panel.ecox.stelast.com/dashboard, https://panel.ecox.stelast.com, https://panel.ecox.stelast.com/login, https://panel.ecox.stelast.com/forgot-password",
-		AllowHeaders:  "Origin, Content-Type, Accept, Authorization",
-	}))
+	
+	httpServer.Use(cors.New(cors.Config{}))
+	
 
 	ws := httpServer.Group("/ws")
 
