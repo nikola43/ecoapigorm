@@ -115,7 +115,7 @@ func InitializeHttpServer(port string) {
 
 	httpServer.Use(jwtlogger.New())
 	httpServer.Use(cors.New(cors.Config{
-		AllowOrigins: "https://panel.ecox.stelast.com/dashboard",
+		AllowOrigins: "https://panel.ecox.stelast.com/dashboard, https://panel.ecox.stelast.com, https://panel.ecox.stelast.com/login, https://panel.ecox.stelast.com/forgot-password",
 		AllowHeaders:  "Origin, Content-Type, Accept, Authorization",
 	}))
 
