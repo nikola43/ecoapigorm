@@ -3,6 +3,9 @@ package app
 import (
 	"database/sql"
 	"fmt"
+	"log"
+	"os"
+
 	"github.com/antoniodipinto/ikisocket"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -17,8 +20,6 @@ import (
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
-	"log"
-	"os"
 )
 
 var httpServer *fiber.App
@@ -98,12 +99,10 @@ func HandleRoutes(api fiber.Router) {
 	routes.StreamingRoutes(api)
 	multimedia := api.Group("/multimedia")
 
-	/*
 	multimedia.Use(cors.New(cors.Config{
 		AllowOrigins: "https://panel.ecox.stelast.com/dashboard, https://panel.ecox.stelast.com, https://panel.ecox.stelast.com/login, https://panel.ecox.stelast.com/forgot-password",
-		AllowHeaders:  "Origin, Content-Type, Accept, Authorization",
+		AllowHeaders: "Origin, Content-Type, Accept, Authorization",
 	}))
-	*/
 
 	routes.MultimediaClinicRoutes(multimedia)
 	routes.MultimediaClientRoutes(api)
@@ -115,16 +114,18 @@ func InitializeHttpServer(port string) {
 		BodyLimit: 2000 * 1024 * 1024, // this is the default limit of 4MB
 	})
 	/*
-	//httpServer.Use(middlewares.XApiKeyMiddleware)
-	httpServer.Use(cors.New(cors.Config{
-		AllowOrigins: "https://panel.ecox.stelast.com",
-	}))
+		//httpServer.Use(middlewares.XApiKeyMiddleware)
+		httpServer.Use(cors.New(cors.Config{
+			AllowOrigins: "https://panel.ecox.stelast.com",
+		}))
 	*/
 
 	httpServer.Use(jwtlogger.New())
-	
-	httpServer.Use(cors.New(cors.Config{}))
-	
+
+	httpServer.Use(cors.New(cors.Config{
+		AllowOrigins: "https://panel.ecox.stelast.com/dashboard, https://panel.ecox.stelast.com, https://panel.ecox.stelast.com/login, https://panel.ecox.stelast.com/forgot-password",
+		AllowHeaders: "Origin, Content-Type, Accept, Authorization",
+	}))
 
 	ws := httpServer.Group("/ws")
 
