@@ -6,6 +6,7 @@ import (
 	"github.com/antoniodipinto/ikisocket"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	jwtlogger "github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/joho/godotenv"
 	database "github.com/nikola43/ecoapigorm/database"
 	middlewares "github.com/nikola43/ecoapigorm/middleware"
@@ -112,10 +113,9 @@ func InitializeHttpServer(port string) {
 	}))
 	*/
 
-	httpServer.Use(cors.New(cors.Config{
-		AllowOrigins: "*",
-		AllowHeaders: "*",
-	}))
+	httpServer.Use(cors.New(cors.Config{}))
+
+	httpServer.Use(jwtlogger.New())
 
 	ws := httpServer.Group("/ws")
 
