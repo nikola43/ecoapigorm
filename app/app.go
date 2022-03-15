@@ -113,7 +113,8 @@ func InitializeHttpServer(port string) {
 	*/
 
 	httpServer.Use(cors.New(cors.Config{
-		AllowOrigins: "https://panel.ecox.stelast.com",
+		AllowOrigins: "*",
+		AllowHeaders: "*",
 	}))
 
 	ws := httpServer.Group("/ws")
