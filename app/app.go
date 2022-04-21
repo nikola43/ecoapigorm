@@ -7,7 +7,6 @@ import (
 	"os"
 
 	"github.com/antoniodipinto/ikisocket"
-	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	//jwtlogger "github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/joho/godotenv"
@@ -97,6 +96,7 @@ func HandleRoutes(api fiber.Router) {
 	routes.CompanyRoutes(api)
 	routes.PromoRoutes(api)
 	routes.StreamingRoutes(api)
+
 	multimedia := api.Group("/multimedia")
 	routes.MultimediaClinicRoutes(multimedia)
 	routes.MultimediaClientRoutes(api)
