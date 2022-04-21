@@ -6,6 +6,8 @@ import (
 	"github.com/nikola43/ecoapigorm/models"
 	"math"
 	"time"
+	"github.com/gofiber/fiber/v2"
+	"github.com/form3tech-oss/jwt-go"
 )
 
 func GenerateClientToken(email string, clientId uint) (string, error) {
