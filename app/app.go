@@ -9,7 +9,7 @@ import (
 	"github.com/antoniodipinto/ikisocket"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
-	jwtlogger "github.com/gofiber/fiber/v2/middleware/logger"
+	//jwtlogger "github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/joho/godotenv"
 	database "github.com/nikola43/ecoapigorm/database"
 	middlewares "github.com/nikola43/ecoapigorm/middleware"
@@ -98,12 +98,6 @@ func HandleRoutes(api fiber.Router) {
 	routes.PromoRoutes(api)
 	routes.StreamingRoutes(api)
 	multimedia := api.Group("/multimedia")
-
-	multimedia.Use(cors.New(cors.Config{
-		AllowOrigins: "https://panel.ecox.stelast.com/dashboard, https://panel.ecox.stelast.com, https://panel.ecox.stelast.com/login, https://panel.ecox.stelast.com/forgot-password",
-		AllowHeaders: "Origin, Content-Type, Accept, Authorization",
-	}))
-
 	routes.MultimediaClinicRoutes(multimedia)
 	routes.MultimediaClientRoutes(api)
 	routes.PaymentRoutes(api)
@@ -120,12 +114,8 @@ func InitializeHttpServer(port string) {
 		}))
 	*/
 
-	httpServer.Use(jwtlogger.New())
-
-	httpServer.Use(cors.New(cors.Config{
-		AllowOrigins: "https://panel.ecox.stelast.com/dashboard, https://panel.ecox.stelast.com, https://panel.ecox.stelast.com/login, https://panel.ecox.stelast.com/forgot-password",
-		AllowHeaders: "Origin, Content-Type, Accept, Authorization",
-	}))
+	//httpServer.Use(jwtlogger.New())
+	httpServer.Use(cors.New(cors.Config{}))
 
 	ws := httpServer.Group("/ws")
 

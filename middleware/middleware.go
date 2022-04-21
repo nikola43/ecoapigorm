@@ -60,6 +60,7 @@ func EmployeeEmployeeMiddleware(context *fiber.Ctx) error {
 	if employeeTokenClaims.Role != models.EMPLOYEE_ROLE {
 		return utils.ReturnErrorResponse(fiber.StatusUnauthorized, errors.New("user not is employee"), context)
 	}
+	fmt.Println("Exploy ok")
 
 	return context.Next()
 }

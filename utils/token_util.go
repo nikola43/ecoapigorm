@@ -3,20 +3,12 @@ package utils
 import (
 	"errors"
 	"fmt"
+	"github.com/form3tech-oss/jwt-go"
+	"github.com/gofiber/fiber/v2"
+	"github.com/nikola43/ecoapigorm/models"
 	"math"
 	"time"
-	"unicode"
-
-	_ "github.com/gofiber/jwt/v3"
-	"github.com/golang-jwt/jwt/v4"
-	"github.com/nikola43/ecoapigorm/models"
-
-	"github.com/gofiber/fiber/v2"
 )
-
-func IsMn(r rune) bool {
-	return unicode.Is(unicode.Mn, r) // Mn: nonspacing marks
-}
 
 func GenerateClientToken(email string, clientId uint) (string, error) {
 	// Create token
