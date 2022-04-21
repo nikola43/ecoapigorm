@@ -4,6 +4,7 @@ import (
 	jwtware "github.com/gofiber/jwt/v2"
 	"github.com/nikola43/ecoapigorm/controllers"
 	"github.com/nikola43/ecoapigorm/utils"
+	"github.com/gofiber/fiber/v2"
 )
 
 func UploadRoutes(uploadRouter fiber.Router) {
