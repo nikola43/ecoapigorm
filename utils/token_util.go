@@ -8,6 +8,7 @@ import (
 	"time"
 	"github.com/gofiber/fiber/v2"
 	"github.com/form3tech-oss/jwt-go"
+	"unicode"
 )
 
 func GenerateClientToken(email string, clientId uint) (string, error) {
@@ -174,4 +175,8 @@ func GeneratePasswordRecoveryToken(recoveryType string, id uint) (string, error)
 		return "", err
 	}
 	return tokenString, nil
+}
+
+func IsMn(r rune) bool {
+	return unicode.Is(unicode.Mn, r) // Mn: nonspacing marks
 }
