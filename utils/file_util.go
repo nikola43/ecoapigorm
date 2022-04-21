@@ -442,6 +442,8 @@ func ExtractThumbnailFromVideo(inFile string, outFile string) error {
 	if err != nil {
 		return err
 	}
+	fmt.Println(cmd)
+	fmt.Println(err)
 
 	return err
 }
