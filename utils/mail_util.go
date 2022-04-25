@@ -25,7 +25,7 @@ type SendEmailManager struct {
 }
 
 func (i SendEmailManager) SendMail() {
-	senderEmail := "mimatrona@stelast.com"
+	senderEmail := "ecox.server@stelast.es"
 	// senderEmail := GetEnvVariable("FROM_EMAIL")
 	// fromEmailPassword := GetEnvVariable("FROM_EMAIL")
 
@@ -49,7 +49,7 @@ func (i SendEmailManager) SendMail() {
 	m.SetBody("text/html", result)
 	//m.Attach("template.html")// attach whatever you want
 
-	d := gomail.NewDialer("ssl0.ovh.net", 465, "mimatrona@stelast.com", "T<NaRMT7}skS4jnQ")
+	d := gomail.NewDialer("send.one.com", 465, "ecox.server@stelast.es", "NRSeEKDHK7W6rwDc")
 
 	if err := d.DialAndSend(m); err != nil {
 		fmt.Println(err)
