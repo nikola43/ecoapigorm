@@ -6,6 +6,7 @@ import (
 	"gopkg.in/gomail.v2"
 	"html/template"
 	"log"
+	"crypto/tls"
 )
 
 type SendEmailManager struct {
@@ -49,7 +50,8 @@ func (i SendEmailManager) SendMail() {
 	m.SetBody("text/html", result)
 	//m.Attach("template.html")// attach whatever you want
 
-	d := gomail.NewDialer("send.one.com", 465, "ecox.server@stelast.es", "NRSeEKDHK7W6rwDc")
+	d := gomail.NewDialer("cph-ecox4d.customprofessionalhosting.com", 587, "enviosapp@ecox4d.com", "Ff86f?n0")
+	d.TLSConfig = &tls.Config{InsecureSkipVerify: true}
 
 	if err := d.DialAndSend(m); err != nil {
 		fmt.Println(err)
